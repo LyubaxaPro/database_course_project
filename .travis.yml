@@ -4,6 +4,6 @@ sudo: required    # for python 3.7: https://github.com/travis-ci/travis-ci/issue
 dist: xenial      # version of ubuntu to use 
 
 # Tell it the things it will need to install when it boots
-# install:
-#   - pip install -r requirements.txt
+install:
+  - pip install -r requirements.txt
 script: pytest 
