@@ -1,0 +1,9 @@
+language: python  # application is in python 
+python: "3.7"     # version of python 
+sudo: required    # for python 3.7: https://github.com/travis-ci/travis-ci/issues/9069#issuecomment-425720905
+dist: xenial      # version of ubuntu to use 
+
+# Tell it the things it will need to install when it boots
+install:
+  - pip install -r requirements.txt
+script: pytest 
