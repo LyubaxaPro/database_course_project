@@ -1,42 +1,3 @@
--- CREATE TABLE customers
--- (
---     NAME TEXT CHECK(NAME != ''),
--- 	SURNAME TEXT,
---     ID INTEGER CHECK(ID > 0)
--- );
-
--- INSERT INTO customers (name, surname, id) VALUES
---     ('Любовь', 'Прохорова', 1),
---     ('Дмитрий', 'Енин', 2),
--- 	('Дарья', 'Русинова', 3);
-
-
--- CREATE TABLE users
--- (
---     user_class_id
--- club_id
--- time
--- day_of_weekid INTEGER CHECK(user_id > 0) primary key
--- );
-
--- insert into users(user_id) values
--- (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15);
-
-
--- CREATE TABLE customers
--- (
---     NAME TEXT CHECK(NAME != ''),
--- 	SURNAME TEXT,
---     ID INTEGER CHECK(ID > 0),
--- 	user_id integer,
--- 	FOREIGN KEY (user_id) REFERENCES users(user_id)
--- );
-
--- INSERT INTO customers (name, surname, id, user_id) VALUES
---     ('Любовь', 'Прохорова', 1, 1),
---     ('Дмитрий', 'Енин', 2, 2),
--- 	('Дарья', 'Русинова', 4, 3);
-
 CREATE TABLE fitness_clubs
 (
     club_id integer primary key,
@@ -96,3 +57,36 @@ create table group_classes(
 );
 
 copy group_classes(class_id, class_name, duration, description) from '/home/lyubaxapro/database_course_project/database_data/group_classes.csv' with delimiter ',' header csv;
+
+create table instructors
+(   
+    instructor_id integer primary key,
+    user_id integer references users(user_id),
+    sex text,
+    name text, 
+    surname text, 
+    patronymic text, 
+    education text[],
+    experience integer,
+    achievements text[],
+    specialization text[]
+);
+
+copy group_classes(class_id, class_name, duration, description) from '/home/lyubaxapro/database_course_project/database_data/instructors.csv' with delimiter ',' header csv;
+
+create table customers
+(
+    customer_id integer primary key,
+    user_id integer references users(user_id),
+    sex text,
+    name text,
+    surname text,
+    patronymic text,
+    day_of_birth date,
+    measure jsonb,
+    tariff_id integer references prices(tariff_id), 
+    tariff_end_date date,
+    instructor_id integer  references instructors(instructor_id)
+);
+copy customers(customer_id, user_id, sex, name, surname, patronymic, day_of_birth, measure, tariff_id, tariff_end_date,
+instructor_id) from '/home/lyubaxapro/database_course_project/database_data/customers.csv' with delimiter ';' header csv;
