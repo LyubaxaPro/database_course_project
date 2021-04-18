@@ -90,3 +90,27 @@ create table customers
 );
 copy customers(customer_id, user_id, sex, name, surname, patronymic, day_of_birth, measure, tariff_id, tariff_end_date,
 instructor_id) from '/home/lyubaxapro/database_course_project/database_data/customers.csv' with delimiter ';' header csv;
+
+create table group_classes_shedule
+(
+    shedule_id integer primary key,
+    class_id integer references group_classes(class_id),
+    club_id integer references fitness_clubs(club_id),
+    instructor_id integer references instructors(instructor_id),
+    class_time time,
+    day_of_week text,
+    maximum_quantity integer
+);
+
+copy group_classes_shedule(shedule_id,class_id, club_id, instructor_id, class_time,
+day_of_week, maximum_quantity) from '/home/lyubaxapro/database_course_project/database_data/group_classes_shedule.csv' with delimiter ',' header csv;
+
+create table group_classes_customers_records
+(
+    record_id serial primary key,
+    shedule_id integer references group_classes_shedule(shedule_id), 
+    customer_id integer references customers(customer_id),
+    class_date date
+);
+
+copy group_classes_customers_records(shedule_id, customer_id, class_date) from '/home/lyubaxapro/database_course_project/database_data/group_classes_customers_records.csv' with delimiter ',' header csv;
