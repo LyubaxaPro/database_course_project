@@ -113,4 +113,38 @@ create table group_classes_customers_records
     class_date date
 );
 
-copy group_classes_customers_records(shedule_id, customer_id, class_date) from '/home/lyubaxapro/database_course_project/database_data/group_classes_customers_records.csv' with delimiter ',' header csv;
+copy group_classes_customers_records(shedule_id, customer_id, class_date) 
+from '/home/lyubaxapro/database_course_project/database_data/group_classes_customers_records.csv' with delimiter ',' header csv;
+
+create table special_offers
+(
+    offer_id integer primary key,
+    offer_name text,
+    offer_description text
+);
+
+copy special_offers(offer_id, offer_name, offer_description)
+from '/home/lyubaxapro/database_course_project/database_data/special_offers.csv' with delimiter ',' header csv;
+
+create table instructor_shedule
+(
+    i_shedule_id integer primary key,
+    instructor_id integer references instructors(instructor_id),
+    training_time time,
+    day_of_week text
+);
+
+copy instructor_shedule(i_shedule_id ,instructor_id ,training_time ,day_of_week)
+from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule.csv' with delimiter ',' header csv;
+
+
+create table instructor_shedule_customers
+(
+    record_id serial primary key,
+    customer_id integer references customers(customer_id),
+    i_shedule_id integer references instructor_shedule(i_shedule_id),
+    training_date date    
+);
+
+copy instructor_shedule_customers(customer_id, i_shedule_id, training_date)
+from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule_customers.csv' with delimiter ',' header csv;
