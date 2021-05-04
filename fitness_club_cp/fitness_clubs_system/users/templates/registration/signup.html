@@ -1,0 +1,31 @@
+<!-- templates/registration/signup.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Sign up as {{role}}</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ user_form.as_p }}
+  <br>
+  <br>
+  {{ profile_form.as_p }}
+  {% if profile_form.errors %}
+    {% for field in profile_form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in profile_form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+  {% endif %}
+  <br>
+  <br>
+  <button type="submit">Sign Up</button>
+</form>
+{% endblock %}

@@ -1,0 +1,4 @@
+[console_scripts]
+grun = runscript_gevent.cli:process_command_line
+run = runscript.cli:process_command_line
+

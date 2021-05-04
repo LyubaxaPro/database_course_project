@@ -72,7 +72,7 @@ create table instructors
     specialization text[]
 );
 
-copy group_classes(class_id, class_name, duration, description) from '/home/lyubaxapro/database_course_project/database_data/instructors.csv' with delimiter ',' header csv;
+copy instructors(instructor_id, user_id, sex, name, surname, patronymic, education, experience, achievements, specialization) from '/home/lyubaxapro/database_course_project/database_data/instructors.csv' with delimiter ',' header csv;
 
 create table customers
 (
