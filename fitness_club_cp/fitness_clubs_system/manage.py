@@ -3,6 +3,10 @@
 import os
 import sys
 
+# PROJECT_ROOT = os.path.dirname(__file__)
+# sys.path.append(os.path.join(PROJECT_ROOT, 'manager'))
+# sys.path.append(os.path.join(PROJECT_ROOT, 'fitness_clubs_system'))
+# sys.path.append(os.path.join(PROJECT_ROOT, 'users'))
 
 def main():
     """Run administrative tasks."""

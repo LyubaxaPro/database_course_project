@@ -7,7 +7,7 @@ aside {
     background: #181818;
     width: 20%;
     padding: 2.5%;
-    height: 100vh;
+    height: 200vh;
     color: #fff;
     border-right: 5px solid #4d4d4d;
 }
@@ -47,7 +47,6 @@ aside ul li:hover, aside ul a:hover {
 
 }
 
-
 main .features{
     float: left;
     color: #fff;
@@ -56,8 +55,38 @@ main .features{
     width: 75%;
 }
 
-main .features h1 {font-size: 50px;}
+main .features h1 {font-size: 50px; color: #eb5959;}
 main .features p {max-width: 400px; margin: 20px auto;}
+main .features ul {list-style: none;}
+main .features ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    size: 30px;
+}
+
+main .features ul li:hover, aside ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+main .features details summary:hover {
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+main .features details summary {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    size: 30px;
+    outline-style: none;
+}
 
 .alert-info{
     float: left;
@@ -72,3 +101,118 @@ form {
     width: 500px;
     margin-top: 50px;
 }
+
+/* ~~~~~~~~~~~~~~~ Таблица ~~~~~~~~~~~~~~*/
+
+table {
+    width: 100%;
+    border-collapse:separate;
+    border-spacing: 4px;
+    border-margin: 20px;
+}
+table thead tr {
+    color: #8785A2;
+    font-weight: bold;
+}
+table thead tr td {
+    border-radius: 4px 4px 0 0;
+    background: #FFCFDF;
+}
+table tbody tr td {
+    color: #8785A2;
+    border: 1px solid #C06C84;
+    border-radius: 4px;
+    background: #FFD3B6;
+}
+table tbody tr td:hover {
+    background: #FAE3D9;
+    transition-duration: 0.2s;
+}
+
+/* ~~~~~~~~~~~~~~~ Инструкторы ~~~~~~~~~~~~~~*/
+
+.instructors {
+    align-items: center;
+	list-style: none;
+	padding: 0;
+}
+
+.instructor-wrapper {
+	display: block;
+	width: 300px;
+	float: left;
+	padding: 20px;
+}
+
+.instructor-photo {
+	display: block;
+    width: 100%;
+}
+
+.instructor-photo img {
+	display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.instructor {
+	display: block;
+	border: 1px solid #b5e9a7;
+	border-radius: 3px;
+	position: relative;
+	background: #fff;
+	text-decoration: none;
+	color: #474747;
+}
+
+.instructor:hover .instructor-photo img {
+	transform: scale(1.05);
+}
+
+.instructor p {
+	position: relative;
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.4em;
+	height: 1.4em;
+	overflow: hidden;
+}
+
+.instructor a {
+	position: relative;
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.4em;
+	height: 1.4em;
+	overflow: hidden;
+	color: black
+}
+
+/* ~~~~~~~~~~~~~~~ Информация об инструкторе ~~~~~~~~~~~~~~*/
+
+.container img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.container h1 {
+  font-size: 50px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+.container p {
+  font-size: 18px;
+}
+
+/* ~~~~~~~~~~~~~~~ кнопка ~~~~~~~~~~~~~~*/
+button.knopka {
+    color: #fff;
+    background: #FFA500;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid #FF8247;
+}
+button.knopka:hover {
+    background: #FF6347;
+}
+
+

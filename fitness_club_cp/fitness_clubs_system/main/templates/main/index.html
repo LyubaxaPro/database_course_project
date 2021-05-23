@@ -1,15 +1,23 @@
 {% extends 'main/layout.html' %}
+{% load static %}
 
 {% block title %}
     {{ title }}
 {% endblock %}
 
 {% block content %}
+    <style>
+    .hideText {display: none; }
+    </style>
     <div class="features">
-        <h1>{{ title }}</h1>
-        <p>lskjdn ds;k ;doncdsjcn;skj sd;ojcsd;j;od coisdjoijsiodk ds;odns; ggg fd eklwf slkfn slkjdn dlksfn swkl lwsk slfkl slkld  e e e e e elkxn slfk sl kx l</p>
-        <button class="btn btn-warning">На страницу про нас</button>
+        <h1>{{ "Фитнес клуб Gold Owl Fitness" }}</h1>
+         <img src="{% static 'main/img/club_main.jpeg' %}", alt="Лого">
+
+<!--        <button class="btn btn-warning">На страницу про нас</button>-->
+
+<!--        <h1>{{ role }}</h1>-->
 
     </div>
+
 
 {% endblock %}

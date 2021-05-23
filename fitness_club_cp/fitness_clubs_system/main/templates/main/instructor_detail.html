@@ -1,0 +1,45 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+
+{% block title %}
+    Инструктор
+{% endblock %}
+
+{% block content %}
+<div class="features" >
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <img src={% static 'main/img/trener.jpg' %} >
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <h1>{{ instructor.surname }} {{ instructor.name }} {{ instructor.patronymic }}</h1>
+        <h2>Стаж {{instructor.experience}} {{ exp_str }}</h2>
+        <h2>Образование</h2>
+        <ul>
+          {% for i in education %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+
+        <h2>Достижения</h2>
+        <ul>
+          {% for i in achievements %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+
+        <h2>Специализация</h2>
+        <ul>
+          {% for i in specialization %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

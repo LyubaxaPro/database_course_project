@@ -15,16 +15,18 @@
 </head>
 <body>
     <aside>
-
-        <img src="{% static 'main/img/pic.svg' %}", alt="Лого">
-        <span class="logo">Gold Owl Fitness</span>
+<!--        <span class="logo">Gold Owl Fitness</span>-->
         <h3>Навигация</h3>
         <ul>
-            <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Главная</li></a>
-            <a href="{% url 'about' %}"><li><i class="fas fa-address-card"></i>Про нас</li></a>
-            <a href=""><li><i class="fas fa-paper-plane"></i>Контакты</li></a>
-            <a href="{% url 'login' %}"><li><i class="fas fa-home"></i>Вход</li></a>
-            <a href="{% url 'signup' %}"><li><i class="fas fa-home"></i>Регистрация</li></a>
+            <a href="{% url 'home' %}"><li><i class="fas fa-home"></i> Главная</li></a>
+            <a href="{% url 'address' %}"><li><i class="fa fa-map-marker"></i> Адреса</li></a>
+            <a href="{% url 'services' %}"><li><i class="fa fa-bicycle"></i> Услуги</li></a>
+            <a href="{% url 'groupclasses' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
+            <a href="{% url 'instructors' %}"><li><i class="fas fa-home"></i> Инструкторы</li></a>
+            <a href="{% url 'login' %}"><li><i class="fas fa-home"></i> Вход</li></a>
+            <a href="{% url 'signup' %}"><li><i class="fas fa-home"></i> Регистрация</li></a>
+            <a href="{% url 'logout' %}"><li><i class="fas fa-home"></i> Выход</li></a>
+
         </ul>
     </aside>
     <main>

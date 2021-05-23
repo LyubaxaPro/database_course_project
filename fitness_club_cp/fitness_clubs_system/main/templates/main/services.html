@@ -1,0 +1,19 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Услуги
+{% endblock %}
+
+{% block content %}
+        <div class="features">
+            <h1>Услуги</h1>
+
+            {% for i in services %}
+                <details>
+                <summary>{{ i.service_name }}</summary>
+                {{ i.service_description }}
+                </details>
+            {% endfor %}
+        </div>
+{% endblock %}
+

@@ -1,7 +1,14 @@
 from django.urls import path
-from . import views
+from .views import *
+
 
 urlpatterns = [
-    path('', views.index, name='home'),
-    path('about', views.about, name='about')
+    path('', index, name='home'),
+    path('address/', address, name='address'),
+    path('services/', services, name='services'),
+    path('groupclasses/', groupclasses, name='groupclasses'),
+    path('instructors/', instructors_list, name='instructors'),
+    path('<int:pk>/', instructor_detail, name='instructor_detail'),
+    path('get_club_schedule/', get_club_schedule, name='get_club_schedule'),
+    path('get_club_instructors/', get_club_instructors, name='get_club_instructors')
 ]

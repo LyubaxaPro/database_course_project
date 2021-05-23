@@ -1,9 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
 
@@ -12,7 +9,7 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, email, password, role=None, **extra_fields):
 
         if not email:
-            raise ValueError(_('The Email must be set'))
+            raise ValueError('The Email must be set')
 
         email = self.normalize_email(email)
         if not role: role = self.model.GUEST
@@ -30,20 +27,30 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
+            raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
+            raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email=email, password=password, role= role, **extra_fields)
 
 class FitnessClubs(models.Model):
+    CLUB_CHOICES = (
+        (1, "Москва, ул. Вильгельма Пика, вл14, 4 этаж (МФК «Хуамин»)"),
+        (2, "Москва, ул. Архитектора Власова, 22"),
+        (3, "Москва, Каширское шоссе, 61Г"),
+        (4, "Москва, ул. Климашкина, 17с2"),
+        (5, "Санкт-Петербург, Пулковское ш., 35, ТРК Масштаб"),
+        (6, "Санкт-Петербург, пл. Карла Фаберже, 8, литера Е"),
+        (7, "Санкт-Петербург, ул. Коллонтай, 31, литера А, корп.1"),
+        (8, "ул. Ю. Фучика, д. 90")
+    )
+
     club_id = models.IntegerField(primary_key=True)
-    address = models.TextField(unique=True, blank=True, null=True)
+    address = models.TextField(unique=True, blank=True, null=True, choices=CLUB_CHOICES)
     city = models.TextField(blank=True, null=True)
     phone = models.TextField(unique=True, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'fitness_clubs'
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -58,7 +65,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         (CUSTOMER, 'Пользователь'),
         (INSTRUCTOR, 'Тренер'),
         (ADMIN, 'Администратор'),
-        #(SUPERUSER, 'Пользователь с абсолютными правами')
+        (SUPERUSER, 'Пользователь с абсолютными правами')
     )
 
     CLUB_CHOICES = (
@@ -69,7 +76,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         (5, "Санкт-Петербург, Пулковское ш., 35, ТРК Масштаб"),
         (6, "Санкт-Петербург, пл. Карла Фаберже, 8, литера Е"),
         (7, "Санкт-Петербург, ул. Коллонтай, 31, литера А, корп.1"),
-        (8, "ул. Ю. Фучика, д. 90")
+        (8, "Казань, ул. Ю. Фучика, д. 90")
     )
 
     email = models.EmailField(verbose_name='email', unique=True)
@@ -79,9 +86,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     club = models.PositiveSmallIntegerField(verbose_name='Фитнес клуб',
                                                choices=CLUB_CHOICES, default=1)
     phone = models.CharField(verbose_name='Телефон', max_length=40)
-
-    # club = models.ForeignKey(FitnessClubs, verbose_name='Фитнес клуб',
-    #                                            choices=CLUB_CHOICES, on_delete=models.CASCADE)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -95,3 +99,4 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+

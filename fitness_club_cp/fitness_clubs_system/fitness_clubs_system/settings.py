@@ -37,9 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
-    'users'
-
+    'main.apps.MainConfig',
+    'users.apps.UsersConfig',
+    'manager.apps.ManagerConfig',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,9 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
+        'TEST': {
+            'NAME': 'superuser_role_connect'
+        }
     },
 
     'guest_role_connect': {
@@ -92,6 +96,9 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
+        'TEST': {
+            'NAME': 'superuser_role_connect'
+        }
     },
 
     'superuser_role_connect': {
@@ -101,6 +108,9 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
+        'TEST': {
+            'NAME': 'superuser_role_connect'
+        }
     },
 
     'instructor_role_connect': {
@@ -110,6 +120,9 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
+        'TEST': {
+            'NAME': 'superuser_role_connect'
+        }
     },
 
     'customer_role_connect': {
@@ -119,6 +132,9 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
+        'TEST': {
+            'NAME': 'superuser_role_connect'
+        }
     },
 
     'admin_role_connect': {
@@ -128,6 +144,9 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
+        'TEST': {
+            'NAME': 'superuser_role_connect'
+        }
     }
 }
 
@@ -155,7 +174,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'rus'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 

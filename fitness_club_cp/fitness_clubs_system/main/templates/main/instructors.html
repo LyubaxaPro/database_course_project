@@ -1,0 +1,72 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}
+  Инструкторы
+{% endblock %}
+
+
+{% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    function get_filtered_instructors(response) {
+        var result = ""
+        for (var i = 0; i < response.length; i++){
+
+        var pk = response[i]['pk'];
+
+        url_str = `<a target="_blank" href="{% url 'instructor_detail' 12345 %}">`.replace('12345', pk);
+
+            result += '<li class="instructor-wrapper">' +
+            '<div class="instructor-photo">' +
+            '<img src={% static 'main/img/trener.jpg' %}>' +
+            '</div>' + '<div  class="instructor">' +
+                url_str + response[i]['fields']['name'] + " " + response[i]['fields']['surname'] + '</a>' +
+            '</div>' + '</li>'
+        }
+        result += '</ul>'
+
+        $(".instructors").prepend(result);
+    }
+
+    $('.btn_get_clubs_instructors').on('click', function (e) {
+        e.preventDefault();
+        console.log('button clicked');
+
+        $.ajax({
+            type: 'GET',
+            url: '/get_club_instructors/?club_id=' + $('#id_address').val(),
+            success: function (result) {
+                $(".instructors").empty()
+                console.log(JSON.parse(result.filtered_instructors))
+                get_filtered_instructors(JSON.parse(result.filtered_instructors))
+            }
+        });
+    });
+});
+</script>
+<div class="features" >
+    <h1>Наша команда</h1>
+    <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn_get_clubs_instructors knopka">Показать расписание</button>
+    </form>
+
+    <ul class="instructors">
+      {% for instructor in instructors %}
+        <li class="instructor-wrapper">
+            <div class="instructor-photo">
+	          <img src={% static 'main/img/trener.jpg' %} >
+            </div>
+            <div  class="instructor">
+                <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">{{ instructor.name }} {{ instructor.surname}}</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+</div>
+{% endblock %}
