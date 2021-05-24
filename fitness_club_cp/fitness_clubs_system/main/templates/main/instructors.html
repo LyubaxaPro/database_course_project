@@ -18,10 +18,9 @@ $(document).ready(function () {
         var pk = response[i]['pk'];
 
         url_str = `<a target="_blank" href="{% url 'instructor_detail' 12345 %}">`.replace('12345', pk);
-
             result += '<li class="instructor-wrapper">' +
             '<div class="instructor-photo">' +
-            '<img src="{{ instructor.photo.url}}">' +
+            '<img src=' + '/media/' + response[i]['fields']['photo'] + '>' +
             '</div>' + '<div  class="instructor">' +
                 url_str + response[i]['fields']['name'] + " " + response[i]['fields']['surname'] + '</a>' +
             '</div>' + '</li>'
@@ -40,7 +39,6 @@ $(document).ready(function () {
             url: '/get_club_instructors/?club_id=' + $('#id_address').val(),
             success: function (result) {
                 $(".instructors").empty()
-                console.log(JSON.parse(result.filtered_instructors))
                 get_filtered_instructors(JSON.parse(result.filtered_instructors))
             }
         });

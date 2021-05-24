@@ -7,7 +7,9 @@ from django.template import loader
 import json
 from django.core import serializers
 
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository, GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository
+from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
+    GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository
+
 
 from .forms import *
 
@@ -107,12 +109,14 @@ def get_club_instructors(request):
         user_id_list.append(user.id)
 
     instructors = Instructors.objects.filter(user__in=user_id_list)
-
-    print(instructors)
-    print(club_id)
     instructors_json = serializers.serialize('json', list(instructors))
 
 
-    #print(instructors_json)
-
     return JsonResponse({'filtered_instructors': instructors_json}, safe=False)
+
+
+def prices(request):
+    special_offers = SpecialOffersRepository.read_all(request.user)
+    prices = PricesRepository.read_all(request.user)
+
+    return render(request, "main/prices.html", {'special_offers': special_offers, 'prices': prices})

@@ -1,0 +1,35 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Цены
+{% endblock %}
+
+{% block content %}
+        <div class="features">
+            <h1> Тарифы </h1>
+            <ul>
+                {% for price in prices %}
+                    <li>
+                        <h2>{{ price.tariff_name }}</h2>
+                        <p>{{ price.tariff_description}} </p>
+                        <h3>Цена</h3>
+                        <p>1 месяц {{ price.price_one_month }} руб.</p>
+                        <p>3 месяца {{ price.price_three_month }} руб.</p>
+                        <p>6 месяцев {{ price.price_six_month }} руб.</p>
+                        <p>12 месяцев {{ price.price_one_year }} руб.</p>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <h1> Специальные предложения </h1>
+            <ul>
+                {% for offer in special_offers %}
+                    <li>
+                        <h2>{{ offer.offer_name }}</h2>
+                        <p>{{ offer.offer_description}} </p>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+{% endblock %}
