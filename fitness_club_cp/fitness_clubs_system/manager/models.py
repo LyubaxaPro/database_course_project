@@ -12,7 +12,7 @@ class AdminRecords(models.Model):
         db_table = 'admin_records'
 
 class Customers(models.Model):
-    customer_id = models.IntegerField(unique=True)
+    customer_id = models.IntegerField(primary_key=True)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, unique=True)
     sex = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
@@ -23,6 +23,9 @@ class Customers(models.Model):
     tariff = models.ForeignKey('Prices', models.DO_NOTHING, blank=True, null=True)
     tariff_end_date = models.DateField(blank=True, null=True)
     instructor = models.ForeignKey('Instructors', models.DO_NOTHING, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.customer_id)
 
     class Meta:
         db_table = 'customers'

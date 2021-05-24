@@ -1,4 +1,3 @@
-<!--быстро прописать шаблон ! + tab-->
 {% load static %}
 
 <!doctype html>
@@ -15,18 +14,35 @@
 </head>
 <body>
     <aside>
-<!--        <span class="logo">Gold Owl Fitness</span>-->
         <h3>Навигация</h3>
         <ul>
+            {% if role.is_customer %}
+            <a href="{% url 'cutomer_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.customer.name }}</li></a>
+            {% endif %}
+
+            {% if role.is_instructor %}
+            <a href="{% url 'instructor_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.instructor.name }}</li></a>
+            {% endif %}
+
+            {% if role.is_admin %}
+            <a href="{% url 'admin_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль администратора</li></a>
+            {% endif %}
+
             <a href="{% url 'home' %}"><li><i class="fas fa-home"></i> Главная</li></a>
             <a href="{% url 'address' %}"><li><i class="fa fa-map-marker"></i> Адреса</li></a>
             <a href="{% url 'services' %}"><li><i class="fa fa-bicycle"></i> Услуги</li></a>
             <a href="{% url 'groupclasses' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
             <a href="{% url 'instructors' %}"><li><i class="fas fa-home"></i> Инструкторы</li></a>
             <a href="{% url 'prices' %}"><li><i class="fa fa-shopping-bag"></i> Цены </li></a>
+
+            {% if role.is_guest %}
             <a href="{% url 'login' %}"><li><i class="fas fa-home"></i> Вход</li></a>
             <a href="{% url 'signup' %}"><li><i class="fas fa-home"></i> Регистрация</li></a>
+            {% endif %}
+
+            {% if not role.is_guest %}
             <a href="{% url 'logout' %}"><li><i class="fas fa-home"></i> Выход</li></a>
+            {% endif %}
 
         </ul>
     </aside>

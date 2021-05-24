@@ -20,7 +20,6 @@ def run():
     users = read_from_file('/home/lyubaxapro/database_course_project/database_data/users.csv')
     for i in users:
         user = CustomUser.objects.create_user(email=i['email'], password=i['password'],role=i['role'], login=i['login'], phone=i['phone'], club=i['club_id'])
-    print("oao")
 
 if __name__ == '__main__':
     run()

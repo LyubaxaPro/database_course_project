@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    {{ title }}
+    {{ Профиль }}
 {% endblock %}
 
 {% block content %}
@@ -10,10 +10,10 @@
     .hideText {display: none; }
     </style>
     <div class="features">
-        <h1>{{ "Фитнес клуб Gold Owl Fitness" }}</h1>
-         <img src="{% static 'main/img/club_main.jpeg' %}", alt="Лого">
+        <h1> Профиль клиента</h1>
+        <b>ФИО</b> <p>{{role.customer.surname}} {{role.customer.name}} {{role.customer.patronymic}}</p>
+
 
     </div>
-
 
 {% endblock %}
