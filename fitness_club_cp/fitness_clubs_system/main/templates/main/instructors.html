@@ -21,7 +21,7 @@ $(document).ready(function () {
 
             result += '<li class="instructor-wrapper">' +
             '<div class="instructor-photo">' +
-            '<img src={% static 'main/img/trener.jpg' %}>' +
+            '<img src="{{ instructor.photo.url}}">' +
             '</div>' + '<div  class="instructor">' +
                 url_str + response[i]['fields']['name'] + " " + response[i]['fields']['surname'] + '</a>' +
             '</div>' + '</li>'
@@ -59,7 +59,7 @@ $(document).ready(function () {
       {% for instructor in instructors %}
         <li class="instructor-wrapper">
             <div class="instructor-photo">
-	          <img src={% static 'main/img/trener.jpg' %} >
+	          <img src="{{ instructor.photo.url}}">
             </div>
             <div  class="instructor">
                 <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">{{ instructor.name }} {{ instructor.surname}}</a>

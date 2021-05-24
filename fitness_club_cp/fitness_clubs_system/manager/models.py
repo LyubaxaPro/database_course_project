@@ -2,6 +2,7 @@ from django.db import models
 
 from users.models import CustomUser, FitnessClubs
 
+from django.contrib.postgres.fields import ArrayField
 
 class AdminRecords(models.Model):
     update_instructor = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -52,10 +53,14 @@ class Instructors(models.Model):
     name = models.TextField(blank=True, null=True)
     surname = models.TextField(blank=True, null=True)
     patronymic = models.TextField(blank=True, null=True)
-    education = models.TextField(blank=True, null=True)  # This field type is a guess.
+    education = ArrayField(models.TextField(blank=True, null=True))  # This field type is a guess.
     experience = models.IntegerField(blank=True, null=True)
-    achievements = models.TextField(blank=True, null=True)  # This field type is a guess.
-    specialization = models.TextField(blank=True, null=True)  # This field type is a guess.
+    achievements = ArrayField(models.TextField(blank=True, null=True))  # This field type is a guess.
+    specialization = ArrayField(models.TextField(blank=True, null=True))  # This field type is a guess.
+    photo = models.ImageField(upload_to='images/', null=True,  default= 'main/img/trener.jpg')
+
+    def __str__(self):
+        return str(self.instructor_id)
 
     class Meta:
         db_table = 'instructors'
