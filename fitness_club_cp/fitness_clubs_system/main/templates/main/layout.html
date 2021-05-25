@@ -17,15 +17,17 @@
         <h3>Навигация</h3>
         <ul>
             {% if role.is_customer %}
-            <a href="{% url 'cutomer_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.customer.name }}</li></a>
-            {% endif %}
+            <a href="{% url 'customer_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.customer.name }}</li></a>
 
-            {% if role.is_instructor %}
-            <a href="{% url 'instructor_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.instructor.name }}</li></a>
-            {% endif %}
+            {% else %}
+                {% if role.is_instructor %}
+                <a href="{% url 'instructor_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.instructor.name }}</li></a>
+                {% else %}
 
-            {% if role.is_admin %}
-            <a href="{% url 'admin_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль администратора</li></a>
+                    {% if role.is_admin %}
+                    <a href="{% url 'admin_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль администратора</li></a>
+                    {% endif %}
+                {% endif %}
             {% endif %}
 
             <a href="{% url 'home' %}"><li><i class="fas fa-home"></i> Главная</li></a>

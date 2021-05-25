@@ -50,7 +50,7 @@ aside ul li:hover, aside ul a:hover {
 main .features{
     float: left;
     color: #fff;
-    margin-top: 100px;
+    margin-top: 50px;
     text-align: center;
     width: 75%;
 }
@@ -87,6 +87,49 @@ main .features details summary {
     size: 30px;
     outline-style: none;
 }
+
+/* ~~~~~~~~~~~~~~~ Профиль ~~~~~~~~~~~~~~*/
+main .profile{
+    float: left;
+    color: #fff;
+    margin-top: 50px;
+    width: 75%;
+}
+
+main .profile h1 {font-size: 50px; color: #eb5959;}
+main .profile p {max-width: 1200px; margin: 20px auto;}
+main .profile ul {list-style: none;}
+main .profile ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    size: 30px;
+}
+
+main .profile ul li:hover, aside ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+main .profile details summary:hover {
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+main .profile details summary {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    size: 30px;
+    outline-style: none;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 .alert-info{
     float: left;
@@ -214,5 +257,6 @@ button.knopka {
 button.knopka:hover {
     background: #FF6347;
 }
+
 
 

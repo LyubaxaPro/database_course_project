@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'manager.apps.ManagerConfig',
     'django_filters',
+    'googlecharts'
 ]
 
 MIDDLEWARE = [

@@ -27,25 +27,25 @@ def get_role(request):
     is_guest = True
 
     if request.user.pk:
-        user = CustomUserRepository.read_filtered(request.user, {'email': CustomUserRepository.read_by_pk(request.user, request.user.pk)})
-        if user[0].role == 0:
+        user = CustomUserRepository.read_filtered(request.user, {'email': CustomUserRepository.read_by_pk(request.user, request.user.pk)})[0]
+        if user.role == 0:
             customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
             is_customer = True
             is_guest = False
-        elif user[0].role == 1:
+        elif user.role == 1:
             instructor = InstructorsRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
             is_instructor = True
             is_guest = False
-        elif user[0].role == 2 or user[0].role == 3:
+        elif user.role == 2 or user.role == 3:
             is_admin = True
             is_guest = False
 
-    return is_customer, customer, is_instructor, instructor, is_admin, is_guest
+    return is_customer, customer, is_instructor, instructor, is_admin, is_guest, user
 
 def get_role_json(request):
-    is_customer, customer, is_instructor, instructor, is_admin, is_guest = get_role(request)
+    is_customer, customer, is_instructor, instructor, is_admin, is_guest, user = get_role(request)
     return {'is_customer': is_customer, 'customer': customer, 'is_instructor': is_instructor, 'instructor': instructor,
-            'is_admin': is_admin, 'is_guest': is_guest}
+            'is_admin': is_admin, 'is_guest': is_guest, 'user': user}
 
 def index(request):
     data = {
@@ -151,12 +151,32 @@ def get_club_instructors(request):
 def prices(request):
     special_offers = SpecialOffersRepository.read_all(request.user)
     prices = PricesRepository.read_all(request.user)
+    role = get_role_json(request)
+    print(role)
 
     return render(request, "main/prices.html", {'special_offers': special_offers, 'prices': prices,
-                                                'role': get_role_json(request)})
+                                                'role': role})
 
-def cutomer_profile(request):
-    return render(request, "main/customer_profile.html", {'role': get_role_json(request)})
+# def customer_profile(request):
+#     role = get_role_json(request)
+#     # fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
+#     # address = fitness_club[0].city + ", " + fitness_club[0].address
+#
+#     print(role)
+#
+#     # measure = role['customer'].measure
+#     #
+#     # print(measure)
+#     return render(request, "main/customer_profile.html", {'role': role, 'address': "aaaa"})
+# def customer_profile(request):
+#     return render(request, "main/customer_profile.html", {'role': get_role_json(request)})
+
+def customer_profile(request):
+    role = get_role_json(request)
+    fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
+    address = fitness_club[0].city + ", " + fitness_club[0].address
+
+    return render(request, "main/customer_profile.html", {'role': get_role_json(request), 'address': address})
 
 def instructor_profile(request):
     return render(request, "main/instructor_profile.html", {'role': get_role_json(request)})

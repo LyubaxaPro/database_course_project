@@ -9,11 +9,15 @@
     <style>
     .hideText {display: none; }
     </style>
-    <div class="features">
-        <h1> Профиль клиента</h1>
-        <b>ФИО</b> <p>{{role.customer.surname}} {{role.customer.name}} {{role.customer.patronymic}}</p>
-
-
+    <div class="profile">
+    <p style="font-size:18px;"> <b>Фамилия Имя Отчество: </b> {{ role.customer.surname }} {{ role.customer.name }} {{ role.customer.patronymic}} </p>
+    <p style="font-size:18px;"> <b>Логин: </b> {{ role.user.login }} </p>
+    <p style="font-size:18px;"> <b>Дата рождения: </b> {{ role.customer.day_of_birth }} </p>
+    <p style="font-size:18px;"> <b>Email: </b> {{ role.user.email }} </p>
+    <p style="font-size:18px;"> <b>Телефон: </b> {{ role.user.phone }} </p>
+    <p style="font-size:18px;"> <b>Тариф: </b> {{ role.customer.tariff.tariff_name }} </p>
+    <p style="font-size:18px;"> <b>Дата окончания срока действия абонимента: </b> {{ role.customer.tariff_end_date }} </p>
+    <p style="font-size:18px;"> <b>Вы прикреплены к фитнес-клубу расположенному по адресу: </b> {{ address }} </p>
     </div>
 
 {% endblock %}
