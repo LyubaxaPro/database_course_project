@@ -10,14 +10,28 @@
     .hideText {display: none; }
     </style>
     <div class="profile">
-    <p style="font-size:18px;"> <b>Фамилия Имя Отчество: </b> {{ role.customer.surname }} {{ role.customer.name }} {{ role.customer.patronymic}} </p>
-    <p style="font-size:18px;"> <b>Логин: </b> {{ role.user.login }} </p>
-    <p style="font-size:18px;"> <b>Дата рождения: </b> {{ role.customer.day_of_birth }} </p>
-    <p style="font-size:18px;"> <b>Email: </b> {{ role.user.email }} </p>
-    <p style="font-size:18px;"> <b>Телефон: </b> {{ role.user.phone }} </p>
-    <p style="font-size:18px;"> <b>Тариф: </b> {{ role.customer.tariff.tariff_name }} </p>
-    <p style="font-size:18px;"> <b>Дата окончания срока действия абонимента: </b> {{ role.customer.tariff_end_date }} </p>
-    <p style="font-size:18px;"> <b>Вы прикреплены к фитнес-клубу расположенному по адресу: </b> {{ address }} </p>
+    <p><b>Фамилия Имя Отчество: </b> {{ role.customer.surname }} {{ role.customer.name }} {{ role.customer.patronymic}} </p>
+    <p><b>Логин: </b> {{ role.user.login }} </p>
+    <p><b>Дата рождения: </b> {{ role.customer.day_of_birth }} </p>
+    <p><b>Email: </b> {{ role.user.email }} </p>
+    <p><b>Телефон: </b> {{ role.user.phone }} </p>
+    <p><b>Тариф: </b> {{ role.customer.tariff.tariff_name }} </p>
+    <p><b>Дата окончания срока действия абонимента: </b> {{ role.customer.tariff_end_date }} </p>
+    <p><b>Вы прикреплены к фитнес-клубу расположенному по адресу: </b> {{ address }} </p>
+    <p><b>Рост: </b> {{ role.customer.height }} см.</p>
+
+    {% if chart %}
+        <p style="font-size:18px;"><b>Статистика прогресса( отслеживание веса): </b>
+        <div class="profile-graph">
+        <img src="data:image/png;base64, {{ chart|safe }}">
+        </div>
+    {% endif %}
+
     </div>
+
+
+
+
+
 
 {% endblock %}

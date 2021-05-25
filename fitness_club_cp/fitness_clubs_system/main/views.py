@@ -17,6 +17,7 @@ from .forms import *
 from users.models import FitnessClubs
 
 from manager.models import Instructors
+from .utils import get_plot
 
 def get_role(request):
     customer = None
@@ -25,6 +26,7 @@ def get_role(request):
     is_instructor = False
     is_admin = False
     is_guest = True
+    user = None
 
     if request.user.pk:
         user = CustomUserRepository.read_filtered(request.user, {'email': CustomUserRepository.read_by_pk(request.user, request.user.pk)})[0]
@@ -157,26 +159,17 @@ def prices(request):
     return render(request, "main/prices.html", {'special_offers': special_offers, 'prices': prices,
                                                 'role': role})
 
-# def customer_profile(request):
-#     role = get_role_json(request)
-#     # fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
-#     # address = fitness_club[0].city + ", " + fitness_club[0].address
-#
-#     print(role)
-#
-#     # measure = role['customer'].measure
-#     #
-#     # print(measure)
-#     return render(request, "main/customer_profile.html", {'role': role, 'address': "aaaa"})
-# def customer_profile(request):
-#     return render(request, "main/customer_profile.html", {'role': get_role_json(request)})
-
 def customer_profile(request):
     role = get_role_json(request)
     fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
     address = fitness_club[0].city + ", " + fitness_club[0].address
 
-    return render(request, "main/customer_profile.html", {'role': get_role_json(request), 'address': address})
+    x = role['customer'].measure_dates
+    y = role['customer'].measured_weights
+
+    chart = get_plot(x, y)
+
+    return render(request, "main/customer_profile.html", {'role': get_role_json(request), 'address': address, 'chart': chart})
 
 def instructor_profile(request):
     return render(request, "main/instructor_profile.html", {'role': get_role_json(request)})

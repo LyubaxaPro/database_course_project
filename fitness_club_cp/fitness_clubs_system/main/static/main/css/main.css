@@ -97,7 +97,8 @@ main .profile{
 }
 
 main .profile h1 {font-size: 50px; color: #eb5959;}
-main .profile p {max-width: 1200px; margin: 20px auto;}
+main .profile p {max-width: 1200px; margin: 20px auto;font-size:18px;}
+main .profile b {max-width: 1200px; margin: 20px auto;font-size:18px;color:#5F9EA0}
 main .profile ul {list-style: none;}
 main .profile ul li {
     color: #fff;
@@ -124,9 +125,22 @@ main .profile details summary {
     color: #fff;
     display: block;
     margin-top: 20px;
+    align: center;
     transition: transform .6s ease;
     size: 30px;
     outline-style: none;
+}
+
+main .profile-graph {
+	display: block;
+	width: 75%;
+}
+
+main .profile-graph img {
+    float: center;
+    display: block;
+    margin: 20px auto
+    width: 100%;
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

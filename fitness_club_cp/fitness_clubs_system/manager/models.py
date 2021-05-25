@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 from users.models import CustomUser, FitnessClubs
@@ -19,7 +21,9 @@ class Customers(models.Model):
     surname = models.TextField(blank=True, null=True)
     patronymic = models.TextField(blank=True, null=True)
     day_of_birth = models.DateField(blank=True, null=True)
-    measure = models.JSONField(blank=True, null=True)
+    height = models.IntegerField(blank=True, null=True, default=0)
+    measured_weights = ArrayField(models.IntegerField(blank=True, null=True, default=0), default=list())
+    measure_dates = ArrayField(models.DateField(blank=True, null=True, default=datetime.date.today), default=list())
     tariff = models.ForeignKey('Prices', models.DO_NOTHING, blank=True, null=True)
     tariff_end_date = models.DateField(blank=True, null=True)
     instructor = models.ForeignKey('Instructors', models.DO_NOTHING, blank=True, null=True)
