@@ -85,13 +85,16 @@ create table customers
     surname text,
     patronymic text,
     day_of_birth date,
-    measure jsonb,
+    height integer,
+    measured_weights integer[],
+    measure_dates date[],
     tariff_id integer references prices(tariff_id) ON DELETE CASCADE ON UPDATE CASCADE, 
     tariff_end_date date,
     instructor_id integer  references instructors(instructor_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
-copy customers(customer_id, user_id, sex, name, surname, patronymic, day_of_birth, measure, tariff_id, tariff_end_date,
-instructor_id) from '/home/lyubaxapro/database_course_project/database_data/customers.csv' with delimiter ';' header csv;
+copy customers(customer_id, user_id, sex, name, surname, patronymic, day_of_birth, height, measured_weights, measure_dates,
+               tariff_id, tariff_end_date,instructor_id) from '/home/lyubaxapro/database_course_project/database_data/customers.csv' with delimiter ';' header csv;
+
 
 create table group_classes_shedule
 (
@@ -172,4 +175,3 @@ from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule_
 -- from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule.csv' with delimiter ',' header csv;
 -- copy instructor_shedule_customers(customer_id, i_shedule_id, training_date)
 -- from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule_customers.csv' with delimiter ',' header csv;
-
