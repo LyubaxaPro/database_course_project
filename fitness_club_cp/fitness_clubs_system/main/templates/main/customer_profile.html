@@ -6,32 +6,89 @@
 {% endblock %}
 
 {% block content %}
-    <style>
-    .hideText {display: none; }
-    </style>
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+<!--  document.getElementById("post-form").reset()-->
+
+    function create_chart(response) {
+        var result =
+        '<p style="font-size:18px;"><b>График изменения веса </b>' +
+        '<div class="profile-graph">' +
+        '<img src="data:image/png;base64,' + response + '">' +
+        '</div>'
+        $(".chart_d").prepend(result);
+    }
+
+    $('.btn_add_measure').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_add_measure clicked');
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_measure/?weight=' + $('#id_weight').val() + '&date=' + $('#id_date').val(),
+            success: function (result) {
+                $(".chart_d").empty()
+                create_chart(result.chart)
+            },
+            error: function(error) {
+                alert("Error occured! :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_measure').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_measure clicked');
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_measure/',
+            success: function (result) {
+                $(".chart_d").empty()
+                create_chart(result.chart)
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+});
+</script>
     <div class="profile">
+    <h1>Профиль клиента</h1>
     <p><b>Фамилия Имя Отчество: </b> {{ role.customer.surname }} {{ role.customer.name }} {{ role.customer.patronymic}} </p>
     <p><b>Логин: </b> {{ role.user.login }} </p>
     <p><b>Дата рождения: </b> {{ role.customer.day_of_birth }} </p>
     <p><b>Email: </b> {{ role.user.email }} </p>
-    <p><b>Телефон: </b> {{ role.user.phone }} </p>
     <p><b>Тариф: </b> {{ role.customer.tariff.tariff_name }} </p>
     <p><b>Дата окончания срока действия абонимента: </b> {{ role.customer.tariff_end_date }} </p>
     <p><b>Вы прикреплены к фитнес-клубу расположенному по адресу: </b> {{ address }} </p>
-    <p><b>Рост: </b> {{ role.customer.height }} см.</p>
-
-    {% if chart %}
-        <p style="font-size:18px;"><b>Статистика прогресса( отслеживание веса): </b>
-        <div class="profile-graph">
-        <img src="data:image/png;base64, {{ chart|safe }}">
-        </div>
+    {% if role.customer.instructor == None %}
+        <p><b>У Вас нет ведушего тренера. </b> </p>
+        {% else %}
+            <p><b>Ваш ведущий тренер: </b> <a target="_blank" href="{% url 'instructor_detail' role.customer.instructor.pk %}">{{ role.customer.instructor.surname }} {{ role.customer.instructor.name }} {{ role.customer.instructor.patronymic }}</p>
+             </a>
     {% endif %}
+    <p><b>Рост: </b> {{ role.customer.height }} см.</p>
+    <br>
+    <p style="font-size:18px;"><a href="{% url 'edit_customer' %}">Редактировать личную информацию</a></p>
+    <br>
 
+        <div class="chart_d">
+        <p style="font-size:18px;"><b>График изменения веса </b>
+        <div class="profile-graph">
+        <img src="data:image/png;base64, {{ chart }}">
+        </div>
+        </div>
+
+        <label>Вес: </label><input style="margin:5px" type="number" id="id_weight" required placeholder="Введите вес в кг">
+        <label>Выбрать дату: </label><input style="margin:5px" type="date" id="id_date" max="{{ today }}" required placeholder="Введите дату взвешивания">
+        <button class="btn btn-success btn-icon btn_add_measure"> <span class="icon"><i class="fas fa-plus"></i></span>Добавить новое измерение </button>
+        <button class="btn btn-danger btn-icon btn_delete_measure"> <span class="icon"><i class="fas fa-trash"></i></span> Удалить последнее изменение </button>
     </div>
-
-
-
-
-
-
 {% endblock %}

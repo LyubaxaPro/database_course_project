@@ -85,7 +85,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         choices=ROLE_CHOICES, default=GUEST)
     club = models.PositiveSmallIntegerField(verbose_name='Фитнес клуб',
                                                choices=CLUB_CHOICES, default=1)
-    phone = models.CharField(verbose_name='Телефон', max_length=40)
+  #  phone = models.CharField(verbose_name='Телефон', max_length=40)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

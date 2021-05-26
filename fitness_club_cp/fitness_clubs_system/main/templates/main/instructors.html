@@ -14,16 +14,19 @@ $(document).ready(function () {
     function get_filtered_instructors(response) {
         var result = ""
         for (var i = 0; i < response.length; i++){
+            var pk = response[i]['pk'];
 
-        var pk = response[i]['pk'];
-
-        url_str = `<a target="_blank" href="{% url 'instructor_detail' 12345 %}">`.replace('12345', pk);
+            a_with_url = `<a target="_blank" href="{% url 'instructor_detail' 12345 %}">`.replace('12345', pk);
             result += '<li class="instructor-wrapper">' +
-            '<div class="instructor-photo">' +
-            '<img src=' + '/media/' + response[i]['fields']['photo'] + '>' +
-            '</div>' + '<div  class="instructor">' +
-                url_str + response[i]['fields']['name'] + " " + response[i]['fields']['surname'] + '</a>' +
-            '</div>' + '</li>'
+                a_with_url +
+                    '<div class="instructor-photo">' +
+                        '<img src=' + '/media/' + response[i]['fields']['photo'] + '>' +
+                    '</div>' +
+                    '<div class="instructor">' +
+                        '<p>' + response[i]['fields']['name'] + " " + response[i]['fields']['surname'] + '</p>'
+                    '</div>' +
+                '</a>' +
+                '</li>'
         }
         result += '</ul>'
 
@@ -40,6 +43,10 @@ $(document).ready(function () {
             success: function (result) {
                 $(".instructors").empty()
                 get_filtered_instructors(JSON.parse(result.filtered_instructors))
+            },
+            error: function(error) {
+                alert("Error occured! :(");
+                console.log(error);
             }
         });
     });
@@ -56,12 +63,15 @@ $(document).ready(function () {
     <ul class="instructors">
       {% for instructor in instructors %}
         <li class="instructor-wrapper">
-            <div class="instructor-photo">
-	          <img src="{{ instructor.photo.url}}">
-            </div>
-            <div  class="instructor">
-                <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">{{ instructor.name }} {{ instructor.surname}}</a>
-            </div>
+            <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">
+                <div class="instructor-photo">
+                  <img src="{{ instructor.photo.url}}">
+                </div>
+                <div  class="instructor">
+                    <p>{{ instructor.name }} {{ instructor.surname}}</p>
+    <!--                <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">{{ instructor.name }} {{ instructor.surname}}</a>-->
+                </div>
+            </a>
         </li>
         {% endfor %}
     </ul>

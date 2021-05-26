@@ -43,6 +43,10 @@ $(document).ready(function () {
             success: function (result) {
                 $(".table_body").empty()
                 create_table_body(result.classes_data)
+            },
+            error: function(error) {
+                alert("Error occured! :(");
+                console.log(error);
             }
         });
     });

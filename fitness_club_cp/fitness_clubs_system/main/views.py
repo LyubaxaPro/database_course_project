@@ -1,6 +1,7 @@
+import datetime
 import time
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.base import View
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import loader
@@ -100,7 +101,7 @@ def get_club_schedule(request):
     club_id = request.GET.get("club_id")
     classes_data = form_classes_data(request.user, club_id)
 
-    return JsonResponse({'classes_data': classes_data, 'role': get_role_json(request)}, safe=False)
+    return JsonResponse({'classes_data': classes_data}, safe=False)
 
 def groupclasses(request):
     classes_data = form_classes_data(request.user, 1)
@@ -169,10 +170,85 @@ def customer_profile(request):
 
     chart = get_plot(x, y)
 
-    return render(request, "main/customer_profile.html", {'role': get_role_json(request), 'address': address, 'chart': chart})
+    today = datetime.datetime.today().strftime('%Y-%m-%d')
+
+    return render(request, "main/customer_profile.html", {'role': get_role_json(request), 'address': address, 'chart': chart,
+                                                          'form':AddMeasureForm(),
+                                                          'today': today})
+
+
+def edit_customer_profile(request):
+    role = get_role_json(request)
+
+    if request.method == 'POST':
+
+        customer_form = CustomerProfileForm(request.POST, instance=role['customer'])
+        customer_form.actual_user = request.user
+
+        if customer_form.is_valid():
+            CustomersRepository.update_by_pk(request.user,
+                                          role['customer'].pk,
+                                          customer_form.cleaned_data)
+
+            return redirect('customer_profile')
+    else:
+        customer_form = CustomerProfileForm(instance=role['customer'])
+
+    return render(request, 'main/edit_customer.html', {'customer_form': customer_form, 'role': role})
+
+
+def add_measure(request):
+    weight = request.GET.get("weight")
+    date = request.GET.get("date")
+    print(date)
+
+    customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+    old_weights = customer.measured_weights
+    old_dates = customer.measure_dates
+
+    old_weights.append(int(weight))
+    old_dates.append(datetime.datetime.strptime(date, "%Y-%m-%d").date())
+
+    measure = []
+    for i in range(len(old_dates)):
+        measure.append((old_dates[i], old_weights[i]))
+
+    sorted_measure = sorted(measure)
+
+    new_weights = []
+    new_dates = []
+    for i in range(len(sorted_measure)):
+        new_dates.append(sorted_measure[i][0])
+        new_weights.append(sorted_measure[i][1])
+
+    CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': new_weights,
+                                                        'measure_dates': new_dates})
+    customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+
+    chart = get_plot(customer.measure_dates, customer.measured_weights)
+
+    return JsonResponse({'chart': chart}, safe=False)
+
+def delete_measure(request):
+    customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+    weights = customer.measured_weights
+    dates = customer.measure_dates
+
+    if len(dates) > 0:
+        dates.pop(len(dates) - 1)
+        weights.pop(len(dates) - 1)
+
+    CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': weights,
+                                                        'measure_dates': dates})
+    customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+
+    chart = get_plot(customer.measure_dates, customer.measured_weights)
+
+    return JsonResponse({'chart': chart}, safe=False)
 
 def instructor_profile(request):
     return render(request, "main/instructor_profile.html", {'role': get_role_json(request)})
 
 def admin_profile(request):
     return render(request, "main/admin_profile.html", {'role': get_role_json(request)})
+

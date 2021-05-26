@@ -14,5 +14,8 @@ urlpatterns = [
     path('prices/', prices, name='prices'),
     path('customer_profile/', customer_profile, name='customer_profile'),
     path('instructor_profile/', instructor_profile, name='instructor_profile'),
-    path('admin_profile/', admin_profile, name='admin_profile')
+    path('admin_profile/', admin_profile, name='admin_profile'),
+    path('edit_customer/', edit_customer_profile, name='edit_customer'),
+    path('add_measure/', add_measure, name='add_measure'),
+    path('delete_measure/', delete_measure, name='delete_measure'),
 ]
