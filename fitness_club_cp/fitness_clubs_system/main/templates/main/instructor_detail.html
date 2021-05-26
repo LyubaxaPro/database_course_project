@@ -40,6 +40,44 @@
       </div>
     </div>
   </div>
+    <h2>Ведет занятия в фитнес-клубе по адресу {{ address }}</h2>
+  <h1>Расписание</h1>
+
+        <table>
+          <thead>
+            <tr>
+              <td>Время</td>
+              <td>Понедельник</td>
+              <td>Вторник</td>
+              <td>Среда</td>
+              <td>Четверг</td>
+              <td>Пятница</td>
+              <td>Суббота</td>
+              <td>Воскресенье</td>
+
+            </tr>
+          </thead>
+          <tbody class="table_body">
+
+          {% for time, tdata in shedule.items %}
+            <tr>
+                <td> {{ time }}</td>
+                {% for day, value in tdata.items %}
+
+                    {% if value|length == 0  %}
+                        <td> - </td>
+                    {% else %}
+                        <td>
+                        Занятие
+                        </td>
+
+                    {% endif %}
+                {% endfor %}
+            </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
 </div>
 {% endblock %}
 

@@ -10,7 +10,7 @@ from django.core import serializers
 
 from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
     GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository
+    CustomersRepository, InstructorSheduleRepository
 
 
 from .forms import *
@@ -76,9 +76,6 @@ def services(request):
 
 def form_classes_data(user, club_id):
     classes = GroupClassesSheduleRepository.read_filtered(user, {"club_id" : int(club_id)})
-    print(club_id)
-   # print(classes)
-
 
     classes_data = {}
     seconds = 32400
@@ -96,6 +93,23 @@ def form_classes_data(user, club_id):
                                                                                           "class_name": current_class.class_field.class_name})
     print(classes_data)
     return classes_data
+
+def form_instructors_shedule(user, instructor_id):
+    shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
+    training_data = {}
+    seconds = 32400
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    for i in range(9, 21):
+        data = {}
+        for day in days:
+            data.update({day: []})
+        training_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
+        seconds += 3600
+
+    for current_shed  in shedule:
+        training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week].append(True)
+    print(training_data)
+    return training_data
 
 def get_club_schedule(request):
     club_id = request.GET.get("club_id")
@@ -122,20 +136,27 @@ def instructor_detail(request, pk):
     education = list(map(lambda x: x.strip("'"), instructor.education))
     achievements = list(map(lambda x: x.strip("'"), instructor.achievements))
     specialization = list(map(lambda x: x.strip("'"), instructor.specialization))
-
+    instructor_shedule = form_instructors_shedule(request.user, instructor.instructor_id)
 
     exp_str = "лет"
     if instructor.experience % 10 == 1 and instructor.experience != 11:
         exp_str = "год"
     elif instructor.experience % 10 in [2, 3, 4] and instructor.experience not in [12, 13, 14]:
         exp_str = "года"
+
+    user = CustomUserRepository.read_filtered(request.user, {'id': instructor.user_id})
+
+    fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': user[0].club})
+    address = fitness_club[0].city + ", " + fitness_club[0].address
+
     return render(request, 'main/instructor_detail.html', {'instructor' : instructor,
                                                            'education' : education,
                                                            'achievements' : achievements,
                                                            'specialization' : specialization,
                                                            'exp_str' : exp_str,
-                                                           'role': get_role_json(request)})
-
+                                                           'role': get_role_json(request),
+                                                           'shedule': instructor_shedule,
+                                                           'address': address})
 
 def get_club_instructors(request):
     club_id = request.GET.get("club_id")
