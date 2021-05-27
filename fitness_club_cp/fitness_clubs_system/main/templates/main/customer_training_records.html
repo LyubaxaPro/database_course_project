@@ -1,0 +1,87 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Записи
+{% endblock %}
+
+{% block content %}
+        <div class="features">
+
+            <details>
+            <summary style="color:#E9967A;">Прошедшие групповые занятия</summary>
+               {% if pass_group_classes|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет прошедших групповых занятий </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for class in pass_group_classes %}
+                    <li>
+                        <p>{{ class.class_name }} {{ class.day_of_week }} {{ class.date }} {{ class.time }}</p>
+                    </li>
+                {% endfor %}
+                </ul>
+            </details>
+
+            <details>
+            <summary style="color:#E9967A;">Запланированные групповые занятия</summary>
+               {% if future_group_classes|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет запланированных групповых занятий </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for class in future_group_classes %}
+                    <li>
+                        <p>{{ class.class_name }} {{ class.day_of_week }} {{ class.date }} {{ class.time }} </p>
+                    </li>
+                {% endfor %}
+                </ul>
+            </details>
+
+            <details>
+            <summary style="color:#E9967A;">Прошедшие персональные тренировки</summary>
+                {% if pass_personal_trainings|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет прошедших персональных тренировок </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for train in pass_personal_trainings %}
+                    <a target="_blank" href="{% url 'instructor_detail' train.instructor_pk %}">
+                    <li>
+                        <p>Инструктор {{ train.instructor_name }} {{ train.day_of_week }} {{ train.date }} {{ train.time }} </p>
+                    </li>
+                    </a>
+                {% endfor %}
+                </ul>
+            </details>
+
+            <details>
+            <summary style="color:#E9967A;">Запланированные персональные тренировки</summary>
+                {% if future_personal_trainings|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет запланированных персональных тренировок </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for train in future_personal_trainings %}
+                    <a target="_blank" href="{% url 'instructor_detail' train.instructor_pk %}">
+                    <li>
+                        <p>Инструктор {{ train.instructor_name }} {{ train.day_of_week }} {{ train.date }} {{ train.time }} </p>
+                    </li>
+                    </a>
+                {% endfor %}
+                </ul>
+            </details>
+
+        </div>
+{% endblock %}

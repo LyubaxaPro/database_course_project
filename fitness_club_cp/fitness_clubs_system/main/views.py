@@ -10,14 +10,12 @@ from django.core import serializers
 
 from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
     GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository, InstructorSheduleRepository
+    CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository
 
 
 from .forms import *
 
-from users.models import FitnessClubs
-
-from manager.models import Instructors
+from manager.models import Instructors, GroupClassesCustomersRecords
 from .utils import get_plot
 
 def get_role(request):
@@ -91,7 +89,6 @@ def form_classes_data(user, club_id):
         classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name": InstructorsRepository.read_filtered(user,
                                                                                                         {"instructor_id": current_class.instructor_id})[0].name,
                                                                                           "class_name": current_class.class_field.class_name})
-    print(classes_data)
     return classes_data
 
 def form_instructors_shedule(user, instructor_id):
@@ -108,7 +105,6 @@ def form_instructors_shedule(user, instructor_id):
 
     for current_shed  in shedule:
         training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week].append(True)
-    print(training_data)
     return training_data
 
 def get_club_schedule(request):
@@ -176,7 +172,6 @@ def prices(request):
     special_offers = SpecialOffersRepository.read_all(request.user)
     prices = PricesRepository.read_all(request.user)
     role = get_role_json(request)
-    print(role)
 
     return render(request, "main/prices.html", {'special_offers': special_offers, 'prices': prices,
                                                 'role': role})
@@ -221,7 +216,6 @@ def edit_customer_profile(request):
 def add_measure(request):
     weight = request.GET.get("weight")
     date = request.GET.get("date")
-    print(date)
 
     customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
     old_weights = customer.measured_weights
@@ -266,6 +260,56 @@ def delete_measure(request):
     chart = get_plot(customer.measure_dates, customer.measured_weights)
 
     return JsonResponse({'chart': chart}, safe=False)
+
+
+
+def customer_training_records(request):
+    role = get_role_json(request)
+    group_classes_records = GroupClassesCustomersRecordsRepository.read_join_filtered(request.user, "shedule",
+                                                                                     {'customer_id': role['customer'].customer_id})
+
+    days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
+            "Saturday": "Суббота", "Sunday": "Воскресенье"}
+    pass_classes = []
+    future_classes = []
+    date_today = datetime.date.today()
+    time_today = datetime.datetime.now().time()
+
+    for group_class in group_classes_records:
+
+        data = {'date': group_class.class_date, 'day_of_week': days[group_class.shedule.day_of_week],
+        'time': group_class.shedule.class_time, 'class_name': group_class.shedule.class_field.class_name}
+
+        if date_today > data['date']:
+            pass_classes.append(data)
+        elif date_today == data['date'] and time_today >= data['time']:
+            pass_classes.append(data)
+        else:
+            future_classes.append(data)
+
+    personal_records = InstructorSheduleCustomersRepository.read_join_filtered(request.user, "i_shedule",
+                                                                               {'customer_id': role['customer'].customer_id})
+
+    pass_personal_trainings = []
+    future_personal_trainings = []
+
+    for train in personal_records:
+        instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': train.i_shedule.instructor_id})[0]
+        name = instructor.surname + " " + instructor.name + " " + instructor.patronymic
+        data = {'date': train.training_date, 'day_of_week': days[train.i_shedule.day_of_week],
+        'time': train.i_shedule.training_time, 'instructor_name': name, 'instructor_pk': instructor.pk}
+
+        if date_today > data['date']:
+            pass_personal_trainings.append(data)
+        elif date_today > data['date'] and time_today >= data['time']:
+            pass_personal_trainings.append(data)
+        else:
+            future_personal_trainings.append(data)
+
+    return render(request, "main/customer_training_records.html", {'role': get_role_json(request), 'pass_group_classes': pass_classes,
+                                                                   'future_group_classes': future_classes,
+                                                                   'pass_personal_trainings': pass_personal_trainings,
+                                                                   'future_personal_trainings': future_personal_trainings})
 
 def instructor_profile(request):
     return render(request, "main/instructor_profile.html", {'role': get_role_json(request)})

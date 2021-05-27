@@ -80,6 +80,11 @@ class CRUDRepository:
     def delete_filtered(cls, client_user, filter_dict):
         pass
 
+    @classmethod
+    @abstractmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        pass
+
 class CustomUserRepository(CRUDRepository):
 
     @classmethod
@@ -122,6 +127,11 @@ class CustomUserRepository(CRUDRepository):
     def delete_filtered(cls, client_user, filter_dict):
         CustomUser.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
+
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return CustomUser.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
 
 class CustomersRepository(CRUDRepository):
 
@@ -171,6 +181,11 @@ class CustomersRepository(CRUDRepository):
         Customers.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
 
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return Customers.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
+
 class InstructorsRepository(CRUDRepository):
 
     @classmethod
@@ -218,6 +233,11 @@ class InstructorsRepository(CRUDRepository):
         Instructors.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
 
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return Instructors.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
+
 class AdminRecordsRepository(CRUDRepository):
 
     @classmethod
@@ -262,6 +282,11 @@ class AdminRecordsRepository(CRUDRepository):
         AdminRecords.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
 
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return AdminRecords.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
+
 class GroupClassesRepository(CRUDRepository):
     @classmethod
     def create(cls, client_user, group_classes):
@@ -304,6 +329,11 @@ class GroupClassesRepository(CRUDRepository):
     def delete_filtered(cls, client_user, filter_dict):
         GroupClasses.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
+
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return GroupClasses.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
 
 class GroupClassesCustomersRecordsRepository(CRUDRepository):
     @classmethod
@@ -348,6 +378,12 @@ class GroupClassesCustomersRecordsRepository(CRUDRepository):
         GroupClassesCustomersRecords.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
 
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return GroupClassesCustomersRecords.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
+
+
 class GroupClassesSheduleRepository(CRUDRepository):
     @classmethod
     def create(cls, client_user, group_classes_shed):
@@ -390,6 +426,11 @@ class GroupClassesSheduleRepository(CRUDRepository):
     def delete_filtered(cls, client_user, filter_dict):
         GroupClassesShedule.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
+
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return GroupClassesShedule.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
 
 class InstructorSheduleRepository(CRUDRepository):
     @classmethod
@@ -434,6 +475,11 @@ class InstructorSheduleRepository(CRUDRepository):
         InstructorShedule.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
 
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return InstructorShedule.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
+
 class InstructorSheduleCustomersRepository(CRUDRepository):
     @classmethod
     def create(cls, client_user, instructor_shed_customers):
@@ -476,6 +522,11 @@ class InstructorSheduleCustomersRepository(CRUDRepository):
     def delete_filtered(cls, client_user, filter_dict):
         InstructorSheduleCustomers.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
+
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return InstructorSheduleCustomers.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
 
 class PricesRepository(CRUDRepository):
     @classmethod
@@ -520,6 +571,11 @@ class PricesRepository(CRUDRepository):
         Prices.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
 
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return Prices.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
+
 class ServicesRepository(CRUDRepository):
     @classmethod
     def create(cls, client_user, service):
@@ -562,6 +618,11 @@ class ServicesRepository(CRUDRepository):
     def delete_filtered(cls, client_user, filter_dict):
         Services.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
+
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return Services.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
 
 class FitnessClubsRepository(CRUDRepository):
     @classmethod
@@ -606,6 +667,11 @@ class FitnessClubsRepository(CRUDRepository):
         FitnessClubs.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
 
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return FitnessClubs.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)
+
 class SpecialOffersRepository(CRUDRepository):
     @classmethod
     def create(cls, client_user, special_offer):
@@ -648,3 +714,8 @@ class SpecialOffersRepository(CRUDRepository):
     def delete_filtered(cls, client_user, filter_dict):
         SpecialOffers.objects.using(cls.db_config_manager.get_connection(
             client_user)).filter(**filter_dict).delete()
+
+    @classmethod
+    def read_join_filtered(cls, client_user, join_field, filter_dict):
+        return SpecialOffers.objects.using(cls.db_config_manager.get_connection(client_user)).\
+            select_related(join_field).filter(**filter_dict)

@@ -43,7 +43,6 @@ class GroupClasses(models.Model):
     class Meta:
         db_table = 'group_classes'
 
-
 class GroupClassesCustomersRecords(models.Model):
     record_id = models.AutoField(primary_key=True)
     shedule = models.ForeignKey('GroupClassesShedule', models.DO_NOTHING, blank=True, null=True)

@@ -18,7 +18,7 @@
         <ul>
             {% if role.is_customer %}
             <a href="{% url 'customer_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.customer.name }}</li></a>
-
+            <a href="{% url 'customer_training_records' %}"><li><i class="fas fa-calendar-check"></i> Записи на тренировки </li></a>
             {% else %}
                 {% if role.is_instructor %}
                 <a href="{% url 'instructor_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.instructor.name }}</li></a>

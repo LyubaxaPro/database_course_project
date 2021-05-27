@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'users.apps.UsersConfig',
     'manager.apps.ManagerConfig',
-    'django_filters',
-    'googlecharts',
     'crispy_forms'
 ]
 

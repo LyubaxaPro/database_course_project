@@ -70,7 +70,6 @@ main .features ul li:hover, aside ul a:hover {
     color: #eb5959;
     text-decoration: none;
     transform: scale(1.05);
-
 }
 
 main .features details summary:hover {
@@ -84,8 +83,25 @@ main .features details summary {
     display: block;
     margin-top: 20px;
     transition: transform .6s ease;
-    size: 30px;
+    font-size:22px;
     outline-style: none;
+}
+
+summary_color {color: green;}
+
+.features .details ul {list-style: none;}
+.features .details ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    font-size:20px;
+}
+
+.features .details ul li:hover, aside ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
 }
 
 /* ~~~~~~~~~~~~~~~ Профиль ~~~~~~~~~~~~~~*/

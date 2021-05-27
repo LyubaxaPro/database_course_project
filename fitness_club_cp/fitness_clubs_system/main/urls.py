@@ -18,4 +18,5 @@ urlpatterns = [
     path('edit_customer/', edit_customer_profile, name='edit_customer'),
     path('add_measure/', add_measure, name='add_measure'),
     path('delete_measure/', delete_measure, name='delete_measure'),
+    path('customer_training_records/', customer_training_records, name='customer_training_records'),
 ]
