@@ -100,6 +100,9 @@ class InstructorSheduleCustomers(models.Model):
     i_shedule = models.ForeignKey(InstructorShedule, models.DO_NOTHING, blank=True, null=True)
     training_date = models.DateField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.record_id)
+
     class Meta:
         db_table = 'instructor_shedule_customers'
 
@@ -114,6 +117,13 @@ class Prices(models.Model):
     price_three_month = models.IntegerField(blank=True, null=True)
     price_six_month = models.IntegerField(blank=True, null=True)
     price_one_year = models.IntegerField(blank=True, null=True)
+    is_time_restricted = models.BooleanField(blank=True, null=True)
+    min_time = models.TimeField(blank=True, null=True)
+    max_time = models.TimeField(blank=True, null=True)
+    days_of_week = ArrayField(models.TextField(blank=True, null=True, default=""), default=[])
+
+    def __str__(self):
+        return str(self.tariff_id)
 
     class Meta:
         db_table = 'prices'

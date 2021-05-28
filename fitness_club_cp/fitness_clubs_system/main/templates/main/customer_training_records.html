@@ -5,6 +5,53 @@
 {% endblock %}
 
 {% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    $('.btn_delete_personal').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_personal clicked');
+        var data = $(this).attr("data");
+        console.log(data);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_personal_training_record/?record_id=' + data,
+            success: function (result) {
+                console.log("success")
+                document.getElementById("future_personal_trainings"+data).remove();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_group_class').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_group_class clicked');
+        var data = $(this).attr("data");
+        console.log(data);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_group_class_record/?record_id=' + data,
+            success: function (result) {
+                console.log("success")
+                document.getElementById("future_group_classes"+data).remove();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+});
+</script>
+
         <div class="features">
 
             <details>
@@ -36,10 +83,14 @@
                 {% endif %}
                 <ul>
                 {% for class in future_group_classes %}
+                    <div class="future_group_classes" id="future_group_classes{{ class.record_id }}" >
                     <li>
                         <p>{{ class.class_name }} {{ class.day_of_week }} {{ class.date }} {{ class.time }} </p>
                     </li>
+                    <button class="btn btn-danger btn-icon btn_delete_group_class" data="{{ class.record_id }}"> <span class="icon"><i class="fas fa-trash"></i></span> Отменить запись </button>
+                    </div>
                 {% endfor %}
+
                 </ul>
             </details>
 
@@ -63,6 +114,7 @@
                 </ul>
             </details>
 
+            <div class="future_trainings">
             <details>
             <summary style="color:#E9967A;">Запланированные персональные тренировки</summary>
                 {% if future_personal_trainings|length == 0 %}
@@ -74,14 +126,18 @@
                 {% endif %}
                 <ul>
                 {% for train in future_personal_trainings %}
+                    <div class="personal_training_record" id="future_personal_trainings{{ train.record_id }}" >
                     <a target="_blank" href="{% url 'instructor_detail' train.instructor_pk %}">
                     <li>
-                        <p>Инструктор {{ train.instructor_name }} {{ train.day_of_week }} {{ train.date }} {{ train.time }} </p>
+                        <p>Инструктор {{ train.instructor_name }} {{ train.day_of_week }} {{ train.date }} {{ train.time }}</p>
                     </li>
                     </a>
+                    <button class="btn btn-danger btn-icon btn_delete_personal"  data="{{ train.record_id }}"> <span class="icon"><i class="fas fa-trash"></i></span> Отменить запись </button>
+                    </div>
                 {% endfor %}
                 </ul>
             </details>
+            </div>
 
         </div>
 {% endblock %}

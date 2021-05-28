@@ -18,6 +18,9 @@ from .forms import *
 from manager.models import Instructors, GroupClassesCustomersRecords
 from .utils import get_plot
 
+days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
+        "Saturday": "Суббота", "Sunday": "Воскресенье"}
+
 def get_role(request):
     customer = None
     is_customer = False
@@ -267,9 +270,6 @@ def customer_training_records(request):
     role = get_role_json(request)
     group_classes_records = GroupClassesCustomersRecordsRepository.read_join_filtered(request.user, "shedule",
                                                                                      {'customer_id': role['customer'].customer_id})
-
-    days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
-            "Saturday": "Суббота", "Sunday": "Воскресенье"}
     pass_classes = []
     future_classes = []
     date_today = datetime.date.today()
@@ -278,7 +278,9 @@ def customer_training_records(request):
     for group_class in group_classes_records:
 
         data = {'date': group_class.class_date, 'day_of_week': days[group_class.shedule.day_of_week],
-        'time': group_class.shedule.class_time, 'class_name': group_class.shedule.class_field.class_name}
+        'time': group_class.shedule.class_time, 'class_name': group_class.shedule.class_field.class_name,
+                'record_id': group_class.record_id}
+        print(data)
 
         if date_today > data['date']:
             pass_classes.append(data)
@@ -297,7 +299,7 @@ def customer_training_records(request):
         instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': train.i_shedule.instructor_id})[0]
         name = instructor.surname + " " + instructor.name + " " + instructor.patronymic
         data = {'date': train.training_date, 'day_of_week': days[train.i_shedule.day_of_week],
-        'time': train.i_shedule.training_time, 'instructor_name': name, 'instructor_pk': instructor.pk}
+        'time': train.i_shedule.training_time, 'instructor_name': name, 'instructor_pk': instructor.pk, 'record_id': train.record_id}
 
         if date_today > data['date']:
             pass_personal_trainings.append(data)
@@ -310,6 +312,19 @@ def customer_training_records(request):
                                                                    'future_group_classes': future_classes,
                                                                    'pass_personal_trainings': pass_personal_trainings,
                                                                    'future_personal_trainings': future_personal_trainings})
+
+def delete_personal_training_record(request):
+    record_id = request.GET.get("record_id")
+    InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record_id})
+
+    return JsonResponse({'delete_data': []}, safe=False)
+
+def delete_group_class_record(request):
+    record_id = request.GET.get("record_id")
+    GroupClassesCustomersRecordsRepository.delete_filtered(request.user, {'record_id': record_id})
+
+    return JsonResponse({'delete_data': []}, safe=False)
+
 
 def instructor_profile(request):
     return render(request, "main/instructor_profile.html", {'role': get_role_json(request)})

@@ -19,4 +19,6 @@ urlpatterns = [
     path('add_measure/', add_measure, name='add_measure'),
     path('delete_measure/', delete_measure, name='delete_measure'),
     path('customer_training_records/', customer_training_records, name='customer_training_records'),
+    path('delete_personal_training_record/', delete_personal_training_record, name='delete_personal_training_record'),
+    path('delete_group_class_record/', delete_group_class_record, name='delete_group_class_record'),
 ]

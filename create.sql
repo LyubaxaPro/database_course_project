@@ -30,7 +30,11 @@ CREATE TABLE prices
     price_one_month integer check (price_one_month > 0),
     price_three_month integer check (price_three_month > 0),
     price_six_month integer check (price_six_month > 0),
-    price_one_year integer check (price_one_year > 0)
+    price_one_year integer check (price_one_year > 0),
+    is_time_restricted boolean,
+    min_time time,
+    max_time time,
+    days_of_week text[] 
 );
 
 copy prices(tariff_id, tariff_name, tariff_description, price_one_month, price_three_month, price_six_month, price_one_year) 
