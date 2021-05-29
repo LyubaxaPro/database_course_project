@@ -49,6 +49,9 @@ class GroupClassesCustomersRecords(models.Model):
     customer = models.ForeignKey(Customers, models.DO_NOTHING, blank=True, null=True)
     class_date = models.DateField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.record_id)
+
     class Meta:
         db_table = 'group_classes_customers_records'
 
@@ -80,6 +83,9 @@ class GroupClassesShedule(models.Model):
     day_of_week = models.TextField(blank=True, null=True)
     maximum_quantity = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.shedule_id)
+
     class Meta:
         db_table = 'group_classes_shedule'
 
@@ -89,6 +95,10 @@ class InstructorShedule(models.Model):
     instructor = models.ForeignKey('Instructors', models.DO_NOTHING, blank=True, null=True)
     training_time = models.TimeField(blank=True, null=True)
     day_of_week = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.i_shedule_id)
+
 
     class Meta:
         db_table = 'instructor_shedule'

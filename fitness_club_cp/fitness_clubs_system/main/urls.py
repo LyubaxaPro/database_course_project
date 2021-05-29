@@ -21,4 +21,9 @@ urlpatterns = [
     path('customer_training_records/', customer_training_records, name='customer_training_records'),
     path('delete_personal_training_record/', delete_personal_training_record, name='delete_personal_training_record'),
     path('delete_group_class_record/', delete_group_class_record, name='delete_group_class_record'),
+    path('add_group_class_record/', add_group_class_record, name='add_group_class_record'),
+    path('add_personal_training_record/', add_personal_training_record, name='add_personal_training_record'),
+    path('appointment_to_instructor/', appointment_to_instructor, name='appointment_to_instructor'),
+    path('delete_appointment_to_instructor/', delete_appointment_to_instructor, name='delete_appointment_to_instructor'),
+    path('replace_appointment_to_instructor/', replace_appointment_to_instructor, name='replace_appointment_to_instructor')
 ]

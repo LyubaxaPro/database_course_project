@@ -15,7 +15,7 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
 
 from .forms import *
 
-from manager.models import Instructors, GroupClassesCustomersRecords
+from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers
 from .utils import get_plot
 
 days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
@@ -81,18 +81,183 @@ def form_classes_data(user, club_id):
     classes_data = {}
     seconds = 32400
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    for i in range(9, 21):
+
+    for i in range (9, 21):
         data = {}
         for day in days:
             data.update({day: []})
         classes_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
         seconds += 3600
 
-    for current_class  in classes:
+    for current_class in classes:
         classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name": InstructorsRepository.read_filtered(user,
                                                                                                         {"instructor_id": current_class.instructor_id})[0].name,
-                                                                                          "class_name": current_class.class_field.class_name})
+                                                                                          "class_name": current_class.class_field.class_name,
+                                                                                          'shedule_id': current_class.shedule_id})
     return classes_data
+
+def form_data_for_tarif(tarif, week):
+    dates_raw = get_week_dates(week)
+
+    classes_data = {}
+    seconds = 32400
+    days_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    days_dates = {}
+    for i in range(len(dates_raw)):
+        days_dates.update({days_week[i]: dates_raw[i]})
+
+    days = tarif.days_of_week
+    dates = []
+    for day in days:
+        dates.append(days_dates[day])
+
+    time_classes = [9, 21]
+    if tarif.is_time_restricted:
+        time_min = tarif.min_time.hour
+        time_max = tarif.max_time.hour
+        time_classes = [max(time_min, 9), min(time_max, 21)]
+        seconds = 3600 * time_classes[0]
+
+    for i in range (time_classes[0], time_classes[1]):
+        data = {}
+        for day in days:
+            data.update({day: []})
+        classes_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
+        seconds += 3600
+    return classes_data, seconds, days_dates, days, dates, time_classes
+
+def form_classes_data_for_tarif_group_classes(user, customer_id, club_id, tarif, week):
+    classes = GroupClassesSheduleRepository.read_filtered(user, {"club_id": int(club_id)})
+    classes_data, seconds, days_dates, days, dates, time_classes = form_data_for_tarif(tarif, week)
+    date_today = datetime.date.today()
+    time_today = datetime.datetime.now().time()
+
+    for current_class in classes:
+        is_in_group_classes_records = False
+        is_in_personal_trainings_records = False
+        class_not_done = True
+        more_than_maximum_quantity = False
+        if current_class.class_time.hour >= time_classes[0] and current_class.class_time.hour < time_classes[1] and current_class.day_of_week in days:
+            groupclasses = GroupClassesCustomersRecordsRepository.read_filtered(user, {'shedule_id': current_class.shedule_id,
+                                                                                       'customer_id': customer_id,
+                                                                                       'class_date': days_dates[current_class.day_of_week]})
+            if len(groupclasses) != 0:
+                is_in_group_classes_records = True
+
+            personal_trainings = InstructorSheduleCustomersRepository.read_filtered(user, {'customer_id': customer_id,
+                                                                                       'training_date': days_dates[current_class.day_of_week]})
+            if len(personal_trainings) != 0:
+                for train in personal_trainings:
+                    personal_training_time = InstructorSheduleRepository.read_filtered(user, {'i_shedule_id': train.i_shedule_id})
+                    if len(personal_training_time) != 0 and personal_training_time[0].training_time == current_class.class_time:
+                        is_in_personal_trainings_records = True
+
+            if is_in_group_classes_records and is_in_personal_trainings_records:
+                print("ОШИБКА: ГРУППОВАЯ И ПЕРСОНАЛЬНАЯ ТРЕНИРОВКА В ОДНО ВРЕМЯ")
+
+            if days_dates[current_class.day_of_week] < date_today:
+                class_not_done = False
+
+            if  days_dates[current_class.day_of_week] == date_today and current_class.class_time < time_today:
+                class_not_done = False
+
+            this_groupclasses = GroupClassesCustomersRecordsRepository.read_filtered(user,
+                                                                                {'shedule_id': current_class.shedule_id,
+                                                                                 'class_date': days_dates[current_class.day_of_week]})
+            if len(this_groupclasses) > 0:
+                this_class_quantity = GroupClassesSheduleRepository.read_filtered(user, {"shedule_id": current_class.shedule_id})[0].maximum_quantity
+                if len(this_groupclasses) >= this_class_quantity:
+                    more_than_maximum_quantity = True
+
+
+
+            classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name": InstructorsRepository.read_filtered(user,
+                                                                                                        {"instructor_id": current_class.instructor_id})[0].name,
+                                                                                          "class_name": current_class.class_field.class_name,
+                                                                                          'shedule_id': current_class.shedule_id,
+                                                                                                'date': str(days_dates[current_class.day_of_week]),
+                                                                                                'is_in_group_classes_records': is_in_group_classes_records,
+                                                                                                'is_in_personal_trainings_records': is_in_personal_trainings_records,
+                                                                                                'class_not_done': class_not_done,
+                                                                                                'more_than_maximum_quantity': more_than_maximum_quantity})
+    return classes_data, dates
+
+def form_instructors_shedule_for_tarif(user, instructor_id, tarif, week, customer_id):
+    shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
+    dates_raw = get_week_dates(week)
+    training_data = {}
+
+    seconds = 32400
+    days_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    days_dates = {}
+    for i in range(len(dates_raw)):
+        days_dates.update({days_week[i]: dates_raw[i]})
+
+    days = tarif.days_of_week
+    dates = []
+    for day in days:
+        dates.append(days_dates[day])
+
+    time_classes = [9, 21]
+    if tarif.is_time_restricted:
+        time_min = tarif.min_time.hour
+        time_max = tarif.max_time.hour
+        time_classes = [max(time_min, 9), min(time_max, 21)]
+        seconds = 3600 * time_classes[0]
+
+    for i in range (time_classes[0], time_classes[1]):
+        data = {}
+        for day in days:
+            data.update({day: []})
+        training_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
+        seconds += 3600
+
+    date_today = datetime.date.today()
+    time_today = datetime.datetime.now().time()
+
+    for current_shed in shedule:
+        is_training_by_customer = False
+        is_training_by_other = False
+        is_in_group_classes_records = False
+        class_not_done = True
+        if current_shed.training_time.hour >= time_classes[0] and current_shed.training_time.hour < time_classes[1] and current_shed.day_of_week in days:
+
+            training_by_customer = InstructorSheduleCustomersRepository.read_filtered(user, {'customer_id': customer_id,
+                                                                                             'i_shedule_id': current_shed.i_shedule_id,
+                                                                                             'training_date': days_dates[current_shed.day_of_week]})
+            if len(training_by_customer) != 0:
+                is_training_by_customer = True
+            else:
+                training_by_other = InstructorSheduleCustomersRepository.read_filtered(user, {'i_shedule_id': current_shed.i_shedule_id,
+                                                                                             'training_date':days_dates[current_shed.day_of_week]})
+                if len(training_by_other) != 0:
+                    is_training_by_other = True
+
+            groupclasses = GroupClassesCustomersRecordsRepository.read_filtered(user,
+                                                                                {'customer_id': customer_id,
+                                                                                 'class_date': days_dates[current_shed.day_of_week]})
+            if len(groupclasses) != 0:
+                for gr_class in groupclasses:
+                    groupclass_time = GroupClassesSheduleRepository.read_filtered(user, {'shedule_id': gr_class.shedule_id})
+                    if len(groupclass_time) != 0 and groupclass_time[0].class_time == current_shed.training_time:
+                        is_in_group_classes_records = True
+
+            if days_dates[current_shed.day_of_week] < date_today:
+                class_not_done = False
+
+            if  days_dates[current_shed.day_of_week] == date_today and current_shed.training_time < time_today:
+                class_not_done = False
+
+            training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week].append({'have_training': True,
+                                                                                                  'i_shedule_id': current_shed.i_shedule_id,
+                                                                                                  'date': str(days_dates[current_shed.day_of_week]),
+                                                                                                  'is_training_by_customer': is_training_by_customer,
+                                                                                                  'is_training_by_other': is_training_by_other,
+                                                                                                  'is_in_group_classes_records': is_in_group_classes_records,
+                                                                                                  'class_not_done': class_not_done
+                                                                                                  })
+
+    return training_data, dates
 
 def form_instructors_shedule(user, instructor_id):
     shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
@@ -164,7 +329,8 @@ def get_club_instructors(request):
     for user in users:
         user_id_list.append(user.id)
 
-    instructors = Instructors.objects.filter(user__in=user_id_list)
+    # instructors = Instructors.objects.filter(user__in=user_id_list)
+    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
     instructors_json = serializers.serialize('json', list(instructors))
 
 
@@ -264,10 +430,25 @@ def delete_measure(request):
 
     return JsonResponse({'chart': chart}, safe=False)
 
+def get_week():
+    my_week_raw = datetime.date.today().isocalendar()
+    return str(my_week_raw[0]) + '-W' + str(my_week_raw[1])
 
+def get_week_dates(week):
+    date = datetime.datetime.strptime(week + '-1', '%G-W%V-%u').date()
+    dates = []
+    dates.append(date)
+    for i in range(6):
+        date += datetime.timedelta(days=1)
+        dates.append(date)
+    return dates
 
 def customer_training_records(request):
     role = get_role_json(request)
+    week = get_week()
+    selected_week = request.GET.get('week_num')
+    if selected_week:
+        week = selected_week
     group_classes_records = GroupClassesCustomersRecordsRepository.read_join_filtered(request.user, "shedule",
                                                                                      {'customer_id': role['customer'].customer_id})
     pass_classes = []
@@ -280,7 +461,6 @@ def customer_training_records(request):
         data = {'date': group_class.class_date, 'day_of_week': days[group_class.shedule.day_of_week],
         'time': group_class.shedule.class_time, 'class_name': group_class.shedule.class_field.class_name,
                 'record_id': group_class.record_id}
-        print(data)
 
         if date_today > data['date']:
             pass_classes.append(data)
@@ -308,10 +488,53 @@ def customer_training_records(request):
         else:
             future_personal_trainings.append(data)
 
-    return render(request, "main/customer_training_records.html", {'role': get_role_json(request), 'pass_group_classes': pass_classes,
-                                                                   'future_group_classes': future_classes,
-                                                                   'pass_personal_trainings': pass_personal_trainings,
-                                                                   'future_personal_trainings': future_personal_trainings})
+    tarif = PricesRepository.read_filtered(request.user, {'tariff_id': role['customer'].tariff_id})[0]
+    classes_data, dates = form_classes_data_for_tarif_group_classes(request.user, role['customer'].customer_id, role['user'].club, tarif, week)
+
+    trainings_data = []
+    instructor_data = {}
+    have_instructor = False
+    if role['customer'].instructor_id:
+        trainings_data, dates = form_instructors_shedule_for_tarif(request.user, role['customer'].instructor_id, tarif, week, role['customer'].customer_id)
+        have_instructor = True
+        customers_instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': role['customer'].instructor_id})[0]
+        instructor_data = {'instructor_name': customers_instructor.name, 'instructor_surname': customers_instructor.surname,
+                            'instructor_patronymic': customers_instructor.patronymic,
+                            'instructor_pk': customers_instructor.pk}
+
+
+    day_of_week_date = {}
+    for i in range(len(tarif.days_of_week)):
+        day_of_week_date.update({days[tarif.days_of_week[i]]: dates[i]})
+
+    club_id = role['user'].club
+    users_instructors = CustomUserRepository.read_filtered(request.user, {"club": club_id, 'role': 1})
+    user_id_list = []
+    for user in users_instructors:
+        user_id_list.append(user.id)
+   # club_instructors = Instructors.objects.filter(user__in=user_id_list)
+    club_instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
+    club_instructors_data = []
+    for instr in club_instructors:
+        data = {'name': instr.name, 'surname': instr.surname, 'patronimyc': instr.patronymic,
+                'instructor_id': instr.instructor_id,
+                'instructor_pk': instr.pk
+                }
+        club_instructors_data.append(data)
+    context = {'role': get_role_json(request), 'pass_group_classes': pass_classes,
+     'future_group_classes': future_classes,
+     'pass_personal_trainings': pass_personal_trainings,
+     'future_personal_trainings': future_personal_trainings,
+     'classes_data': classes_data,
+     'day_of_week_date': day_of_week_date,
+    'current_week': week,
+    'trainings_data': trainings_data,
+    'have_instructor': have_instructor,
+    'instructor_data': instructor_data,
+    'club_instructors_data': club_instructors_data
+     }
+
+    return render(request, "main/customer_training_records.html", context)
 
 def delete_personal_training_record(request):
     record_id = request.GET.get("record_id")
@@ -324,6 +547,75 @@ def delete_group_class_record(request):
     GroupClassesCustomersRecordsRepository.delete_filtered(request.user, {'record_id': record_id})
 
     return JsonResponse({'delete_data': []}, safe=False)
+
+def add_group_class_record(request):
+    role = get_role_json(request)
+    new_record = GroupClassesCustomersRecords()
+    date_raw = request.GET.get("date")
+    date = datetime.datetime.strptime(date_raw, "%Y-%m-%d").date()
+    new_record.class_date = date
+    new_record.shedule_id = request.GET.get("shedule_id")
+    new_record.customer_id=role['customer'].customer_id
+
+
+    GroupClassesCustomersRecordsRepository.create(request.user, new_record)
+    return JsonResponse({'q': []}, safe=False)
+
+def add_personal_training_record(request):
+    i_shedule_id = request.GET.get("i_shedule_id")
+    date_raw = request.GET.get("date")
+    date = datetime.datetime.strptime(date_raw, "%Y-%m-%d").date()
+
+    new_record = InstructorSheduleCustomers()
+    role = get_role_json(request)
+    new_record.customer_id = role['customer'].customer_id
+    new_record.training_date = date
+    new_record.i_shedule_id = i_shedule_id
+
+    InstructorSheduleCustomersRepository.create(request.user, new_record)
+    return JsonResponse({'q': []}, safe=False)
+
+def appointment_to_instructor(request):
+    instructor_id = request.GET.get("instructor_id")
+    CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': instructor_id})
+
+    return JsonResponse({'q': []}, safe=False)
+
+def delete_future_records_for_personal_trainings(request):
+    role = get_role_json(request)
+    instructors_shedule = InstructorSheduleRepository.read_filtered(request.user,
+                                                                    {'instructor_id': role['customer'].instructor_id})
+    shedule_id_list = []
+    for sh in instructors_shedule:
+        shedule_id_list.append(sh.i_shedule_id)
+
+    records = InstructorSheduleCustomersRepository.read_filtered(request.user, {'i_shedule_id__in': shedule_id_list,
+                                                                                'customer_id': role['customer'].customer_id})
+
+    date_today = datetime.date.today()
+    time_today = datetime.datetime.now().time()
+
+    for record in records:
+        if record.training_date > date_today:
+            InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record.record_id})
+        if record.training_date == date_today:
+            shedule_time = InstructorSheduleRepository.read_filtered(request.user,
+                                                                     {'i_shedule_id': record.i_shedule_id})
+            if len(shedule_time) != 0 and shedule_time[0].training_time > time_today:
+                InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record.record_id})
+
+
+def delete_appointment_to_instructor(request):
+    delete_future_records_for_personal_trainings(request)
+    CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': None})
+    return JsonResponse({'q': []}, safe=False)
+
+def replace_appointment_to_instructor(request):
+    selected_instructor_id = request.GET.get("instructor_id")
+    delete_future_records_for_personal_trainings(request)
+    CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': selected_instructor_id})
+
+    return JsonResponse({'q': []}, safe=False)
 
 
 def instructor_profile(request):
