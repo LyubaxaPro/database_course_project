@@ -261,18 +261,21 @@ def form_instructors_shedule_for_tarif(user, instructor_id, tarif, week, custome
 
 def form_instructors_shedule(user, instructor_id):
     shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
+    group_classes = GroupClassesSheduleRepository.read_join_filtered(user, 'class_field', {'instructor_id': instructor_id})
     training_data = {}
     seconds = 32400
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     for i in range(9, 21):
         data = {}
         for day in days:
-            data.update({day: []})
+            data.update({day: ''})
         training_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
         seconds += 3600
 
     for current_shed  in shedule:
-        training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week].append(True)
+        training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week] = 'Персональная тренировка'
+    for current_shed in group_classes:
+       training_data[str(current_shed.class_time)[:-3]][current_shed.day_of_week] = current_shed.class_field.class_name
     return training_data
 
 def get_club_schedule(request):
@@ -297,9 +300,9 @@ def instructors_list(request):
 def instructor_detail(request, pk):
     """Информация об инструкторе"""
     instructor =  InstructorsRepository.read_by_pk(request.user, pk)
-    education = list(map(lambda x: x.strip("'"), instructor.education))
-    achievements = list(map(lambda x: x.strip("'"), instructor.achievements))
-    specialization = list(map(lambda x: x.strip("'"), instructor.specialization))
+    # education = list(map(lambda x: x.strip("'"), instructor.education))
+    # achievements = list(map(lambda x: x.strip("'"), instructor.achievements))
+    # specialization = list(map(lambda x: x.strip("'"), instructor.specialization))
     instructor_shedule = form_instructors_shedule(request.user, instructor.instructor_id)
 
     exp_str = "лет"
@@ -314,9 +317,6 @@ def instructor_detail(request, pk):
     address = fitness_club[0].city + ", " + fitness_club[0].address
 
     return render(request, 'main/instructor_detail.html', {'instructor' : instructor,
-                                                           'education' : education,
-                                                           'achievements' : achievements,
-                                                           'specialization' : specialization,
                                                            'exp_str' : exp_str,
                                                            'role': get_role_json(request),
                                                            'shedule': instructor_shedule,
@@ -619,7 +619,21 @@ def replace_appointment_to_instructor(request):
 
 
 def instructor_profile(request):
-    return render(request, "main/instructor_profile.html", {'role': get_role_json(request)})
+    """Профиль инструктора"""
+    role = get_role_json(request)
+    fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
+    address = fitness_club[0].city + ", " + fitness_club[0].address
+    instructor_shedule = form_instructors_shedule(request.user, role['instructor'].instructor_id)
+
+    exp_str = "лет"
+    if role['instructor'].experience % 10 == 1 and role['instructor'].experience != 11:
+        exp_str = "год"
+    elif role['instructor'].experience % 10 in [2, 3, 4] and role['instructor'].experience not in [12, 13, 14]:
+        exp_str = "года"
+
+    return render(request, "main/instructor_profile.html",
+                  {'role': get_role_json(request), 'address': address, 'shedule': instructor_shedule, 'exp_str': exp_str})
+
 
 def admin_profile(request):
     return render(request, "main/admin_profile.html", {'role': get_role_json(request)})

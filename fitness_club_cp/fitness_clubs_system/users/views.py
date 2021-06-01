@@ -50,6 +50,7 @@ class UserSignUpView(View):
         user_form = CustomUserSignUpForm(request.POST)
 
         if user_form.is_valid():
+            print(user_form.role)
             print("FFFFFF")
             user_form.save()
             return redirect('login')

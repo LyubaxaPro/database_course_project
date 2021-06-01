@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="features" >
+<div class="profile" >
   <div class="container">
     <div class="row">
       <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
@@ -15,24 +15,24 @@
       </div>
       <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
         <h1>{{ instructor.surname }} {{ instructor.name }} {{ instructor.patronymic }}</h1>
-        <h2>Стаж {{instructor.experience}} {{ exp_str }}</h2>
-        <h2>Образование</h2>
+        <h2 style="color:red">Стаж {{instructor.experience}} {{ exp_str }} </h2>
+        <h2 style="color:red">Образование</h2>
         <ul>
-          {% for i in education %}
+          {% for i in instructor.education %}
           <li>{{ i }}</li>
           {% endfor %}
         </ul>
 
-        <h2>Достижения</h2>
+        <h2 style="color:red">Достижения</h2>
         <ul>
-          {% for i in achievements %}
+          {% for i in instructor.achievements %}
           <li>{{ i }}</li>
           {% endfor %}
         </ul>
 
-        <h2>Специализация</h2>
+        <h2 style="color:red">Специализация</h2>
         <ul>
-          {% for i in specialization %}
+          {% for i in instructor.specialization %}
           <li>{{ i }}</li>
           {% endfor %}
         </ul>
@@ -61,14 +61,14 @@
 
           {% for time, tdata in shedule.items %}
             <tr>
-                <td> {{ time }}</td>
+            <td> {{ time }}</td>
                 {% for day, value in tdata.items %}
 
                     {% if value|length == 0  %}
                         <td> - </td>
                     {% else %}
                         <td>
-                        Занятие
+                       {{ value }}
                         </td>
 
                     {% endif %}

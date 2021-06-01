@@ -1,19 +1,86 @@
 {% extends 'main/layout.html' %}
 {% load static %}
 
+
 {% block title %}
-    {{ Профиль }}
+    Инструктор
 {% endblock %}
 
 {% block content %}
-    <style>
-    .hideText {display: none; }
-    </style>
-    <div class="features">
-        <h1> Профиль тренера</h1>
-        <b>ФИО</b> <p>{{role.instructor.surname}} {{role.instructor.name}} {{role.instructor.patronymic}}</p>
+<div class="profile" >
+<h1>Профиль инструктора</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <img src="{{ role.instructor.photo.url}}" >
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <p><b style="color:red">Фамилия Имя Отчество: </b> {{ role.instructor.surname }} {{ role.instructor.name }} {{ role.instructor.patronymic }} </p>
+        <p><b style="color:red">Логин: </b> {{ role.user.login }} </p>
+        <p><b style="color:red">Email: </b> {{ role.user.email }} </p>
+        <p><b style="color:red">Стаж: </b> {{role.instructor.experience}} {{ exp_str }}</p>
+        <p><b style="color:red">Образование:</b></p>
+        <ul>
+          {% for i in role.instructor.education %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
 
+        <p><b style="color:red">Достижения:</b></p>
+        <ul>
+          {% for i in role.instructor.achievements %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
 
+        <p><b style="color:red">Специализация:</b></p>
+        <ul>
+          {% for i in role.instructor.specialization %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+
+      </div>
     </div>
+  </div>
+    <h2>Вы ведете занятия в фитнес-клубе по адресу {{ address }}</h2>
+  <h1>Расписание</h1>
 
+        <table>
+          <thead>
+            <tr>
+              <td>Время</td>
+              <td>Понедельник</td>
+              <td>Вторник</td>
+              <td>Среда</td>
+              <td>Четверг</td>
+              <td>Пятница</td>
+              <td>Суббота</td>
+              <td>Воскресенье</td>
+
+            </tr>
+          </thead>
+          <tbody class="table_body">
+
+          {% for time, tdata in shedule.items %}
+            <tr>
+                <td> {{ time }}</td>
+                {% for day, value in tdata.items %}
+
+                    {% if value|length == 0  %}
+                        <td> - </td>
+                    {% else %}
+                        <td>
+                       {{ value }}
+                        </td>
+
+                    {% endif %}
+                {% endfor %}
+            </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
+</div>
 {% endblock %}
+

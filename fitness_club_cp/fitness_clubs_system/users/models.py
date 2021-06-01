@@ -64,8 +64,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         (CUSTOMER, 'Пользователь'),
         (INSTRUCTOR, 'Тренер'),
-        (ADMIN, 'Администратор'),
-        (SUPERUSER, 'Пользователь с абсолютными правами')
+        # (ADMIN, 'Администратор'),
+        # (SUPERUSER, 'Пользователь с абсолютными правами')
     )
 
     CLUB_CHOICES = (
