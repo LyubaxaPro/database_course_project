@@ -7,6 +7,58 @@
 {% endblock %}
 
 {% block content %}
+
+
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.2.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+    $('.btn_add_personal_training').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_add_personal_training clicked');
+        var day = $(this).attr("data-day");
+        var time = $(this).attr("data-time");
+        console.log(day);
+        console.log(time);
+
+        $.ajax({
+            type: 'GET',
+            url: '/instructor_add_personal_training/?day=' + day + '&time=' + time,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/instructor_profile/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_personal_training').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_personal_training clicked');
+        var i_shedule_id = $(this).attr("data-shedule-id");
+        console.log(i_shedule_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/instructor_delete_personal_training/?i_shedule_id=' + i_shedule_id,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/instructor_profile/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+});
+
+</script>
 <div class="profile" >
 <h1>Профиль инструктора</h1>
   <div class="container">
@@ -49,6 +101,7 @@
   <div class="features">
     <h2>Вы ведете занятия в фитнес-клубе по адресу {{ address }}</h2>
   <h1>Расписание</h1>
+    <p>Вы можете добавить персональную тренировку в Ваше расписание или удалить занятие из расписания.</p>
 
         <table>
           <thead>
@@ -72,10 +125,16 @@
                 {% for day, value in tdata.items %}
 
                     {% if value|length == 0  %}
-                        <td> - </td>
+                        <td>
+                        <button  type="button"class="btn btn-outline-success btn_add_personal_training btn-floating" data-time='{{ time }}' data-day='{{ day }}'><i class="fas fa-plus"></i></button>
+                        </td>
+
                     {% else %}
                         <td>
-                       {{ value }}
+                        {{ value.name }}
+                        {% if value.is_editable %}
+                          <button  type="button"class="btn btn-outline-danger btn_delete_personal_training btn-floating" data-shedule-id='{{ value.i_shedule_id }}'><i class="fas fa-trash"></i></button>
+                        {% endif %}
                         </td>
 
                     {% endif %}

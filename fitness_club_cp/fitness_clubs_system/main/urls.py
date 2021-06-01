@@ -26,5 +26,7 @@ urlpatterns = [
     path('appointment_to_instructor/', appointment_to_instructor, name='appointment_to_instructor'),
     path('delete_appointment_to_instructor/', delete_appointment_to_instructor, name='delete_appointment_to_instructor'),
     path('replace_appointment_to_instructor/', replace_appointment_to_instructor, name='replace_appointment_to_instructor'),
-    path('edit_instructor/', edit_instructor, name='edit_instructor')
+    path('edit_instructor/', edit_instructor, name='edit_instructor'),
+    path('instructor_add_personal_training/', instructor_add_personal_training, name='instructor_add_personal_training'),
+    path('instructor_delete_personal_training/', instructor_delete_personal_training, name='instructor_delete_personal_training')
 ]

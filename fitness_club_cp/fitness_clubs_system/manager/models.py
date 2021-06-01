@@ -24,9 +24,9 @@ class Customers(models.Model):
     height = models.IntegerField(blank=True, null=True, default=0, verbose_name='Рост')
     measured_weights = ArrayField(models.IntegerField(blank=True, null=True, default=0), default=list())
     measure_dates = ArrayField(models.DateField(blank=True, null=True, default=datetime.date.today), default=list())
-    tariff = models.ForeignKey('Prices', models.DO_NOTHING, blank=True, null=True)
+    tariff = models.ForeignKey('Prices', on_delete=models.CASCADE, blank=True, null=True)
     tariff_end_date = models.DateField(blank=True, null=True)
-    instructor = models.ForeignKey('Instructors', models.DO_NOTHING, blank=True, null=True)
+    instructor = models.ForeignKey('Instructors', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return str(self.customer_id)
@@ -45,8 +45,8 @@ class GroupClasses(models.Model):
 
 class GroupClassesCustomersRecords(models.Model):
     record_id = models.AutoField(primary_key=True)
-    shedule = models.ForeignKey('GroupClassesShedule', models.DO_NOTHING, blank=True, null=True)
-    customer = models.ForeignKey(Customers, models.DO_NOTHING, blank=True, null=True)
+    shedule = models.ForeignKey('GroupClassesShedule', on_delete=models.CASCADE, blank=True, null=True)
+    customer = models.ForeignKey(Customers, on_delete=models.CASCADE, blank=True, null=True)
     class_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
@@ -76,9 +76,9 @@ class Instructors(models.Model):
 
 class GroupClassesShedule(models.Model):
     shedule_id = models.IntegerField(primary_key=True)
-    class_field = models.ForeignKey(GroupClasses, models.DO_NOTHING, db_column='class_id', blank=True, null=True)  # Field renamed because it was a Python reserved word.
-    club = models.ForeignKey(FitnessClubs, models.DO_NOTHING, db_column='club_id', blank=True, null=True)
-    instructor = models.ForeignKey(Instructors, models.DO_NOTHING, db_column='instructor_id', blank=True, null=True)
+    class_field = models.ForeignKey(GroupClasses, on_delete=models.CASCADE, db_column='class_id', blank=True, null=True)  # Field renamed because it was a Python reserved word.
+    club = models.ForeignKey(FitnessClubs, on_delete=models.CASCADE, db_column='club_id', blank=True, null=True)
+    instructor = models.ForeignKey(Instructors, on_delete=models.CASCADE, db_column='instructor_id', blank=True, null=True)
     class_time = models.TimeField(blank=True, null=True)
     day_of_week = models.TextField(blank=True, null=True)
     maximum_quantity = models.IntegerField(blank=True, null=True)
@@ -91,8 +91,8 @@ class GroupClassesShedule(models.Model):
 
 
 class InstructorShedule(models.Model):
-    i_shedule_id = models.IntegerField(primary_key=True)
-    instructor = models.ForeignKey('Instructors', models.DO_NOTHING, blank=True, null=True)
+    i_shedule_id = models.AutoField(primary_key=True)
+    instructor = models.ForeignKey('Instructors', on_delete=models.CASCADE, blank=True, null=True)
     training_time = models.TimeField(blank=True, null=True)
     day_of_week = models.TextField(blank=True, null=True)
 
@@ -106,8 +106,8 @@ class InstructorShedule(models.Model):
 
 class InstructorSheduleCustomers(models.Model):
     record_id = models.AutoField(primary_key=True)
-    customer = models.ForeignKey(Customers, models.DO_NOTHING, blank=True, null=True)
-    i_shedule = models.ForeignKey(InstructorShedule, models.DO_NOTHING, blank=True, null=True)
+    customer = models.ForeignKey(Customers, on_delete=models.CASCADE, blank=True, null=True)
+    i_shedule = models.ForeignKey(InstructorShedule, on_delete=models.CASCADE, blank=True, null=True)
     training_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
@@ -115,9 +115,6 @@ class InstructorSheduleCustomers(models.Model):
 
     class Meta:
         db_table = 'instructor_shedule_customers'
-
-
-
 
 class Prices(models.Model):
     tariff_id = models.IntegerField(primary_key=True)
@@ -137,7 +134,6 @@ class Prices(models.Model):
 
     class Meta:
         db_table = 'prices'
-
 
 class Services(models.Model):
     service_id = models.IntegerField(primary_key=True)

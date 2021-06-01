@@ -65,14 +65,12 @@
             <tr>
             <td> {{ time }}</td>
                 {% for day, value in tdata.items %}
-
                     {% if value|length == 0  %}
                         <td> - </td>
                     {% else %}
                         <td>
-                       {{ value }}
+                       {{ value.name }}
                         </td>
-
                     {% endif %}
                 {% endfor %}
             </tr>

@@ -15,7 +15,7 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
 
 from .forms import *
 
-from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers
+from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule
 from .utils import get_plot
 
 days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
@@ -268,14 +268,17 @@ def form_instructors_shedule(user, instructor_id):
     for i in range(9, 21):
         data = {}
         for day in days:
-            data.update({day: ''})
+            data.update({day: {}})
         training_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
         seconds += 3600
 
     for current_shed  in shedule:
-        training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week] = 'Персональная тренировка'
+        training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week].update({'name':'Персональная тренировка',
+                                                                                              'is_editable': True,
+                                                                                              'i_shedule_id': current_shed.i_shedule_id})
     for current_shed in group_classes:
-       training_data[str(current_shed.class_time)[:-3]][current_shed.day_of_week] = current_shed.class_field.class_name
+       training_data[str(current_shed.class_time)[:-3]][current_shed.day_of_week].update({'name':current_shed.class_field.class_name,
+                                                                                          'is_editable': False})
     return training_data
 
 def get_club_schedule(request):
@@ -652,6 +655,29 @@ def edit_instructor(request):
         instructor_form = InstructorProfileForm(instance=role['instructor'])
 
     return render(request, 'main/edit_instructor.html', {'instructor_form': instructor_form, 'role': role})
+
+def instructor_add_personal_training(request):
+    day = request.GET.get("day")
+    time_raw = request.GET.get("time")
+    time = datetime.datetime.strptime(time_raw, '%H:%M').time()
+
+    role = get_role_json(request)
+
+    new_record = InstructorShedule()
+
+    new_record.instructor_id = role['instructor'].instructor_id
+    new_record.training_time = time
+    new_record.day_of_week = day
+
+    InstructorSheduleRepository.create(request.user, new_record)
+
+    return JsonResponse({'q': []}, safe=False)
+
+def instructor_delete_personal_training(request):
+    i_shedule_id = request.GET.get("i_shedule_id")
+    InstructorSheduleRepository.delete_filtered(request.user, {'i_shedule_id': i_shedule_id})
+
+    return JsonResponse({'q': []}, safe=False)
 
 
 def admin_profile(request):
