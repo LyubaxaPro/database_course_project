@@ -352,9 +352,12 @@ def customer_profile(request):
     role = get_role_json(request)
     fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
     address = fitness_club[0].city + ", " + fitness_club[0].address
+    is_chart = True
 
     x = role['customer'].measure_dates
     y = role['customer'].measured_weights
+    if len(x) == 0:
+        is_chart = False
 
     chart = get_plot(x, y)
 
@@ -362,7 +365,8 @@ def customer_profile(request):
 
     return render(request, "main/customer_profile.html", {'role': get_role_json(request), 'address': address, 'chart': chart,
                                                           'form':AddMeasureForm(),
-                                                          'today': today})
+                                                          'today': today,
+                                                          'is_chart': is_chart})
 
 
 def edit_customer_profile(request):
@@ -412,9 +416,14 @@ def add_measure(request):
                                                         'measure_dates': new_dates})
     customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
 
-    chart = get_plot(customer.measure_dates, customer.measured_weights)
+    is_chart = 1
+    if len(customer.measure_dates) == 0:
+        is_chart = 0
 
-    return JsonResponse({'chart': chart}, safe=False)
+    chart = get_plot(customer.measure_dates, customer.measured_weights)
+    print(customer.measure_dates)
+    print(is_chart)
+    return JsonResponse({'chart': chart, 'is_chart': is_chart}, safe=False)
 
 def delete_measure(request):
     customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
@@ -428,10 +437,12 @@ def delete_measure(request):
     CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': weights,
                                                         'measure_dates': dates})
     customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
-
+    is_chart = 1
+    if len(customer.measure_dates) == 0:
+        is_chart = 0
     chart = get_plot(customer.measure_dates, customer.measured_weights)
 
-    return JsonResponse({'chart': chart}, safe=False)
+    return JsonResponse({'chart': chart, 'is_chart': is_chart}, safe=False)
 
 def get_week():
     my_week_raw = datetime.date.today().isocalendar()
@@ -678,6 +689,29 @@ def instructor_delete_personal_training(request):
     InstructorSheduleRepository.delete_filtered(request.user, {'i_shedule_id': i_shedule_id})
 
     return JsonResponse({'q': []}, safe=False)
+
+def instructor_attached_customers(request):
+    role = get_role_json(request)
+    customers_data = []
+    customers = CustomersRepository.read_filtered(request.user, {'instructor_id': role['instructor'].instructor_id})
+    is_chart = True
+
+    for customer in customers:
+        x = customer.measure_dates
+        y = customer.measured_weights
+        if len(x) == 0:
+            is_chart = False
+        chart = get_plot(x, y)
+        customers_data.append({'name': customer.name,
+                               'surname': customer.surname,
+                               'patronymic': customer.patronymic,
+                               'chart': chart,
+                               'is_chart': is_chart,
+                               'day_of_birth': customer.day_of_birth,
+                               'height': customer.height})
+
+    return render(request, 'main/instructor_attached_customers.html', {'role': role, 'customers_data': customers_data})
+
 
 
 def admin_profile(request):

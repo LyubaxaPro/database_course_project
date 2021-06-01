@@ -22,6 +22,7 @@
             {% else %}
                 {% if role.is_instructor %}
                 <a href="{% url 'instructor_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.instructor.name }}</li></a>
+                <a href="{% url 'instructor_attached_customers' %}"><li><i class="fas fa-address-card"></i> Прикреплённые клиенты </li></a>
                 {% else %}
 
                     {% if role.is_admin %}
