@@ -1,6 +1,6 @@
 import self as self
 from django import forms
-from manager.models import Customers
+from manager.models import Customers, Instructors
 from users.models import CustomUser
 from django import forms
 #
@@ -31,5 +31,8 @@ class AddMeasureForm(forms.Form):
 
     weight = forms.IntegerField(label="Вес")
     date = forms.DateField(label="Дата")
-    # widgets = {
-    #     'date': forms.DateField(format=('%d-%m-%Y'), type=date)}
+
+class InstructorProfileForm(forms.ModelForm):
+    class Meta:
+        model = Instructors
+        fields = ('name', 'surname', 'patronymic', 'education', 'experience', 'achievements', 'specialization')

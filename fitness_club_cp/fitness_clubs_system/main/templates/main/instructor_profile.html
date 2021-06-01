@@ -39,10 +39,14 @@
           <li>{{ i }}</li>
           {% endfor %}
         </ul>
-
       </div>
     </div>
   </div>
+    <br>
+    <p style="font-size:18px;"><a href="{% url 'edit_instructor' %}">Редактировать личную информацию</a></p>
+    <br>
+  </div>
+  <div class="features">
     <h2>Вы ведете занятия в фитнес-клубе по адресу {{ address }}</h2>
   <h1>Расписание</h1>
 
@@ -81,6 +85,6 @@
 
           </tbody>
         </table>
-</div>
+    </div>
 {% endblock %}
 

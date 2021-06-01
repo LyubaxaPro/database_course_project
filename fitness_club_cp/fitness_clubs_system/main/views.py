@@ -634,6 +634,25 @@ def instructor_profile(request):
     return render(request, "main/instructor_profile.html",
                   {'role': get_role_json(request), 'address': address, 'shedule': instructor_shedule, 'exp_str': exp_str})
 
+def edit_instructor(request):
+    role = get_role_json(request)
+
+    if request.method == 'POST':
+
+        instructor_form = InstructorProfileForm(request.POST, instance=role['customer'])
+        instructor_form.actual_user = request.user
+
+        if instructor_form.is_valid():
+            InstructorsRepository.update_by_pk(request.user,
+                                          role['instructor'].pk,
+                                          instructor_form.cleaned_data)
+
+            return redirect('instructor_profile')
+    else:
+        instructor_form = InstructorProfileForm(instance=role['instructor'])
+
+    return render(request, 'main/edit_instructor.html', {'instructor_form': instructor_form, 'role': role})
+
 
 def admin_profile(request):
     return render(request, "main/admin_profile.html", {'role': get_role_json(request)})
