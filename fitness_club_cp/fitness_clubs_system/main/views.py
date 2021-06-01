@@ -281,6 +281,48 @@ def form_instructors_shedule(user, instructor_id):
                                                                                           'is_editable': False})
     return training_data
 
+def form_instructors_shedule_for_week(user, instructor_id, week):
+    shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
+    group_classes = GroupClassesSheduleRepository.read_join_filtered(user, 'class_field', {'instructor_id': instructor_id})
+    training_data = {}
+    seconds = 32400
+    days_en = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    dates_raw = get_week_dates(week)
+    days_dates = {}
+    for i in range(len(dates_raw)):
+        days_dates.update({days_en[i]: dates_raw[i]})
+
+    for i in range(9, 21):
+        data = {}
+        for day in days_en:
+            data.update({day: {}})
+        training_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
+        seconds += 3600
+
+    for current_shed in shedule:
+        customer = None
+        customer_raw = InstructorSheduleCustomersRepository.read_filtered(user, {'i_shedule_id': current_shed.i_shedule_id,
+                                                                             'training_date': days_dates[current_shed.day_of_week]})
+
+        if len(customer_raw) != 0:
+            customer = CustomersRepository.read_filtered(user, {'customer_id': customer_raw[0].customer_id})[0]
+        training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week].update({'name':'Персональная тренировка',
+                                                                                              'is_personal': True,
+                                                                                              'customer': customer})
+    for current_shed in group_classes:
+
+        count = len(GroupClassesCustomersRecordsRepository.read_filtered(user, {'shedule_id': current_shed.shedule_id,
+                                                                             'class_date': days_dates[current_shed.day_of_week]}))
+
+        training_data[str(current_shed.class_time)[:-3]][current_shed.day_of_week].update({'name':current_shed.class_field.class_name,
+                                                                                          'is_personal': False,
+                                                                                           'count': count})
+    day_of_week_date = {}
+    for i in range(len(days)):
+        day_of_week_date.update({days[days_en[i]]: dates_raw[i]})
+
+    return training_data, day_of_week_date
+
 def get_club_schedule(request):
     club_id = request.GET.get("club_id")
     classes_data = form_classes_data(request.user, club_id)
@@ -303,9 +345,6 @@ def instructors_list(request):
 def instructor_detail(request, pk):
     """Информация об инструкторе"""
     instructor =  InstructorsRepository.read_by_pk(request.user, pk)
-    # education = list(map(lambda x: x.strip("'"), instructor.education))
-    # achievements = list(map(lambda x: x.strip("'"), instructor.achievements))
-    # specialization = list(map(lambda x: x.strip("'"), instructor.specialization))
     instructor_shedule = form_instructors_shedule(request.user, instructor.instructor_id)
 
     exp_str = "лет"
@@ -421,8 +460,6 @@ def add_measure(request):
         is_chart = 0
 
     chart = get_plot(customer.measure_dates, customer.measured_weights)
-    print(customer.measure_dates)
-    print(is_chart)
     return JsonResponse({'chart': chart, 'is_chart': is_chart}, safe=False)
 
 def delete_measure(request):
@@ -526,7 +563,6 @@ def customer_training_records(request):
     user_id_list = []
     for user in users_instructors:
         user_id_list.append(user.id)
-   # club_instructors = Instructors.objects.filter(user__in=user_id_list)
     club_instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
     club_instructors_data = []
     for instr in club_instructors:
@@ -712,7 +748,19 @@ def instructor_attached_customers(request):
 
     return render(request, 'main/instructor_attached_customers.html', {'role': role, 'customers_data': customers_data})
 
+def instructor_training_records(request):
+    role = get_role_json(request)
+    week = get_week()
+    selected_week = request.GET.get('week_num')
+    if selected_week:
+        week = selected_week
+    instructor_shedule, day_of_week_date = form_instructors_shedule_for_week(request.user, role['instructor'].instructor_id, week)
 
+
+    return render(request, "main/instructor_training_records.html",
+                  {'role': get_role_json(request), 'address': address, 'shedule': instructor_shedule,
+                   'day_of_week_date': day_of_week_date,
+                   'current_week': week})
 
 def admin_profile(request):
     return render(request, "main/admin_profile.html", {'role': get_role_json(request)})

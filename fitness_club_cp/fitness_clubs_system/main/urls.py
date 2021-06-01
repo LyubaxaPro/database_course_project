@@ -29,5 +29,6 @@ urlpatterns = [
     path('edit_instructor/', edit_instructor, name='edit_instructor'),
     path('instructor_add_personal_training/', instructor_add_personal_training, name='instructor_add_personal_training'),
     path('instructor_delete_personal_training/', instructor_delete_personal_training, name='instructor_delete_personal_training'),
-    path('instructor_attached_customers/', instructor_attached_customers, name='instructor_attached_customers')
+    path('instructor_attached_customers/', instructor_attached_customers, name='instructor_attached_customers'),
+    path('instructor_training_records/', instructor_training_records, name='instructor_training_records')
 ]
