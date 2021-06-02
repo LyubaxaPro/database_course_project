@@ -1,0 +1,140 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Групповые занятия
+{% endblock %}
+
+{% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    $('.btn_select_club').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_select_club clicked');
+        console.log($('#select_club').val())
+        document.location.href = '/group_classes_admin/?club_id=' + $('#select_club').val();
+     });
+
+    $('.btn_message').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_message clicked');
+        var name = $('#select_group_class').val()
+        var message = $('#message-text').val()
+        console.log(name);
+        console.log(message);
+    });
+
+	$('#selectModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    })
+});
+</script>
+    <div class="features">
+      <select id="select_club">
+        {% for club in clubs %}
+          {% if club.club_id == club_id %}
+          <option selected value={{ club.club_id }}>{{ club.address }}</option>
+          {% else %}
+            <option value={{ club.club_id }}>{{ club.address }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      <button class="btn btn_select_club knopka">Показать расписание</button>
+
+        <h1>Расписание</h1>
+
+        <table>
+          <thead>
+            <tr>
+              <td>Время</td>
+              <td>Понедельник</td>
+              <td>Вторник</td>
+              <td>Среда</td>
+              <td>Четверг</td>
+              <td>Пятница</td>
+              <td>Суббота</td>
+              <td>Воскресенье</td>
+
+            </tr>
+          </thead>
+          <tbody class="table_body">
+
+          {% for time, tdata in classes_data.items %}
+            <tr>
+                <td> {{ time }}</td>
+                {% for day, value in tdata.items %}
+
+                    {% if value|length == 0  %}
+                        <td>
+                        {% if role.is_admin %}
+                         <button  type="button" class="btn btn-outline-success btn_add_class_by_admin btn-floating" data-toggle="modal" data-target="#selectModal" data-whatever="@mdo" data-time='{{ time }}' data-day='{{ day }}'><i class="fas fa-plus"></i></button>
+                        {% else %}
+                            -
+                        {% endif %}
+                        </td>
+                        {% else %}
+                        <td>
+
+                        {%for v in value%}
+                            <p>{{ v.class_name }} {{ v.instructor_name }}</p>
+                            {% if role.is_admin %}
+                            <button  type="button"class="btn btn-outline-danger btn_delete_class_by_admin btn-floating" data-shedule-id='{{ value.i_shedule_id }}'><i class="fas fa-trash"></i></button>
+                            {% endif %}
+                        {% endfor %}
+                        </td>
+
+                    {% endif %}
+                {% endfor %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+        <h2>Описание занятий</h2>
+        {% for i in classes %}
+            <details>
+            <summary>{{ i.class_name }}</summary>
+                <p>Длительнось занятия: {{ i.duration }} минут</p>
+                <p>{{ i.description }}</p>
+            </details>
+        {% endfor %}
+        </div>
+</div>
+<div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="selectModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" style="margin-left:0" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="selectModalLabel">Выберите тренера и занятие</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label class="control-label">Занятие</label>
+          <select id="select_group_class">
+              {% for class in classes %}
+              <option value={{ class.class_id }} > {{ class.class_name }}</option>
+              {% endfor %}
+            </select>
+<!--            <input type="select" id="group_class">-->
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">Message:</label>
+            <textarea id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn_message" data-dismiss="modal">Send message</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

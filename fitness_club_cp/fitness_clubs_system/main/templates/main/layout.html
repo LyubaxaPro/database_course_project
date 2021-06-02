@@ -35,13 +35,18 @@
             <a href="{% url 'home' %}"><li><i class="fas fa-home"></i> Главная</li></a>
             <a href="{% url 'address' %}"><li><i class="fa fa-map-marker"></i> Адреса</li></a>
             <a href="{% url 'services' %}"><li><i class="fa fa-bicycle"></i> Услуги</li></a>
+            {% if role.is_admin %}
+             <a href="{% url 'group_classes_admin' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
+            {% else %}
             <a href="{% url 'groupclasses' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
+            {% endif %}
             <a href="{% url 'instructors' %}"><li><i class="fas fa-home"></i> Инструкторы</li></a>
             <a href="{% url 'prices' %}"><li><i class="fa fa-shopping-bag"></i> Цены </li></a>
 
             {% if role.is_guest %}
             <a href="{% url 'login' %}"><li><i class="fas fa-home"></i> Вход</li></a>
-            <a href="{% url 'signup' %}"><li><i class="fas fa-home"></i> Регистрация</li></a>
+            <a href="{% url 'signup_instructor' %}"><li><i class="fas fa-home"></i> Зарегистрироваться как инструктор</li></a>
+            <a href="{% url 'signup_customer' %}"><li><i class="fas fa-home"></i> Зарегистрироваться как клиент</li></a>
             {% endif %}
 
             {% if not role.is_guest %}
@@ -54,6 +59,8 @@
         {% block content %}
         {% endblock %}
     </main>
-
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 </body>
 </html>

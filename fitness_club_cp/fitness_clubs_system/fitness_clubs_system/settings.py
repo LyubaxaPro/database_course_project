@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'crispy_forms'
 ]
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -194,7 +196,7 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
+LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'home'
 MEDIA_URL = '/media/'  # является путем файловой системы, куда пользователи будут загружать файлы;
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # представляет собой URL, который мы можем использовать в шаблонах для файлов.

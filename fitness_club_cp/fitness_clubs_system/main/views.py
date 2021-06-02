@@ -763,5 +763,25 @@ def instructor_training_records(request):
                    'current_week': week})
 
 def admin_profile(request):
-    return render(request, "main/admin_profile.html", {'role': get_role_json(request)})
+    role = get_role_json(request)
+    fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
+    address = fitness_club[0].city + ", " + fitness_club[0].address
+    return render(request, "main/admin_profile.html", {'role': role, 'address': address})
 
+def group_classes_admin(request):
+    club_id = 1
+    selected_club = request.GET.get('club_id')
+    if selected_club:
+        club_id = selected_club
+    classes_data = form_classes_data(request.user, club_id)
+
+    clubs = FitnessClubsRepository.read_all(request.user)
+    clubs_data = []
+    for cl in clubs:
+        address = cl.city + ", " + cl.address
+        clubs_data.append({'address': address, 'club_id': cl.club_id})
+
+    classes = GroupClassesRepository.read_all(request.user)
+    return render(request, "main/group_classes_admin.html", {'form' : ClubForm(), 'classes_data' : classes_data,
+                                                       'classes':classes, 'role': get_role_json(request),
+                                                             'clubs': clubs_data})

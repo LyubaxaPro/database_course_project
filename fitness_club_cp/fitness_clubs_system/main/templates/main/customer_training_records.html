@@ -362,7 +362,7 @@
                         {%for v in value%}
                             <p>{{ v.class_name }} {{ v.instructor_name }}</p>
                             {%if v.class_not_done %}
-                                {% if v.more_than_maximum_quantity %}
+                                {% if v.more_than_maximum_quantity and not v.is_in_group_classes_records %}
                                     <p>На занятие уже записано максимальное количество человек </p>
                                 {% else %}
                                     {% if v.is_in_personal_trainings_records %}

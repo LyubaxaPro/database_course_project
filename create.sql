@@ -1,3 +1,16 @@
+-- drop table instructor_shedule_customers;
+-- drop table instructor_shedule;
+-- drop table special_offers;
+-- drop table group_classes_customers_records;
+-- drop table group_classes_shedule;
+-- drop table customers;
+-- drop table instructors;
+-- drop table group_classes;
+-- drop table services;
+-- drop table admin_records;
+-- drop table prices;
+-- drop table fitness_clubs;
+
 CREATE TABLE fitness_clubs
 (
     club_id integer primary key,
@@ -37,8 +50,9 @@ CREATE TABLE prices
     days_of_week text[] 
 );
 
-copy prices(tariff_id, tariff_name, tariff_description, price_one_month, price_three_month, price_six_month, price_one_year) 
-from '/home/lyubaxapro/database_course_project/database_data/prices.csv' with delimiter ',' header csv;
+copy prices(tariff_id, tariff_name, tariff_description, price_one_month, price_three_month,
+            price_six_month, price_one_year, is_time_restricted, min_time, max_time, days_of_week) 
+from '/home/lyubaxapro/database_course_project/database_data/prices.csv' with delimiter ';' header csv;
 
 CREATE TABLE admin_records (
     update_instructor json,
@@ -65,7 +79,7 @@ copy group_classes(class_id, class_name, duration, description) from '/home/lyub
 
 create table instructors
 (   
-    instructor_id integer primary key,
+    instructor_id serial primary key,
     user_id integer references users_customuser(id) ON DELETE CASCADE ON UPDATE CASCADE,
     sex text,
     name text, 
@@ -82,7 +96,7 @@ from '/home/lyubaxapro/database_course_project/database_data/instructors.csv' wi
 
 create table customers
 (
-    customer_id integer primary key,
+    customer_id serial primary key,
     user_id integer references users_customuser(id) ON DELETE CASCADE ON UPDATE CASCADE,
     sex text,
     name text,
@@ -102,7 +116,7 @@ copy customers(customer_id, user_id, sex, name, surname, patronymic, day_of_birt
 
 create table group_classes_shedule
 (
-    shedule_id integer primary key,
+    shedule_id serial primary key,
     class_id integer references group_classes(class_id) ON DELETE CASCADE ON UPDATE CASCADE,
     club_id integer references fitness_clubs(club_id) ON DELETE CASCADE ON UPDATE CASCADE,
     instructor_id integer references instructors(instructor_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -137,7 +151,7 @@ from '/home/lyubaxapro/database_course_project/database_data/special_offers.csv'
 
 create table instructor_shedule
 (
-    i_shedule_id integer primary key,
+    i_shedule_id serial primary key,
     instructor_id integer references instructors(instructor_id) ON DELETE CASCADE ON UPDATE CASCADE,
     training_time time,
     day_of_week text
@@ -157,25 +171,3 @@ create table instructor_shedule_customers
 
 copy instructor_shedule_customers(customer_id, i_shedule_id, training_date)
 from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule_customers.csv' with delimiter ',' header csv;
-
-
-
--- copy prices(tariff_id, tariff_name, tariff_description, price_one_month, price_three_month, price_six_month, price_one_year) 
--- from '/home/lyubaxapro/database_course_project/database_data/prices.csv' with delimiter ',' header csv;
--- copy services(service_id, service_name, service_description) from '/home/lyubaxapro/database_course_project/database_data/services.csv' with delimiter ',' header csv;
--- copy group_classes(class_id, class_name, duration, description) from '/home/lyubaxapro/database_course_project/database_data/group_classes.csv' with delimiter ',' header csv;
--- copy instructors(instructor_id, user_id, sex, name, surname, patronymic, education, experience, achievements, specialization) 
--- from '/home/lyubaxapro/database_course_project/database_data/instructors.csv' with delimiter ';' header csv;
-
--- copy customers(customer_id, user_id, sex, name, surname, patronymic, day_of_birth, measure, tariff_id, tariff_end_date,
--- instructor_id) from '/home/lyubaxapro/database_course_project/database_data/customers.csv' with delimiter ';' header csv;
--- copy group_classes_shedule(shedule_id,class_id, club_id, instructor_id, class_time,
--- day_of_week, maximum_quantity) from '/home/lyubaxapro/database_course_project/database_data/group_classes_shedule.csv' with delimiter ',' header csv;
--- copy group_classes_customers_records(shedule_id, customer_id, class_date) 
--- from '/home/lyubaxapro/database_course_project/database_data/group_classes_customers_records.csv' with delimiter ',' header csv;
--- copy special_offers(offer_id, offer_name, offer_description)
--- from '/home/lyubaxapro/database_course_project/database_data/special_offers.csv' with delimiter ',' header csv;
--- copy instructor_shedule(i_shedule_id ,instructor_id ,training_time ,day_of_week)
--- from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule.csv' with delimiter ',' header csv;
--- copy instructor_shedule_customers(customer_id, i_shedule_id, training_date)
--- from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule_customers.csv' with delimiter ',' header csv;

@@ -25,7 +25,7 @@ class ClubForm(forms.Form):
 class CustomerProfileForm(forms.ModelForm):
     class Meta:
         model = Customers
-        fields = ('name', 'surname', 'patronymic', 'day_of_birth', 'height')
+        fields = ('name', 'surname', 'patronymic', 'day_of_birth', 'height', 'tariff', 'tariff_end_date')
 
 class AddMeasureForm(forms.Form):
 
@@ -35,4 +35,4 @@ class AddMeasureForm(forms.Form):
 class InstructorProfileForm(forms.ModelForm):
     class Meta:
         model = Instructors
-        fields = ('name', 'surname', 'patronymic', 'education', 'experience', 'achievements', 'specialization')
+        fields = ('name', 'surname', 'patronymic', 'education', 'experience', 'achievements', 'specialization', 'photo')

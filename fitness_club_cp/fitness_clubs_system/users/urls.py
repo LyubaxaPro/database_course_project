@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import UserLoginView, UserSignUpView
+from .views import UserLoginView, InstructorSignUpView, CustomerSignUpView
 from django.contrib.auth import views
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
-    path('signup/', UserSignUpView.as_view(), name='signup'),
-    path('logout/', views.LogoutView.as_view(), name='logout'),
+    path('signup/instructor', InstructorSignUpView.as_view(), name='signup_instructor'),
+    path('signup/customer', CustomerSignUpView.as_view(), name='signup_customer'),
 ]

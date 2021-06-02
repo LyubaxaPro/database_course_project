@@ -1,33 +1,35 @@
 <!-- templates/registration/signup.html -->
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="features">
-<h2>Sign up as {{role}}</h2>
 
 <form method="post">
-  {% csrf_token %}
-  {{ user_form.as_p }}
-  <br>
-  <br>
-  {{ profile_form.as_p }}
-  {% if profile_form.errors %}
+    {% csrf_token %}
+    {{ user_form|crispy }}
+    <br>
+    {{ profile_form|crispy }}
+    {% if profile_form.errors %}
     {% for field in profile_form %}
-        {% for error in field.errors %}
-            <div class="alert alert-danger">
-                <strong>{{ error|escape }}</strong>
-            </div>
-        {% endfor %}
+    {% for error in field.errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+    {% endfor %}
     {% endfor %}
     {% for error in profile_form.non_field_errors %}
-        <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
-        </div>
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
     {% endfor %}
-  {% endif %}
-  <br>
-  <br>
-  <button type="submit">Sign Up</button>
+    {% endif %}
+    {% if specializations %}
+    <br>
+
+    {% endif %}
+    <br>
+    <br>
+    <button type="submit" class="button-submit-success">Зарегистрироваться!</button>
+
 </form>
-</div>
 {% endblock %}

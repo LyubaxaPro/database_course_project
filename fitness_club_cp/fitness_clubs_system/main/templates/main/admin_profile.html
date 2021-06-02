@@ -6,12 +6,10 @@
 {% endblock %}
 
 {% block content %}
-    <style>
-    .hideText {display: none; }
-    </style>
-    <div class="features">
-        <h1> Профиль администратора</h1>
-        <b>Вы зарегестрировались как администратор</p>
+    <div class="profile">
+    <h1>Профиль администратора</h1>
+    <p><b>Логин: </b> {{ role.user.login }} </p>
+    <p><b>Email: </b> {{ role.user.email }} </p>
+    <p><b>Вы работаете в фитнес-клубе по адресу: </b> {{ address }} </p>
     </div>
-
 {% endblock %}

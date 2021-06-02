@@ -14,18 +14,18 @@ class AdminRecords(models.Model):
         db_table = 'admin_records'
 
 class Customers(models.Model):
-    customer_id = models.IntegerField(primary_key=True)
+    customer_id = models.AutoField(primary_key=True, unique=True)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, unique=True)
     sex = models.TextField(blank=True, null=True)
-    name = models.TextField(blank=True, null=True, verbose_name='Имя')
-    surname = models.TextField(blank=True, null=True, verbose_name='Фамилия')
-    patronymic = models.TextField(blank=True, null=True, verbose_name='Отчество')
-    day_of_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
-    height = models.IntegerField(blank=True, null=True, default=0, verbose_name='Рост')
+    name = models.CharField(verbose_name='Имя', max_length=50)
+    surname = models.CharField(verbose_name='Фамилия', max_length=50)
+    patronymic = models.CharField(verbose_name='Отчество', max_length=50)
+    day_of_birth = models.DateField(verbose_name='Дата рождения')
+    height = models.IntegerField(default=0, verbose_name='Рост')
     measured_weights = ArrayField(models.IntegerField(blank=True, null=True, default=0), default=list())
     measure_dates = ArrayField(models.DateField(blank=True, null=True, default=datetime.date.today), default=list())
-    tariff = models.ForeignKey('Prices', on_delete=models.CASCADE, blank=True, null=True)
-    tariff_end_date = models.DateField(blank=True, null=True)
+    tariff = models.ForeignKey('Prices', on_delete=models.CASCADE)
+    tariff_end_date = models.DateField()
     instructor = models.ForeignKey('Instructors', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
@@ -56,17 +56,17 @@ class GroupClassesCustomersRecords(models.Model):
         db_table = 'group_classes_customers_records'
 
 class Instructors(models.Model):
-    instructor_id = models.IntegerField(primary_key=True)
+    instructor_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, unique=True)
     sex = models.TextField(blank=True, null=True)
-    name = models.TextField(blank=True, null=True)
-    surname = models.TextField(blank=True, null=True)
-    patronymic = models.TextField(blank=True, null=True)
-    education = ArrayField(models.TextField(blank=True, null=True))  # This field type is a guess.
-    experience = models.IntegerField(blank=True, null=True)
-    achievements = ArrayField(models.TextField(blank=True, null=True))  # This field type is a guess.
-    specialization = ArrayField(models.TextField(blank=True, null=True))  # This field type is a guess.
-    photo = models.ImageField(upload_to='images/', null=True,  default= 'main/img/trener.jpg')
+    name = models.CharField(max_length=50, verbose_name='Имя')
+    surname = models.CharField(max_length=50, verbose_name='Фамилия')
+    patronymic = models.CharField(max_length=50, verbose_name='Отчество')
+    education = ArrayField(models.TextField(blank=True, null=True), verbose_name='Образование')  # This field type is a guess.
+    experience = models.IntegerField( verbose_name='Стаж')
+    achievements = ArrayField(models.TextField(blank=True, null=True),  verbose_name='Достижения')  # This field type is a guess.
+    specialization = ArrayField(models.TextField(blank=True, null=True),  verbose_name='Специализация')  # This field type is a guess.
+    photo = models.ImageField(upload_to='images/', null=True, default= 'images/default.jpg',  verbose_name='Фото')
 
     def __str__(self):
         return str(self.instructor_id)
@@ -145,7 +145,7 @@ class Services(models.Model):
 
 
 class SpecialOffers(models.Model):
-    offer_id = models.IntegerField(primary_key=True)
+    offer_id = models.AutoField(primary_key=True)
     offer_name = models.TextField(blank=True, null=True)
     offer_description = models.TextField(blank=True, null=True)
 
