@@ -5,6 +5,62 @@
 {% endblock %}
 
 {% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    $('.btn_delete_special_offer_by_admin').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_special_offer_by_admin clicked');
+        var offer_id = $(this).attr("data-id");
+        console.log(offer_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_special_offer_by_admin/?offer_id=' + offer_id,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/prices/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+   $('.btn_add_special_offer_by_admin').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_add_special_offer_by_admin clicked');
+        var offer_name = $('#add_offer_name').val()
+        var offer_description = $('#add_offer_description').val()
+
+        console.log(offer_name)
+        console.log(offer_description)
+
+        if (offer_name == '' || offer_description == ''){
+            alert("Поля должны быть заполнены");
+            return
+        }
+
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_special_offer_by_admin/?offer_name=' + offer_name + '&offer_description=' + offer_description,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/prices/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+});
+</script>
         <div class="features">
             <h1> Тарифы </h1>
             <ul>
@@ -27,9 +83,20 @@
                     <li>
                         <h2>{{ offer.offer_name }}</h2>
                         <p>{{ offer.offer_description}} </p>
+                        {% if role.is_admin %}
+                        <button  type="button" class="btn btn-outline-danger btn_delete_special_offer_by_admin btn-floating" data-id = {{ offer.offer_id }}><i class="fas fa-trash"></i></button>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
-
+            {% if role.is_admin %}
+                <h3>Добавить специальное предложение</h3>
+                <p><b>Название:</b><br>
+                <input type="text" id="add_offer_name">
+                <p><b>Описание:</b><br>
+                <input type="text" id="add_offer_description">
+                <p></p>
+                <button class="btn btn-success btn-icon btn_add_special_offer_by_admin"> <span class="icon"><i class="fas fa-plus"></i></span>Добавить специальное предложение</button>
+            {% endif %}
         </div>
 {% endblock %}

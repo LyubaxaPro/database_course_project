@@ -15,7 +15,7 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
 
 from .forms import *
 
-from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule, GroupClassesShedule
+from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule, GroupClassesShedule, SpecialOffers
 from .utils import get_plot
 
 days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
@@ -858,3 +858,22 @@ def delete_group_class_in_shedule(request):
 
     return JsonResponse({'q': []}, safe=False)
 
+
+def delete_special_offer_by_admin(request):
+    offer_id = request.GET.get("offer_id")
+    SpecialOffersRepository.delete_filtered(request.user, {'offer_id': offer_id})
+
+    return JsonResponse({'q': []}, safe=False)
+
+def add_special_offer_by_admin(request):
+    offer_name = request.GET.get("offer_name")
+    offer_description = request.GET.get("offer_description")
+    print(offer_name)
+    print(offer_description)
+
+    new_record = SpecialOffers()
+    new_record.offer_name = offer_name
+    new_record.offer_description = offer_description
+
+    SpecialOffersRepository.create(request.user, new_record)
+    return JsonResponse({'q': []}, safe=False)

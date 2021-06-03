@@ -117,7 +117,7 @@ class InstructorSheduleCustomers(models.Model):
         db_table = 'instructor_shedule_customers'
 
 class Prices(models.Model):
-    tariff_id = models.IntegerField(primary_key=True)
+    tariff_id = models.AutoField(primary_key=True)
     tariff_name = models.TextField(unique=True, blank=True, null=True)
     tariff_description = models.TextField(unique=True, blank=True, null=True)
     price_one_month = models.IntegerField(blank=True, null=True)
