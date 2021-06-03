@@ -15,7 +15,7 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
 
 from .forms import *
 
-from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule
+from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule, GroupClassesShedule
 from .utils import get_plot
 
 days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
@@ -91,6 +91,37 @@ def form_classes_data(user, club_id):
 
     for current_class in classes:
         classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name": InstructorsRepository.read_filtered(user,
+                                                                                                        {"instructor_id": current_class.instructor_id})[0].name,
+                                                                                          "class_name": current_class.class_field.class_name,
+                                                                                          'shedule_id': current_class.shedule_id })
+    return classes_data
+
+def form_admin_classes_data(user, club_id):
+    classes = GroupClassesSheduleRepository.read_filtered(user, {"club_id" : int(club_id)})
+
+    classes_data = {}
+    seconds = 32400
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    for i in range (9, 21):
+        data = {}
+        for day in days:
+
+            data.update({day: {'data': [], 'busy_instructors': json.dumps([])}})
+        classes_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
+        seconds += 3600
+
+    for current_class in classes:
+        if len(json.loads(classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week]['busy_instructors'])) == 0:
+            busy = GroupClassesSheduleRepository.read_filtered(user, {'class_time': current_class.class_time,
+                                                                      'day_of_week': current_class.day_of_week,
+                                                                      "club_id": int(club_id)})
+            instructors = []
+            for b in busy:
+                instructors.append(b.instructor_id)
+
+            classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].update({'busy_instructors': json.dumps(instructors)})
+        classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week]['data'].append({"instructor_name": InstructorsRepository.read_filtered(user,
                                                                                                         {"instructor_id": current_class.instructor_id})[0].name,
                                                                                           "class_name": current_class.class_field.class_name,
                                                                                           'shedule_id': current_class.shedule_id})
@@ -769,19 +800,61 @@ def admin_profile(request):
     return render(request, "main/admin_profile.html", {'role': role, 'address': address})
 
 def group_classes_admin(request):
-    club_id = 1
-    selected_club = request.GET.get('club_id')
-    if selected_club:
-        club_id = selected_club
-    classes_data = form_classes_data(request.user, club_id)
+    role = get_role_json(request)
+    club_id = role['user'].club
+    classes_data = form_admin_classes_data(request.user, club_id)
 
-    clubs = FitnessClubsRepository.read_all(request.user)
-    clubs_data = []
-    for cl in clubs:
-        address = cl.city + ", " + cl.address
-        clubs_data.append({'address': address, 'club_id': cl.club_id})
+    club_info = FitnessClubsRepository.read_filtered(request.user, {'club_id': club_id})[0]
+    address = club_info.city + ", " + club_info.address
 
     classes = GroupClassesRepository.read_all(request.user)
-    return render(request, "main/group_classes_admin.html", {'form' : ClubForm(), 'classes_data' : classes_data,
-                                                       'classes':classes, 'role': get_role_json(request),
-                                                             'clubs': clubs_data})
+
+    users = CustomUserRepository.read_filtered(request.user, {"club": club_id})
+    user_id_list = []
+    for user in users:
+        user_id_list.append(user.id)
+
+    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
+
+    return render(request, "main/group_classes_admin.html", {'classes_data' : classes_data,
+                                                       'classes':classes, 'role': role,
+                                                             'address': address, 'instructors': instructors,
+                                                             'club_id': club_id})
+
+def add_group_class_in_shedule(request):
+    day = request.GET.get("day")
+    time_raw = request.GET.get("time")
+    time = datetime.datetime.strptime(time_raw, '%H:%M').time()
+    instructor_id = request.GET.get("instructor_id")
+    class_id = request.GET.get("class_id")
+    club_id = request.GET.get("club_id")
+    maximum_quantity = request.GET.get("maximum_quantity")
+    busy_instructors_str = request.GET.get("busy_instructors")
+    print(busy_instructors_str)
+    busy_instructors = json.loads(busy_instructors_str)
+
+    if int(instructor_id) in busy_instructors:
+        response = JsonResponse({"error": "there was an error"})
+        response.status_code = 403
+        return response
+
+    new_record = GroupClassesShedule()
+    new_record.class_field = GroupClassesRepository.read_filtered(request.user, {'class_id': class_id})[0]
+    new_record.club = FitnessClubsRepository.read_filtered(request.user, {'club_id': club_id})[0]
+    new_record.instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})[0]
+    new_record.class_time = time
+    new_record.day_of_week = day
+    new_record.maximum_quantity = int(maximum_quantity)
+
+    GroupClassesSheduleRepository.create(request.user, new_record)
+
+    return JsonResponse({'q': []}, safe=False)
+
+def delete_group_class_in_shedule(request):
+    shedule_id = request.GET.get("shedule_id")
+    print(shedule_id)
+    GroupClassesSheduleRepository.delete_filtered(request.user, {'shedule_id': shedule_id})
+
+
+    return JsonResponse({'q': []}, safe=False)
+

@@ -75,7 +75,7 @@ class Instructors(models.Model):
         db_table = 'instructors'
 
 class GroupClassesShedule(models.Model):
-    shedule_id = models.IntegerField(primary_key=True)
+    shedule_id = models.AutoField(primary_key=True)
     class_field = models.ForeignKey(GroupClasses, on_delete=models.CASCADE, db_column='class_id', blank=True, null=True)  # Field renamed because it was a Python reserved word.
     club = models.ForeignKey(FitnessClubs, on_delete=models.CASCADE, db_column='club_id', blank=True, null=True)
     instructor = models.ForeignKey(Instructors, on_delete=models.CASCADE, db_column='instructor_id', blank=True, null=True)

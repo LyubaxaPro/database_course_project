@@ -387,8 +387,7 @@ class GroupClassesCustomersRecordsRepository(CRUDRepository):
 class GroupClassesSheduleRepository(CRUDRepository):
     @classmethod
     def create(cls, client_user, group_classes_shed):
-        group_classes_shed.save(
-            using=cls.db_config_manager.get_connection(client_user))
+        group_classes_shed.save(using=cls.db_config_manager.get_connection(client_user))
 
     @classmethod
     def read_by_pk(cls, client_user, pk):

@@ -103,15 +103,12 @@ class CustomerSignUpView(View):
 
         user_form = CustomUserSignUpForm(request.POST)
         profile_form = CustomerProfileForm(request.POST)
-        print(user_form)
-        print(profile_form)
 
         if user_form.is_valid() and profile_form.is_valid():
             print("FFFFFF")
 
             user = user_form.save(commit=False)
             user.role = CustomUser.CUSTOMER
-            print(profile_form)
             customer = profile_form.save(commit=False)
             customer.user = user
             customer.customer_id = user.id

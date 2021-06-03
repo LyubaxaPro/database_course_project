@@ -10,44 +10,79 @@
 <script>
 $(document).ready(function () {
 
-    $('.btn_select_club').on('click', function (e) {
-        e.preventDefault();
-        console.log('button btn_select_club clicked');
-        console.log($('#select_club').val())
-        document.location.href = '/group_classes_admin/?club_id=' + $('#select_club').val();
-     });
+	$('#selectModal').on('show.bs.modal', function (event) {
+    var time = $(event.relatedTarget).attr("data-time");
+    var day = $(event.relatedTarget).attr("data-day");
+    var busy_instructors = $(event.relatedTarget).attr("data-busy-instructors");
+    console.log(busy_instructors)
+    var modal = $(this)
+    document.getElementById('btn_submit').setAttribute('data-time', time)
+    document.getElementById('btn_submit').setAttribute('data-day', day)
+    document.getElementById('btn_submit').setAttribute('data-busy-instructors', busy_instructors)
 
-    $('.btn_message').on('click', function (e) {
+    })
+
+    $('.btn_submit').on('click', function (e) {
         e.preventDefault();
-        console.log('button btn_message clicked');
-        var name = $('#select_group_class').val()
-        var message = $('#message-text').val()
-        console.log(name);
-        console.log(message);
+        console.log('button btn_submit clicked');
+        var class_id = $('#select_group_class').val();
+        var instructor_id = $('#select_instructor').val();
+        var maximum_quantity = $('#select_maximum_quantity').val();
+        var time =  $(this).attr("data-time");
+        var day = $(this).attr("data-day");
+        var busy_instructors = $(this).attr("data-busy-instructors");
+        console.log(class_id);
+        console.log(instructor_id);
+        console.log(time);
+        console.log(day);
+        console.log(busy_instructors)
+        console.log(maximum_quantity);
+        if (maximum_quantity <= 0 || maximum_quantity > 40){
+            alert("Максимальное количество человек должно быть положительным целым числом и не превышать 40");
+            return
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_group_class_in_shedule/?class_id=' + class_id + '&instructor_id=' + instructor_id + '&time=' +
+             time + '&day=' + day + '&club_id=' + {{ club_id }} + '&maximum_quantity=' + maximum_quantity +
+             '&busy_instructors=' + busy_instructors,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/group_classes_admin/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
     });
 
-	$('#selectModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-    var modal = $(this)
-    })
+    $('.btn_delete_class_by_admin').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_class_by_admin clicked');
+        var shedule_id =  $(this).attr("data-shedule-id");
+
+        console.log(shedule_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_group_class_in_shedule/?shedule_id=' + shedule_id,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/group_classes_admin/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
 });
 </script>
     <div class="features">
-      <select id="select_club">
-        {% for club in clubs %}
-          {% if club.club_id == club_id %}
-          <option selected value={{ club.club_id }}>{{ club.address }}</option>
-          {% else %}
-            <option value={{ club.club_id }}>{{ club.address }}</option>
-          {% endif %}
-        {% endfor %}
-      </select>
-      <button class="btn btn_select_club knopka">Показать расписание</button>
-
-        <h1>Расписание</h1>
-
+        <h1>Расписание групповых занятий</h1>
+        <p>Расписание для клуба по адресу {{ address }}</p>
         <table>
           <thead>
             <tr>
@@ -69,24 +104,19 @@ $(document).ready(function () {
                 <td> {{ time }}</td>
                 {% for day, value in tdata.items %}
 
-                    {% if value|length == 0  %}
+                    {% if value.data|length == 0  %}
                         <td>
-                        {% if role.is_admin %}
-                         <button  type="button" class="btn btn-outline-success btn_add_class_by_admin btn-floating" data-toggle="modal" data-target="#selectModal" data-whatever="@mdo" data-time='{{ time }}' data-day='{{ day }}'><i class="fas fa-plus"></i></button>
-                        {% else %}
-                            -
-                        {% endif %}
+                         <button  type="button" class="btn btn-outline-success btn_add_class_by_admin btn-floating" data-toggle="modal" data-target="#selectModal" data-time='{{ time }}' data-busy-instructors='{{value.busy_instructors }}' data-day='{{ day }}'><i class="fas fa-plus"></i></button>
                         </td>
                         {% else %}
                         <td>
 
-                        {%for v in value%}
+                        {%for v in value.data %}
                             <p>{{ v.class_name }} {{ v.instructor_name }}</p>
-                            {% if role.is_admin %}
-                            <button  type="button"class="btn btn-outline-danger btn_delete_class_by_admin btn-floating" data-shedule-id='{{ value.i_shedule_id }}'><i class="fas fa-trash"></i></button>
-                            {% endif %}
+                            <button  type="button"class="btn btn-outline-danger btn_delete_class_by_admin btn-floating" data-shedule-id='{{ v.shedule_id }}'><i class="fas fa-trash"></i></button>
                         {% endfor %}
-                        </td>
+                         <button  type="button" class="btn btn-outline-success btn_add_class_by_admin btn-floating" data-toggle="modal" data-target="#selectModal" data-time='{{ time }}' data-day='{{ day }}' data-busy-instructors='{{ value.busy_instructors }}'><i class="fas fa-plus"></i></button>
+                         </td>
 
                     {% endif %}
                 {% endfor %}
@@ -121,17 +151,24 @@ $(document).ready(function () {
               <option value={{ class.class_id }} > {{ class.class_name }}</option>
               {% endfor %}
             </select>
-<!--            <input type="select" id="group_class">-->
           </div>
-          <div class="form-group">
-            <label for="message-text" class="control-label">Message:</label>
-            <textarea id="message-text"></textarea>
+        <div class="form-group">
+            <label class="control-label">Занятие</label>
+          <select id="select_instructor">
+              {% for instructor in instructors %}
+              <option value={{ instructor.instructor_id }} >{{ instructor.surname }} {{ instructor.name }} {{ instructor.patronymic }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        <div class="form-group">
+            <label class="control-label">Максимальное количество человек</label>
+          <input id="select_maximum_quantity" type="number" min="1" max="40" required>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary btn_message" data-dismiss="modal">Send message</button>
+        <button type="button" class="btn btn-primary btn_submit" data-dismiss="modal" id="btn_submit">Добавить занятие</button>
       </div>
     </div>
   </div>
