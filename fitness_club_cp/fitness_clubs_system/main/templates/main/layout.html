@@ -37,6 +37,7 @@
             <a href="{% url 'services' %}"><li><i class="fa fa-bicycle"></i> Услуги</li></a>
             {% if role.is_admin %}
              <a href="{% url 'group_classes_admin' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
+            <a href="{% url 'group_class_statistics' %}"><li><i class="fas fa-futbol"></i> Статистика посещения групповых занятий</li></a>
             {% else %}
             <a href="{% url 'groupclasses' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
             {% endif %}

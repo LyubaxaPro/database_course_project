@@ -96,17 +96,21 @@ def form_classes_data(user, club_id):
                                                                                           'shedule_id': current_class.shedule_id })
     return classes_data
 
-def form_admin_classes_data(user, club_id):
+def form_admin_classes_data(user, club_id, week):
     classes = GroupClassesSheduleRepository.read_filtered(user, {"club_id" : int(club_id)})
+    dates_raw = get_week_dates(week)
 
     classes_data = {}
     seconds = 32400
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    days_en = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    days_dates = {}
+    for i in range(len(dates_raw)):
+        days_dates.update({days_en[i]: dates_raw[i]})
 
     for i in range (9, 21):
         data = {}
         for day in days:
-
             data.update({day: {'data': [], 'busy_instructors': json.dumps([])}})
         classes_data.update({time.strftime("%H:%M", time.gmtime(seconds)): data})
         seconds += 3600
@@ -121,11 +125,20 @@ def form_admin_classes_data(user, club_id):
                 instructors.append(b.instructor_id)
 
             classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].update({'busy_instructors': json.dumps(instructors)})
+
+        count = len(GroupClassesCustomersRecordsRepository.read_filtered(user, {'shedule_id': current_class.shedule_id,
+                                                                                'class_date': days_dates[current_class.day_of_week]}))
+
         classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week]['data'].append({"instructor_name": InstructorsRepository.read_filtered(user,
                                                                                                         {"instructor_id": current_class.instructor_id})[0].name,
                                                                                           "class_name": current_class.class_field.class_name,
-                                                                                          'shedule_id': current_class.shedule_id})
-    return classes_data
+                                                                                          'shedule_id': current_class.shedule_id,
+                                                                                          'class_date': days_dates[current_class.day_of_week],
+                                                                                                    'count': count})
+    day_of_week_date = {}
+    for i in range(len(days)):
+        day_of_week_date.update({days[days_en[i]]: dates_raw[i]})
+    return classes_data, day_of_week_date
 
 def form_data_for_tarif(tarif, week):
     dates_raw = get_week_dates(week)
@@ -182,9 +195,6 @@ def form_classes_data_for_tarif_group_classes(user, customer_id, club_id, tarif,
                     personal_training_time = InstructorSheduleRepository.read_filtered(user, {'i_shedule_id': train.i_shedule_id})
                     if len(personal_training_time) != 0 and personal_training_time[0].training_time == current_class.class_time:
                         is_in_personal_trainings_records = True
-
-            if is_in_group_classes_records and is_in_personal_trainings_records:
-                print("ОШИБКА: ГРУППОВАЯ И ПЕРСОНАЛЬНАЯ ТРЕНИРОВКА В ОДНО ВРЕМЯ")
 
             if days_dates[current_class.day_of_week] < date_today:
                 class_not_done = False
@@ -800,9 +810,10 @@ def admin_profile(request):
     return render(request, "main/admin_profile.html", {'role': role, 'address': address})
 
 def group_classes_admin(request):
+    week = get_week()
     role = get_role_json(request)
     club_id = role['user'].club
-    classes_data = form_admin_classes_data(request.user, club_id)
+    classes_data, day_dates = form_admin_classes_data(request.user, club_id, week)
 
     club_info = FitnessClubsRepository.read_filtered(request.user, {'club_id': club_id})[0]
     address = club_info.city + ", " + club_info.address
@@ -830,7 +841,7 @@ def add_group_class_in_shedule(request):
     club_id = request.GET.get("club_id")
     maximum_quantity = request.GET.get("maximum_quantity")
     busy_instructors_str = request.GET.get("busy_instructors")
-    print(busy_instructors_str)
+
     busy_instructors = json.loads(busy_instructors_str)
 
     if int(instructor_id) in busy_instructors:
@@ -852,7 +863,6 @@ def add_group_class_in_shedule(request):
 
 def delete_group_class_in_shedule(request):
     shedule_id = request.GET.get("shedule_id")
-    print(shedule_id)
     GroupClassesSheduleRepository.delete_filtered(request.user, {'shedule_id': shedule_id})
 
 
@@ -868,8 +878,6 @@ def delete_special_offer_by_admin(request):
 def add_special_offer_by_admin(request):
     offer_name = request.GET.get("offer_name")
     offer_description = request.GET.get("offer_description")
-    print(offer_name)
-    print(offer_description)
 
     new_record = SpecialOffers()
     new_record.offer_name = offer_name
@@ -877,3 +885,33 @@ def add_special_offer_by_admin(request):
 
     SpecialOffersRepository.create(request.user, new_record)
     return JsonResponse({'q': []}, safe=False)
+
+def statistics_of_traininng(request):
+    week = get_week()
+    selected_week = request.GET.get('week_num')
+    if selected_week:
+        week = selected_week
+
+    role = get_role_json(request)
+    club_id = role['user'].club
+    classes_data, day_of_week_date = form_admin_classes_data(request.user, club_id, week)
+
+    club_info = FitnessClubsRepository.read_filtered(request.user, {'club_id': club_id})[0]
+    address = club_info.city + ", " + club_info.address
+
+    classes = GroupClassesRepository.read_all(request.user)
+
+    users = CustomUserRepository.read_filtered(request.user, {"club": club_id})
+    user_id_list = []
+    for user in users:
+        user_id_list.append(user.id)
+
+    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
+
+    return render(request, "main/group_class_statistics.html", {'classes_data': classes_data,
+                                                             'classes': classes, 'role': role,
+                                                             'address': address, 'instructors': instructors,
+                                                             'club_id': club_id,
+                                                             'day_of_week_date': day_of_week_date,
+                                                                'current_week': week})
+

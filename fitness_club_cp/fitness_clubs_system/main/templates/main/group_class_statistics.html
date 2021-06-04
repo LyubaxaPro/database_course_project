@@ -1,0 +1,69 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}
+    Записи на занятия
+{% endblock %}
+
+{% block content %}
+
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.2.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+
+      $('.btn_select_week').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_select_week clicked');
+        document.location.href = '/group_class_statistics/?week_num=' + $('#week').val();
+         });
+});
+
+</script>
+<div class="features" >
+<h1>Записи на тренировки</h1>
+<label for="week">Выберите дату: </label>
+        <input id="week" type="week" name="week" value="{{ current_week }}">
+        <button class="btn btn-info btn_select_week"> Выбрать неделю </button>
+  <table>
+    <thead>
+        <tr>
+        <td>Время</td>
+        {% for day, date in day_of_week_date.items %}
+          <td>{{ day }} {{ date }}</td>
+        {% endfor %}
+        </tr>
+    </thead>
+    <tbody class="table_body">
+
+    {% for time, tdata in classes_data.items %}
+      <tr>
+          <td> {{ time }}</td>
+          {% for day, value in tdata.items %}
+
+              {% if value.data|length == 0  %}
+                  <td>
+                  <p>-</p>
+                  </td>
+              {% else %}
+                <td>
+              {% for v in value.data %}
+                  {{ v.class_name }}
+                    {{ v.instructor_name }}
+                      <p>Количество записавшихся: {{ v.count }}</p>
+             {% endfor %}
+               </td>
+
+              {% endif %}
+          {% endfor %}
+      </tr>
+    {% endfor %}
+
+    </tbody>
+  </table>
+  </div>
+{% endblock %}
+
+
