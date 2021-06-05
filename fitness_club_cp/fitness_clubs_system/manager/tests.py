@@ -25,11 +25,6 @@ class test_CRUD(TestCase):
             surname = "Владимирский",
             patronymic = "Антонович",
             day_of_birth = "1989-05-23",
-            measure = {
-                        "height": "[177]",
-                        "weights": "[106]",
-                        "measure_dates": "['2019-01-01']"
-                        },
             tariff_end_date = "2021-08-14",
             user = user
         )
@@ -46,11 +41,6 @@ class test_CRUD(TestCase):
         assert(db_customer.surname == "Владимирский")
         assert(db_customer.patronymic == "Антонович")
         assert(str(db_customer.day_of_birth) == "1989-05-23")
-        assert(db_customer.measure == {
-                      "height": "[177]",
-                      "weights": "[106]",
-                      "measure_dates": "['2019-01-01']"
-                  })
         assert(str(db_customer.tariff_end_date) == "2021-08-14")
         assert(db_customer.user_id == 1)
 
@@ -87,8 +77,8 @@ class test_CRUD(TestCase):
             patronymic = "Николаевна",
             education = "{'КемГУ'}",
             experience = 20,
-            achievements = {"'МС по синхронному плаванию'","'Презентер российских конвенций по направлениям step и aero'","'Мастер спорта по дзюдо'"},
-            specialization = {"'Подготовка к соревнованиям'","'Восстановление после травм и операций'","'Функциональный тренинг'"}
+            achievements = {"МС по синхронному плаванию","Презентер российских конвенций по направлениям step и aero","Мастер спорта по дзюдо"},
+            specialization = {"Подготовка к соревнованиям","Восстановление после травм и операций","Функциональный тренинг"}
         )
 
         InstructorsRepository.create(test_CRUD.client_user, instructor)
@@ -104,8 +94,8 @@ class test_CRUD(TestCase):
         assert(db_instructor.patronymic == "Николаевна")
         assert(db_instructor.education == "{'КемГУ'}")
         assert(db_instructor.experience == 20)
-        assert(str(db_instructor.achievements) == str({"'МС по синхронному плаванию'","'Презентер российских конвенций по направлениям step и aero'", "'Мастер спорта по дзюдо'"}))
-        assert(str(db_instructor.specialization) == str({"'Подготовка к соревнованиям'", "'Восстановление после травм и операций'", "'Функциональный тренинг'"}))
+        assert(str(db_instructor.achievements) == str({"МС по синхронному плаванию","Презентер российских конвенций по направлениям step и aero", "Мастер спорта по дзюдо"}))
+        assert(str(db_instructor.specialization) == str({"Подготовка к соревнованиям", "Восстановление после травм и операций", "Функциональный тренинг"}))
 
         InstructorsRepository.update_by_pk(test_CRUD.client_user, 1, {'name': "Валентина", 'surname': "Ежова"})
         db_instructor = InstructorsRepository.read_by_pk(test_CRUD.client_user, 1)

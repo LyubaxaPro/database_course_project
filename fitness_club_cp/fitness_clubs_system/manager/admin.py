@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Instructors, Customers, InstructorSheduleCustomers, Prices, GroupClassesShedule, InstructorShedule, GroupClassesCustomersRecords
+from .models import Instructors, Customers, InstructorSheduleCustomers, Prices, GroupClassesShedule, InstructorShedule, GroupClassesCustomersRecords, Administrators
 
 admin.site.register(Instructors)
 admin.site.register(Customers)
@@ -9,3 +9,4 @@ admin.site.register(Prices)
 admin.site.register(GroupClassesShedule)
 admin.site.register(InstructorShedule)
 admin.site.register(GroupClassesCustomersRecords)
+admin.site.register(Administrators)

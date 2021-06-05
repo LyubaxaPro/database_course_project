@@ -5,13 +5,21 @@ from django.db import models
 from users.models import CustomUser, FitnessClubs
 
 from django.contrib.postgres.fields import ArrayField
+import json
 
-class AdminRecords(models.Model):
-    update_instructor = models.TextField(blank=True, null=True)  # This field type is a guess.
-    add_instructor = models.TextField(blank=True, null=True)  # This field type is a guess.
+
+class Administrators(models.Model):
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=30)
+    surname = models.CharField(max_length=30)
+    patronym = models.CharField(max_length=30, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.user)
 
     class Meta:
-        db_table = 'admin_records'
+        db_table = 'administrators'
 
 class Customers(models.Model):
     customer_id = models.AutoField(primary_key=True, unique=True)
@@ -67,6 +75,9 @@ class Instructors(models.Model):
     achievements = ArrayField(models.TextField(blank=True, null=True),  verbose_name='Достижения')  # This field type is a guess.
     specialization = ArrayField(models.TextField(blank=True, null=True),  verbose_name='Специализация')  # This field type is a guess.
     photo = models.ImageField(upload_to='images/', null=True, default= 'images/default.jpg',  verbose_name='Фото')
+    is_active = models.BooleanField(default=False)
+    admin = models.ForeignKey(Administrators, null=True, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return str(self.instructor_id)
@@ -88,6 +99,55 @@ class GroupClassesShedule(models.Model):
 
     class Meta:
         db_table = 'group_classes_shedule'
+
+class AdminRecords(models.Model):
+
+    PENDING = 0  # изменения ожидают обработки
+    ACCEPTED = 1  # изменения разрешены
+    DECLINED = 2  # изменения отклонены
+
+    STATUS_CHOICES = (
+        (PENDING, 'pending'),
+        (ACCEPTED, 'active'),
+        (DECLINED, 'cancelled')
+    )
+
+    creation_datetime = models.DateTimeField(default=datetime.datetime.now())
+    status = models.PositiveIntegerField(choices=STATUS_CHOICES, default=PENDING)
+    instructor = models.ForeignKey(Instructors,  blank=True, null=True,  on_delete=models.CASCADE)
+    admin = models.ForeignKey(Administrators,  blank=True, null=True,  on_delete=models.CASCADE)
+    change = models.JSONField( blank=True, null=True)
+    is_new = models.BooleanField(default=True)
+
+    def get_changes(self):
+
+        change_json = json.loads(self.change)
+
+        if not change_json['profile']:
+            return self.instructor.surname + " " + self.instructor.name + " " + self.instructor.patronymic
+
+        fio = ""
+        try:
+            fio += change_json['profile']['surname']
+        except:
+            fio += self.doctor.surname
+
+        fio += " "
+        try:
+            fio += change_json['profile']['name']
+        except:
+            fio += self.doctor.name
+
+        fio += " "
+        try:
+            fio += change_json['profile']['patronym']
+        except:
+            fio += self.doctor.patronym
+
+        return fio
+
+    class Meta:
+        db_table = 'admin_records'
 
 
 class InstructorShedule(models.Model):
@@ -151,5 +211,3 @@ class SpecialOffers(models.Model):
 
     class Meta:
         db_table = 'special_offers'
-
-

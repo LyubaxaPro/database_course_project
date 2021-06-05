@@ -11,6 +11,13 @@
     </style>
     <div class="features">
         <h1>{{ "Фитнес клуб Gold Owl Fitness" }}</h1>
+        {% if role.is_instructor %}
+            {% if role.instructor.is_active %}
+            <p>Вы являетесь инструктором фитнес-клуба</p>
+            {% else %}
+            <h2>Ваша заявка на регистрацию находится на рассмотрении у администратора.</h2>
+            {% endif %}
+        {% endif %}
          <img src="{% static 'main/img/club_main.jpeg' %}", alt="Лого">
 
     </div>

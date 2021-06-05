@@ -36,5 +36,8 @@ urlpatterns = [
     path('delete_group_class_in_shedule/', delete_group_class_in_shedule, name='delete_group_class_in_shedule'),
     path('delete_special_offer_by_admin/', delete_special_offer_by_admin, name='delete_special_offer_by_admin'),
     path('add_special_offer_by_admin/', add_special_offer_by_admin, name='add_special_offer_by_admin'),
-    path('group_class_statistics/', statistics_of_traininng, name='group_class_statistics')
+    path('group_class_statistics/', statistics_of_traininng, name='group_class_statistics'),
+    path('add_new_instructor/', add_new_instructor, name='add_new_instructor'),
+    path('delete_new_instructor/', delete_new_instructor, name='delete_new_instructor')
+
 ]

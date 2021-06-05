@@ -10,7 +10,8 @@ from django.core import serializers
 
 from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
     GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository
+    CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository,\
+    AdministratorsRepository, AdminRecordsRepository
 
 
 from .forms import *
@@ -27,6 +28,7 @@ def get_role(request):
     instructor = None
     is_instructor = False
     is_admin = False
+    admin = None
     is_guest = True
     user = None
 
@@ -42,14 +44,16 @@ def get_role(request):
             is_guest = False
         elif user.role == 2 or user.role == 3:
             is_admin = True
+            admin = 1#AdministratorsRepository.read_filtered(request.user, {'user': request.user.pk})[0]
             is_guest = False
 
-    return is_customer, customer, is_instructor, instructor, is_admin, is_guest, user
+
+    return is_customer, customer, is_instructor, instructor, is_admin, admin, is_guest, user
 
 def get_role_json(request):
-    is_customer, customer, is_instructor, instructor, is_admin, is_guest, user = get_role(request)
+    is_customer, customer, is_instructor, instructor, is_admin, admin, is_guest, user = get_role(request)
     return {'is_customer': is_customer, 'customer': customer, 'is_instructor': is_instructor, 'instructor': instructor,
-            'is_admin': is_admin, 'is_guest': is_guest, 'user': user}
+            'is_admin': is_admin, 'admin': admin, 'is_guest': is_guest, 'user': user}
 
 def index(request):
     data = {
@@ -380,7 +384,7 @@ def groupclasses(request):
 
 def instructors_list(request):
     """Список инструкторов"""
-    instructors = InstructorsRepository.read_all(request.user)
+    instructors = InstructorsRepository.read_filtered(request.user, {'is_active': True})
     return render(request, 'main/instructors.html', {'instructors': instructors, 'form' : ClubForm(), 'role': get_role_json(request)})
 
 def instructor_detail(request, pk):
@@ -413,7 +417,7 @@ def get_club_instructors(request):
         user_id_list.append(user.id)
 
     # instructors = Instructors.objects.filter(user__in=user_id_list)
-    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
+    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list, 'is_active': True})
     instructors_json = serializers.serialize('json', list(instructors))
 
 
@@ -604,7 +608,7 @@ def customer_training_records(request):
     user_id_list = []
     for user in users_instructors:
         user_id_list.append(user.id)
-    club_instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
+    club_instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list, 'is_active': True})
     club_instructors_data = []
     for instr in club_instructors:
         data = {'name': instr.name, 'surname': instr.surname, 'patronimyc': instr.patronymic,
@@ -807,7 +811,23 @@ def admin_profile(request):
     role = get_role_json(request)
     fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user'].club})
     address = fitness_club[0].city + ", " + fitness_club[0].address
-    return render(request, "main/admin_profile.html", {'role': role, 'address': address})
+
+    admin = AdministratorsRepository.read_filtered(request.user, {'user': role['admin']})[0]
+
+    users_instructors = CustomUserRepository.read_filtered(request.user, {"club": role['user'].club, 'role': 1})
+    user_id_list = []
+    for user in users_instructors:
+        user_id_list.append(user.id)
+
+    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list, 'is_active': False})
+
+    instructors_data = []
+    for instructor in instructors:
+        user = CustomUserRepository.read_filtered(request.user, {'id': instructor.user_id})[0]
+        instructors_data.append({'data': instructor, 'user': user})
+
+    return render(request, "main/admin_profile.html", {'role': role, 'address': address,
+                                                       'admin': admin, 'instructors': instructors_data})
 
 def group_classes_admin(request):
     week = get_week()
@@ -825,7 +845,7 @@ def group_classes_admin(request):
     for user in users:
         user_id_list.append(user.id)
 
-    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
+    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list, 'is_active': True})
 
     return render(request, "main/group_classes_admin.html", {'classes_data' : classes_data,
                                                        'classes':classes, 'role': role,
@@ -906,12 +926,20 @@ def statistics_of_traininng(request):
     for user in users:
         user_id_list.append(user.id)
 
-    instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list})
 
     return render(request, "main/group_class_statistics.html", {'classes_data': classes_data,
                                                              'classes': classes, 'role': role,
-                                                             'address': address, 'instructors': instructors,
+                                                             'address': address,
                                                              'club_id': club_id,
                                                              'day_of_week_date': day_of_week_date,
                                                                 'current_week': week})
 
+def add_new_instructor(request):
+    instructor_id = request.GET.get("instructor_id")
+    InstructorsRepository.update_filtered(request.user, {'instructor_id': instructor_id}, {'is_active': True})
+    return JsonResponse({'q': []}, safe=False)
+
+def delete_new_instructor(request):
+    user_id = request.GET.get("user_id")
+    CustomUserRepository.delete_filtered(request.user, {'id': user_id})
+    return JsonResponse({'q': []}, safe=False)

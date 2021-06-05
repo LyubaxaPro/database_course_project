@@ -75,6 +75,7 @@ class InstructorSignUpView(View):
             user.role = CustomUser.INSTRUCTOR
             instructor = profile_form.save(commit=False)
             instructor.user = user
+            instructor.admin_id = user.club
             InstructorsRepository.create(user, instructor)
             auth_manually(self.request)
             return redirect('home')

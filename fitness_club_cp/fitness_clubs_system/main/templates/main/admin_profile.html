@@ -6,10 +6,114 @@
 {% endblock %}
 
 {% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+
+$(document).ready(function () {
+
+    $('.btn_add_new_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_add_new_instructor clicked');
+        instructor_id = $(this).attr("data-instructor-id");
+        console.log(instructor_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_new_instructor/?instructor_id=' + instructor_id,
+            success: function (result) {
+                document.getElementById("new_instructor"+instructor_id).remove();
+                console.log('success');
+
+            },
+            error: function(error) {
+                alert("Error occured! :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_new_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_new_instructor clicked');
+        user_id = $(this).attr("data-user-id");
+        instructor_id = $(this).attr("data-instructor-id");
+        console.log(user_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_new_instructor/?user_id=' + user_id,
+            success: function (result) {
+                document.getElementById("new_instructor"+instructor_id).remove();
+                console.log('success');
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+});
+</script>
+
     <div class="profile">
     <h1>Профиль администратора</h1>
+    <p><b>Фамилия Имя Отчество: </b> {{ admin.surname }} {{ admin.name }} {{ admin.patronym}} </p>
     <p><b>Логин: </b> {{ role.user.login }} </p>
     <p><b>Email: </b> {{ role.user.email }} </p>
     <p><b>Вы работаете в фитнес-клубе по адресу: </b> {{ address }} </p>
+ <div class="features">
+    <h2>Заявки на регистрацию</h2>
+    {% if instructors|length == 0 %}
+     <p>Заявок на регистрацию нет</p>
+    {% else %}
+    {% for instructor in instructors %}
+     <div id="new_instructor{{ instructor.data.instructor_id }}">
+        <details>
+        <summary>{{ instructor.data.surname }} {{ instructor.data.name }} {{ instructor.data.patronymic }}</summary>
+        <div class="profile" >
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <img src="{{ instructor.data.photo.url}}" >
+              </div>
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <p><b>Фамилия Имя Отчество: </b> {{ instructor.data.surname }} {{ instructor.data.name }} {{ instructor.data.patronymic }} </p>
+                <p><b>Логин: </b> {{ instructor.user.login }} </p>
+                <p><b>Email: </b> {{ instructor.user.email }} </p>
+                <p><b>Стаж: </b> {{instructor.data.experience}}</p>
+                <p><b>Образование:</b></p>
+                <ul>
+                  {% for i in instructor.data.education %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                <p><b>Достижения:</b></p>
+                <ul>
+                  {% for i in instructor.data.achievements %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                <p><b>Специализация:</b></p>
+                <ul>
+                  {% for i in instructor.data.specialization %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+          </div>
+
+        <button class="btn btn-success btn-icon btn_add_new_instructor"  data-instructor-id='{{ instructor.data.instructor_id }}'> <span class="icon"><i class="fas fa-plus"></i></span>Разрешить запрос на регистрацию </button>
+        <button class="btn btn-danger btn-icon btn_delete_new_instructor" data-instructor-id='{{ instructor.data.instructor_id }}' data-user-id='{{ instructor.user.id }}'> <span class="icon"><i class="fas fa-trash"></i></span> Отклонить запрос на регистрацию </button>
+        </details>
+         </div>
+    {% endfor %}
+     {% endif %}
+ </div>
     </div>
 {% endblock %}
