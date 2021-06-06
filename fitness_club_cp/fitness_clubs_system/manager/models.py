@@ -117,34 +117,9 @@ class AdminRecords(models.Model):
     instructor = models.ForeignKey(Instructors,  blank=True, null=True,  on_delete=models.CASCADE)
     admin = models.ForeignKey(Administrators,  blank=True, null=True,  on_delete=models.CASCADE)
     change = models.JSONField( blank=True, null=True)
-    is_new = models.BooleanField(default=True)
 
-    def get_changes(self):
-
-        change_json = json.loads(self.change)
-
-        if not change_json['profile']:
-            return self.instructor.surname + " " + self.instructor.name + " " + self.instructor.patronymic
-
-        fio = ""
-        try:
-            fio += change_json['profile']['surname']
-        except:
-            fio += self.doctor.surname
-
-        fio += " "
-        try:
-            fio += change_json['profile']['name']
-        except:
-            fio += self.doctor.name
-
-        fio += " "
-        try:
-            fio += change_json['profile']['patronym']
-        except:
-            fio += self.doctor.patronym
-
-        return fio
+    def __str__(self):
+        return str(self.pk)
 
     class Meta:
         db_table = 'admin_records'

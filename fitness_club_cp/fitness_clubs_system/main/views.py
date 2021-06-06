@@ -16,7 +16,8 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
 
 from .forms import *
 
-from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule, GroupClassesShedule, SpecialOffers
+from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule,\
+    GroupClassesShedule, SpecialOffers, AdminRecords
 from .utils import get_plot
 
 days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
@@ -44,7 +45,7 @@ def get_role(request):
             is_guest = False
         elif user.role == 2 or user.role == 3:
             is_admin = True
-            admin = 1#AdministratorsRepository.read_filtered(request.user, {'user': request.user.pk})[0]
+            admin = AdministratorsRepository.read_filtered(request.user, {'user': request.user.pk})[0]
             is_guest = False
 
 
@@ -726,8 +727,19 @@ def instructor_profile(request):
     elif role['instructor'].experience % 10 in [2, 3, 4] and role['instructor'].experience not in [12, 13, 14]:
         exp_str = "года"
 
+    record = AdminRecordsRepository.read_filtered(request.user, {'instructor': role['instructor'],
+                                                                 'status': AdminRecords.PENDING})
+    change_record = None
+    is_already_record = False
+    if record:
+        is_already_record = True
+        change_record = record[0]
+
     return render(request, "main/instructor_profile.html",
-                  {'role': get_role_json(request), 'address': address, 'shedule': instructor_shedule, 'exp_str': exp_str})
+                  {'role': get_role_json(request), 'address': address, 'shedule': instructor_shedule,
+                   'exp_str': exp_str,
+                   'is_already_record': is_already_record,
+                   'change_record': change_record})
 
 def edit_instructor(request):
     role = get_role_json(request)
@@ -738,9 +750,70 @@ def edit_instructor(request):
         instructor_form.actual_user = request.user
 
         if instructor_form.is_valid():
-            InstructorsRepository.update_by_pk(request.user,
-                                          role['instructor'].pk,
-                                          instructor_form.cleaned_data)
+
+            admin_record = AdminRecords()
+            admin_record.creation_datetime = datetime.datetime.now()
+            admin_record.status = AdminRecords.PENDING
+            admin_record.instructor = role['instructor']
+            admin_record.admin = role['instructor'].admin
+            admin_record.change = {}
+
+            new_instructor_data = instructor_form.cleaned_data
+
+
+            old_instructor_data = InstructorsRepository.read_filtered(request.user,
+                                                                      {'instructor_id': role['instructor'].instructor_id})[0]
+
+            admin_record.change.update({'old_name': old_instructor_data.name})
+            admin_record.change.update({'old_surname': old_instructor_data.surname})
+            admin_record.change.update({'old_patronymic': old_instructor_data.patronymic})
+            admin_record.change.update({'old_education': old_instructor_data.education})
+            admin_record.change.update({'old_experience': old_instructor_data.experience})
+            admin_record.change.update({'old_achievements': old_instructor_data.achievements})
+            admin_record.change.update({'old_specialization': old_instructor_data.specialization})
+            admin_record.change.update({'old_photo': str(old_instructor_data.photo)})
+
+            if (old_instructor_data.name != new_instructor_data['name']):
+                admin_record.change.update({'new_name': new_instructor_data['name']})
+            else:
+                admin_record.change.update({'new_name': ''})
+            if (old_instructor_data.surname != new_instructor_data['surname']):
+                admin_record.change.update({'new_surname': new_instructor_data['surname']})
+            else:
+                admin_record.change.update({'new_surname': ''})
+            if (old_instructor_data.patronymic != new_instructor_data['patronymic']):
+                admin_record.change.update({'new_patronymic': new_instructor_data['patronymic']})
+            else:
+                admin_record.change.update({'new_patronymic': ''})
+            if (old_instructor_data.education != new_instructor_data['education']):
+                admin_record.change.update({'new_education': new_instructor_data['education']})
+            else:
+                admin_record.change.update({'new_education': ''})
+            if (old_instructor_data.experience != new_instructor_data['experience']):
+                admin_record.change.update({'new_experience': new_instructor_data['experience']})
+            else:
+                admin_record.change.update({'new_experience': ''})
+            if (old_instructor_data.achievements != new_instructor_data['achievements']):
+                admin_record.change.update({'new_achievements': new_instructor_data['achievements']})
+            else:
+                admin_record.change.update({'new_achievements': ''})
+            if (old_instructor_data.achievements != new_instructor_data['achievements']):
+                admin_record.change.update({'new_achievements': new_instructor_data['achievements']})
+            else:
+                admin_record.change.update({'new_achievements': ''})
+            if (old_instructor_data.specialization != new_instructor_data['specialization']):
+                admin_record.change.update({'new_specialization': new_instructor_data['specialization']})
+            else:
+                admin_record.change.update({'new_specialization': ''})
+            if (old_instructor_data.photo != new_instructor_data['photo']):
+                if new_instructor_data['photo'] != 'images/default.jpg':
+                    admin_record.change.update({'new_photo': str(new_instructor_data['photo'])})
+                else:
+                    admin_record.change.update({'new_photo': ''})
+            else:
+                admin_record.change.update({'new_photo': ''})
+
+            AdminRecordsRepository.create(request.user, admin_record)
 
             return redirect('instructor_profile')
     else:
@@ -762,6 +835,12 @@ def instructor_add_personal_training(request):
     new_record.day_of_week = day
 
     InstructorSheduleRepository.create(request.user, new_record)
+
+    return JsonResponse({'q': []}, safe=False)
+
+def instructor_delete_changes(request):
+    pk = request.GET.get("pk")
+    AdminRecordsRepository.delete_by_pk(request.user, pk)
 
     return JsonResponse({'q': []}, safe=False)
 
@@ -826,8 +905,13 @@ def admin_profile(request):
         user = CustomUserRepository.read_filtered(request.user, {'id': instructor.user_id})[0]
         instructors_data.append({'data': instructor, 'user': user})
 
+    changes_instructors = AdminRecordsRepository.read_filtered(request.user, {'admin': role['admin'].user_id,
+                                                                              'status': AdminRecords.PENDING})
+
+
     return render(request, "main/admin_profile.html", {'role': role, 'address': address,
-                                                       'admin': admin, 'instructors': instructors_data})
+                                                       'admin': admin, 'instructors': instructors_data,
+                                                       'changes_instructors': changes_instructors})
 
 def group_classes_admin(request):
     week = get_week()
@@ -943,3 +1027,46 @@ def delete_new_instructor(request):
     user_id = request.GET.get("user_id")
     CustomUserRepository.delete_filtered(request.user, {'id': user_id})
     return JsonResponse({'q': []}, safe=False)
+
+
+def btn_change_instructor(request):
+    pk = request.GET.get("pk")
+
+    AdminRecordsRepository.update_by_pk(request.user, pk, {'status': AdminRecords.ACCEPTED})
+    change_dict = {}
+    admin_record = AdminRecordsRepository.read_by_pk(request.user, pk)
+
+    if admin_record.change['new_name'] != '':
+        change_dict.update({'name': admin_record.change['new_name']})
+
+    if admin_record.change['new_surname']:
+        change_dict.update({'surname': admin_record.change['new_surname']})
+
+    if admin_record.change['new_patronymic']:
+        change_dict.update({'patronymic': admin_record.change['new_patronymic']})
+
+    if admin_record.change['new_education']:
+        change_dict.update({'education': admin_record.change['new_education']})
+
+    if admin_record.change['new_experience']:
+        change_dict.update({'experience': admin_record.change['new_experience']})
+
+    if admin_record.change['new_achievements']:
+        change_dict.update({'achievements': admin_record.change['new_achievements']})
+
+    if admin_record.change['new_specialization']:
+        change_dict.update({'specialization': admin_record.change['new_specialization']})
+
+    if admin_record.change['new_photo']:
+        change_dict.update({'photo': admin_record.change.new_photo})
+
+    InstructorsRepository.update_filtered(request.user, {'instructor_id': admin_record.instructor.instructor_id},
+                                          change_dict)
+    return JsonResponse({'q': []}, safe=False)
+
+def btn_not_change_instructor(request):
+    pk = request.GET.get("pk")
+    AdminRecordsRepository.update_by_pk(request.user, pk, {'status': AdminRecords.DECLINED})
+    return JsonResponse({'q': []}, safe=False)
+
+

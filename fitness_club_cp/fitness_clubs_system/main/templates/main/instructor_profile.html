@@ -56,6 +56,27 @@
             }
         });
     });
+
+    $('.btn_delete_changes').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_changes clicked');
+        var pk = $(this).attr("data-pk");
+        console.log(pk);
+
+        $.ajax({
+            type: 'GET',
+            url: '/instructor_delete_changes/?pk=' + pk,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/instructor_profile/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
 });
 
 </script>
@@ -95,7 +116,54 @@
     </div>
   </div>
     <br>
+    {% if  is_already_record %}
+    <p><b>Вы уже отправили запрос на изменение данных администратору.Для отправки нового запроса дождитесь обработки запроса или отмените его.</b></p>
+    {% if change_record.change.new_surname %}
+    <p><b style="color:red">Изменение фамилии: </b> {{ change_record.change.new_surname }} </p>
+    {% endif %}
+
+    {% if change_record.change.new_name %}
+    <p><b style="color:red">Изменение имени: </b> {{ change_record.change.new_name }} </p>
+    {% endif %}
+
+    {% if change_record.change.new_patronymic %}
+    <p><b style="color:red">Изменение отчества: </b> {{ change_record.change.new_patronymic }} </p>
+    {% endif %}
+
+    {% if change_record.change.new_experience %}
+    <p><b style="color:red">Изменение стажа: </b> {{ change_record.change.new_experience }} {{ exp_str }}</p>
+    {% endif %}
+
+    {% if change_record.change.new_education %}
+    <p><b style="color:red">Изменение образования: </b></p>
+        <ul>
+          {% for i in change_record.change.new_education %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if change_record.change.new_achievements %}
+    <p><b style="color:red">Изменение достижений: </b></p>
+        <ul>
+          {% for i in change_record.change.new_achievements %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if change_record.change.new_specialization %}
+    <p><b style="color:red">Изменение специализации: </b></p>
+        <ul>
+          {% for i in change_record.change.new_specialization %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+    <button class="btn btn-danger btn-icon btn_delete_changes" data-pk='{{ change_record.pk }}'> <span class="icon"><i class="fas fa-trash"></i></span> Отменить изменения </button>
+    {% else %}
     <p style="font-size:18px;"><a href="{% url 'edit_instructor' %}">Редактировать личную информацию</a></p>
+    {% endif %}
     <br>
   </div>
   <div class="features">
