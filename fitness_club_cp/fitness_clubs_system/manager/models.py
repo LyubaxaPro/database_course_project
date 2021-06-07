@@ -198,3 +198,16 @@ class InstructorPersonalTrainingsLogs(models.Model):
 
     class Meta:
         db_table = 'instructor_personal_trainings_logs'
+
+class AdminGroupClassesLogs(models.Model):
+
+    act_date = models.DateTimeField(default=datetime.datetime.now())
+    club = models.IntegerField(blank=True, null=True)
+    group_class = models.ForeignKey(GroupClasses, blank=True, null=True, on_delete=models.CASCADE)
+    description = models.TextField(default='')
+
+    def __str__(self):
+        return str(self.pk)
+
+    class Meta:
+        db_table = 'admin_group_classes_logs'

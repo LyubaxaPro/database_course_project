@@ -97,5 +97,39 @@ $(document).ready(function () {
         <label>Выбрать дату: </label><input style="margin:5px" type="date" id="id_date" max="{{ today }}" required placeholder="Введите дату взвешивания">
         <button class="btn btn-success btn-icon btn_add_measure"> <span class="icon"><i class="fas fa-plus"></i></span>Добавить новое измерение </button>
         <button class="btn btn-danger btn-icon btn_delete_measure"> <span class="icon"><i class="fas fa-trash"></i></span> Удалить последнее изменение </button>
+
+    <div class="features">
+    {% if instructor_action_logs|length != 0  %}
+    <details>
+    <summary><h2 style="color:orange"> Изменение расписания персональных тренировок за последнюю неделю </h2> </summary>
+     <ul>
+     {% for act in instructor_action_logs %}
+         <li>
+        <p>{{act.act_date}} <a target="_blank" href="{% url 'instructor_detail' act.instructor.pk %}"> {{act.instructor.surname }} {{act.instructor.name }} </a> {{ act.description }}</p>
+         </li>
+     {% endfor %}
+     </ul>
+    </details>
+    {% else %}
+        {% if have_instructor %}
+        <h2 style="color:orange"> Расписание персональных тренировок за последнюю неделю не менялось</h2>
+        {% endif %}
+    {% endif %}
+
+    {% if group_classes_logs|length != 0  %}
+    <details>
+    <summary><h2 style="color:orange"> Изменение расписания групповых тренировок за последнюю неделю </h2> </summary>
+     <ul>
+     {% for act in group_classes_logs %}
+         <li>
+        <p>{{act.act_date}} {{ act.description }}. Тип тренировки - {{ act.group_class.class_name }}</p>
+         </li>
+     {% endfor %}
+     </ul>
+    </details>
+    {% else %}
+    <h2 style="color:orange"> Расписание групповых тренировок за последнюю неделю не менялось</h2>
+    {% endif %}
+    </div>
     </div>
 {% endblock %}

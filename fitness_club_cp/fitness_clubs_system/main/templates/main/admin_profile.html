@@ -100,7 +100,7 @@ $(document).ready(function () {
 
     <div class="profile">
     <h1>Профиль администратора</h1>
-    <p><b>Фамилия Имя Отчество: </b> {{ admin.surname }} {{ admin.name }} {{ admin.patronym}} Дата: {{ admin.patronym}} </p>
+    <p><b>Фамилия Имя Отчество: </b> {{ admin.surname }} {{ admin.name }} {{ admin.patronym}} </p>
     <p><b>Логин: </b> {{ role.user.login }} </p>
     <p><b>Email: </b> {{ role.user.email }} </p>
     <p><b>Вы работаете в фитнес-клубе по адресу: </b> {{ address }} </p>
@@ -252,7 +252,7 @@ $(document).ready(function () {
      {% endif %}
 
      <details>
-         <summary><h2 style="color:orange"> Действия инструкторов </h2> </summary>
+         <summary><h2 style="color:orange"> Действия инструкторов за последнюю неделю </h2> </summary>
      <ul>
      {% for act in instructor_action_logs %}
          <li>

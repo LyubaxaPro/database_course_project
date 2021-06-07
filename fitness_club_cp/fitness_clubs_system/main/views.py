@@ -11,7 +11,7 @@ from django.core import serializers
 from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
     GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
     CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository,\
-    AdministratorsRepository, AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository
+    AdministratorsRepository, AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, AdminGroupClassesLogsRepository
 
 
 from .forms import *
@@ -449,12 +449,32 @@ def customer_profile(request):
 
     today = datetime.datetime.today().strftime('%Y-%m-%d')
 
+    instructor_action_logs = []
+    have_instructor = False
+    if role['customer'].instructor_id:
+        have_instructor = True
+        instructor_action_records = InstructorPersonalTrainingsLogsRepository.read_join_filtered(request.user,
+                                                                                                  'instructor',
+                                                                     {'instructor': role['customer'].instructor_id})
+
+        for cur in instructor_action_records:
+            if cur.act_date + datetime.timedelta(days=7) >= timezone.now():
+                instructor_action_logs.append(cur)
+
+    group_classes_logs = []
+    admin_action_records = AdminGroupClassesLogsRepository.read_join_filtered(request.user, 'group_class',
+                                                                         {'club': role['user'].club})
+    for cur in admin_action_records:
+        if cur.act_date + datetime.timedelta(days=7) >= timezone.now():
+            group_classes_logs.append(cur)
+
     return render(request, "main/customer_profile.html", {'role': get_role_json(request), 'address': address, 'chart': chart,
                                                           'form':AddMeasureForm(),
                                                           'today': today,
-                                                          'is_chart': is_chart})
-
-
+                                                          'is_chart': is_chart,
+                                                          'instructor_action_logs': instructor_action_logs,
+                                                          'group_classes_logs': group_classes_logs,
+                                                          'have_instructor': have_instructor})
 def edit_customer_profile(request):
     role = get_role_json(request)
 
