@@ -11,7 +11,7 @@ from django.core import serializers
 from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
     GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
     CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository,\
-    AdministratorsRepository, AdminRecordsRepository
+    AdministratorsRepository, AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository
 
 
 from .forms import *
@@ -19,6 +19,7 @@ from .forms import *
 from manager.models import Instructors, GroupClassesCustomersRecords, InstructorSheduleCustomers, InstructorShedule,\
     GroupClassesShedule, SpecialOffers, AdminRecords
 from .utils import get_plot
+from django.utils import timezone
 
 days = {"Monday": "Понедельник", "Tuesday": "Вторник", "Wednesday": "Среда", "Thursday": "Четверг", "Friday": "Пятница",
         "Saturday": "Суббота", "Sunday": "Воскресенье"}
@@ -908,10 +909,21 @@ def admin_profile(request):
     changes_instructors = AdminRecordsRepository.read_filtered(request.user, {'admin': role['admin'].user_id,
                                                                               'status': AdminRecords.PENDING})
 
+    active_instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list, 'is_active': True})
+
+    instructor_action_records = InstructorPersonalTrainingsLogsRepository.read_join_filtered(request.user, 'instructor',
+                                                                             {'instructor__in': active_instructors})
+    instructor_action_logs = []
+
+    for cur in instructor_action_records:
+        if cur.act_date + datetime.timedelta(days=7) >= timezone.now():
+            instructor_action_logs.append(cur)
+
 
     return render(request, "main/admin_profile.html", {'role': role, 'address': address,
                                                        'admin': admin, 'instructors': instructors_data,
-                                                       'changes_instructors': changes_instructors})
+                                                       'changes_instructors': changes_instructors,
+                                                       'instructor_action_logs': instructor_action_logs})
 
 def group_classes_admin(request):
     week = get_week()

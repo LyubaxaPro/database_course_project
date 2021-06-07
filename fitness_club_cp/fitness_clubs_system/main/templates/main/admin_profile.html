@@ -105,7 +105,7 @@ $(document).ready(function () {
     <p><b>Email: </b> {{ role.user.email }} </p>
     <p><b>Вы работаете в фитнес-клубе по адресу: </b> {{ address }} </p>
  <div class="features">
-    <h2>Заявки на регистрацию</h2>
+    <h2 style="color:orange">Заявки на регистрацию</h2>
     {% if instructors|length == 0 %}
      <p>Заявок на регистрацию нет</p>
     {% else %}
@@ -155,7 +155,7 @@ $(document).ready(function () {
     {% endfor %}
      {% endif %}
 
-     <h2>Заявки на изменение данных</h2>
+     <h2 style="color:orange">Заявки на изменение данных</h2>
     {% if changes_instructors|length == 0 %}
      <p>Заявок на изменение данных нет</p>
     {% else %}
@@ -250,6 +250,17 @@ $(document).ready(function () {
 
      {% endfor %}
      {% endif %}
+
+     <details>
+         <summary><h2 style="color:orange"> Действия инструкторов </h2> </summary>
+     <ul>
+     {% for act in instructor_action_logs %}
+         <li>
+        <p>{{act.act_date}} <a target="_blank" href="{% url 'instructor_detail' act.instructor.pk %}"> {{act.instructor.surname }} {{act.instructor.name }} </a> {{ act.description }}</p>
+         </li>
+     {% endfor %}
+     </ul>
+         </details>
  </div>
     </div>
 {% endblock %}

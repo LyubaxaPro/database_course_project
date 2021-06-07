@@ -186,3 +186,15 @@ class SpecialOffers(models.Model):
 
     class Meta:
         db_table = 'special_offers'
+
+class InstructorPersonalTrainingsLogs(models.Model):
+
+    act_date = models.DateTimeField(default=datetime.datetime.now())
+    instructor = models.ForeignKey(Instructors, blank=True, null=True, on_delete=models.CASCADE)
+    description = models.TextField(default='')
+
+    def __str__(self):
+        return str(self.pk)
+
+    class Meta:
+        db_table = 'instructor_personal_trainings_logs'
