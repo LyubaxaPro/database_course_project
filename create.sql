@@ -1,16 +1,3 @@
--- drop table instructor_shedule_customers;
--- drop table instructor_shedule;
--- drop table special_offers;
--- drop table group_classes_customers_records;
--- drop table group_classes_shedule;
--- drop table customers;
--- drop table instructors;
--- drop table group_classes;
--- drop table services;
--- drop table admin_records;
--- drop table prices;
--- drop table fitness_clubs;
-
 CREATE TABLE fitness_clubs
 (
     club_id integer primary key,
@@ -22,18 +9,18 @@ CREATE TABLE fitness_clubs
 
 copy fitness_clubs(club_id, address, city, phone) from '/home/lyubaxapro/database_course_project/database_data/fitness_clubs.csv' with delimiter ',' header csv;
 
--- CREATE TABLE users
--- (
---     user_id integer primary key,
---     login text unique,
---     password text,
---     email text unique,
---     phone text unique,
---     role text,
---     club_id integer references fitness_clubs (club_id)
--- );
+CREATE TABLE users
+(
+    user_id integer primary key,
+    login text unique,
+    password text,
+    email text unique,
+    phone text unique,
+    role text,
+    club_id integer references fitness_clubs (club_id)
+);
 
--- copy users(user_id, login, password, email, phone, role, club_id) from '/home/lyubaxapro/database_course_project/database_data/users.csv' with delimiter ',' header csv;
+copy users(user_id, login, password, email, phone, role, club_id) from '/home/lyubaxapro/database_course_project/database_data/users.csv' with delimiter ',' header csv;
 
 CREATE TABLE prices
 (
@@ -53,11 +40,6 @@ CREATE TABLE prices
 copy prices(tariff_id, tariff_name, tariff_description, price_one_month, price_three_month,
             price_six_month, price_one_year, is_time_restricted, min_time, max_time, days_of_week) 
 from '/home/lyubaxapro/database_course_project/database_data/prices.csv' with delimiter ';' header csv;
-
-CREATE TABLE admin_records (
-    update_instructor json,
-    add_instructor json
-);
 
 create table services(
     service_id integer primary key,
@@ -171,3 +153,23 @@ create table instructor_shedule_customers
 
 copy instructor_shedule_customers(customer_id, i_shedule_id, training_date)
 from '/home/lyubaxapro/database_course_project/database_data/instructor_shedule_customers.csv' with delimiter ',' header csv;
+
+
+create table administrators
+(
+    user_id integer primary key references users_customuser(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    name varchar(30),
+    surname varchar(30),
+    patronym varchar(30)
+
+);
+
+create table admin_records
+(
+    id serial primary key,
+    creation_datetime timestamp with time zone,
+    status integer,
+    instructor_id integer references instructors(instructor_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    admin_id integer references admins(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    change jsonb
+);

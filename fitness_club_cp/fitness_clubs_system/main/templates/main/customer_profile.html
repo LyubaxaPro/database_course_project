@@ -73,7 +73,7 @@ $(document).ready(function () {
     <p><b>Дата окончания срока действия абонемента: </b> {{ role.customer.tariff_end_date }} </p>
     <p><b>Вы прикреплены к фитнес-клубу расположенному по адресу: </b> {{ address }} </p>
     {% if role.customer.instructor == None %}
-        <p><b>У Вас нет ведушего тренера. </b> </p>
+        <p><b>У Вас нет ведущего тренера. </b> </p>
         {% else %}
             <p><b>Ваш ведущий тренер: </b> <a target="_blank" href="{% url 'instructor_detail' role.customer.instructor.pk %}">{{ role.customer.instructor.surname }} {{ role.customer.instructor.name }} {{ role.customer.instructor.patronymic }}</p>
              </a>

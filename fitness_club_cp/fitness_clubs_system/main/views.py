@@ -1060,7 +1060,6 @@ def delete_new_instructor(request):
     CustomUserRepository.delete_filtered(request.user, {'id': user_id})
     return JsonResponse({'q': []}, safe=False)
 
-
 def btn_change_instructor(request):
     pk = request.GET.get("pk")
 

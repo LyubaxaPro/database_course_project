@@ -32,8 +32,8 @@ class Customers(models.Model):
     height = models.IntegerField(default=0, verbose_name='Рост')
     measured_weights = ArrayField(models.IntegerField(blank=True, null=True, default=0), default=list())
     measure_dates = ArrayField(models.DateField(blank=True, null=True, default=datetime.date.today), default=list())
-    tariff = models.ForeignKey('Prices', on_delete=models.CASCADE)
-    tariff_end_date = models.DateField()
+    tariff = models.ForeignKey('Prices', on_delete=models.CASCADE, verbose_name='Тариф')
+    tariff_end_date = models.DateField(verbose_name='Дата окончания срока действия абонемента')
     instructor = models.ForeignKey('Instructors', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):

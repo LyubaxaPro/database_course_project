@@ -94,13 +94,10 @@ DATABASES = {
     'guest_role_connect': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'fitness_clubs',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'USER': 'guest',
+        'PASSWORD': 'quest_password',
         'HOST': 'localhost',
         'PORT': '5432',
-        'TEST': {
-            'NAME': 'superuser_role_connect'
-        }
     },
 
     'superuser_role_connect': {
@@ -110,33 +107,24 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
-        'TEST': {
-            'NAME': 'superuser_role_connect'
-        }
     },
 
     'instructor_role_connect': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'fitness_clubs',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'USER': 'instructor',
+        'PASSWORD': 'instructor_password',
         'HOST': 'localhost',
         'PORT': '5432',
-        'TEST': {
-            'NAME': 'superuser_role_connect'
-        }
     },
 
     'customer_role_connect': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'fitness_clubs',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'USER': 'customer',
+        'PASSWORD': 'customer_password',
         'HOST': 'localhost',
         'PORT': '5432',
-        'TEST': {
-            'NAME': 'superuser_role_connect'
-        }
     },
 
     'admin_role_connect': {
@@ -146,9 +134,6 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
-        'TEST': {
-            'NAME': 'superuser_role_connect'
-        }
     }
 }
 
