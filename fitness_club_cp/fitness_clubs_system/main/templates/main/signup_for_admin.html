@@ -1,0 +1,50 @@
+<div class="features">
+    <h2 style="color:orange">Заявки на регистрацию</h2>
+    {% if instructors|length == 0 %}
+     <p>Заявок на регистрацию нет</p>
+    {% else %}
+    {% for instructor in instructors %}
+     <div id="new_instructor{{ instructor.data.instructor_id }}">
+        <details>
+        <summary>{{ instructor.data.surname }} {{ instructor.data.name }} {{ instructor.data.patronymic }}</summary>
+        <div class="profile" >
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <img src="{{ instructor.data.photo.url}}" >
+              </div>
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <p><b>Фамилия Имя Отчество: </b> {{ instructor.data.surname }} {{ instructor.data.name }} {{ instructor.data.patronymic }} </p>
+                <p><b>Логин: </b> {{ instructor.user.login }} </p>
+                <p><b>Email: </b> {{ instructor.user.email }} </p>
+                <p><b>Стаж: </b> {{instructor.data.experience}}</p>
+                <p><b>Образование:</b></p>
+                <ul>
+                  {% for i in instructor.data.education %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                <p><b>Достижения:</b></p>
+                <ul>
+                  {% for i in instructor.data.achievements %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                <p><b>Специализация:</b></p>
+                <ul>
+                  {% for i in instructor.data.specialization %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+        <button class="btn btn-success btn-icon btn_add_new_instructor"  data-instructor-id='{{ instructor.data.instructor_id }}'> <span class="icon"><i class="fas fa-plus"></i></span>Разрешить запрос на регистрацию </button>
+        <button class="btn btn-danger btn-icon btn_delete_new_instructor" data-instructor-id='{{ instructor.data.instructor_id }}' data-user-id='{{ instructor.user.id }}'> <span class="icon"><i class="fas fa-trash"></i></span> Отклонить запрос на регистрацию </button>
+              </div>
+            </div>
+          </div>
+          </div>
+        </details>
+         </div>
+    {% endfor %}
+     {% endif %}

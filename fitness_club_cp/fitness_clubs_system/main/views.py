@@ -480,20 +480,23 @@ def edit_customer_profile(request):
 
     if request.method == 'POST':
 
-        customer_form = CustomerProfileForm(request.POST, instance=role['customer'])
+        customer_form = CustomerEditProfileForm(request.POST, instance=role['customer'])
         customer_form.actual_user = request.user
 
+
         if customer_form.is_valid():
+            print("a")
+            print(customer_form.cleaned_data)
+
             CustomersRepository.update_by_pk(request.user,
                                           role['customer'].pk,
                                           customer_form.cleaned_data)
 
             return redirect('customer_profile')
     else:
-        customer_form = CustomerProfileForm(instance=role['customer'])
+        customer_form = CustomerEditProfileForm(instance=role['customer'])
 
     return render(request, 'main/edit_customer.html', {'customer_form': customer_form, 'role': role})
-
 
 def add_measure(request):
     weight = request.GET.get("weight")
@@ -767,7 +770,7 @@ def edit_instructor(request):
 
     if request.method == 'POST':
 
-        instructor_form = InstructorProfileForm(request.POST, instance=role['customer'])
+        instructor_form = InstructorEditProfileForm(request.POST, request.FILES)
         instructor_form.actual_user = request.user
 
         if instructor_form.is_valid():
@@ -826,19 +829,12 @@ def edit_instructor(request):
                 admin_record.change.update({'new_specialization': new_instructor_data['specialization']})
             else:
                 admin_record.change.update({'new_specialization': ''})
-            if (old_instructor_data.photo != new_instructor_data['photo']):
-                if new_instructor_data['photo'] != 'images/default.jpg':
-                    admin_record.change.update({'new_photo': str(new_instructor_data['photo'])})
-                else:
-                    admin_record.change.update({'new_photo': ''})
-            else:
-                admin_record.change.update({'new_photo': ''})
 
             AdminRecordsRepository.create(request.user, admin_record)
 
             return redirect('instructor_profile')
     else:
-        instructor_form = InstructorProfileForm(instance=role['instructor'])
+        instructor_form = InstructorEditProfileForm(instance=role['instructor'])
 
     return render(request, 'main/edit_instructor.html', {'instructor_form': instructor_form, 'role': role})
 
@@ -1087,9 +1083,6 @@ def btn_change_instructor(request):
 
     if admin_record.change['new_specialization']:
         change_dict.update({'specialization': admin_record.change['new_specialization']})
-
-    if admin_record.change['new_photo']:
-        change_dict.update({'photo': admin_record.change.new_photo})
 
     InstructorsRepository.update_filtered(request.user, {'instructor_id': admin_record.instructor.instructor_id},
                                           change_dict)

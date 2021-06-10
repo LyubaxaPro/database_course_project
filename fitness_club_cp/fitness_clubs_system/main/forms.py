@@ -27,6 +27,11 @@ class CustomerProfileForm(forms.ModelForm):
         model = Customers
         fields = ('name', 'surname', 'patronymic', 'day_of_birth', 'height', 'tariff', 'tariff_end_date')
 
+class CustomerEditProfileForm(forms.ModelForm):
+    class Meta:
+        model = Customers
+        fields = ('name', 'surname', 'patronymic', 'day_of_birth', 'height')
+
 class AddMeasureForm(forms.Form):
 
     weight = forms.IntegerField(label="Вес")
@@ -35,4 +40,12 @@ class AddMeasureForm(forms.Form):
 class InstructorProfileForm(forms.ModelForm):
     class Meta:
         model = Instructors
+        photo = forms.ImageField(widget=forms.FileInput())
         fields = ('name', 'surname', 'patronymic', 'education', 'experience', 'achievements', 'specialization', 'photo')
+
+
+class InstructorEditProfileForm(forms.ModelForm):
+    class Meta:
+        model = Instructors
+        photo = forms.ImageField(widget=forms.FileInput())
+        fields = ('name', 'surname', 'patronymic', 'education', 'experience', 'achievements', 'specialization')

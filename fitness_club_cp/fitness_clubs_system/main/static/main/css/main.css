@@ -52,11 +52,12 @@ main .features{
     color: #fff;
     margin-top: 50px;
     text-align: center;
-    width: 75%;
+    width: 80%;
 }
+ul {padding: 0;}
 
 main .features h1 {font-size: 50px; color: #eb5959;}
-main .features p {max-width: 400px; margin: 20px auto;}
+main .features p {max-width: 1000px; margin: 20px auto;}
 main .features ul {list-style: none;}
 main .features ul li {
     color: #fff;
@@ -66,10 +67,27 @@ main .features ul li {
     size: 30px;
 }
 
+select {width: 250px;}
 main .features ul li:hover, aside ul a:hover {
     color: #eb5959;
     text-decoration: none;
     transform: scale(1.05);
+}
+
+.signups{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+}
+
+form {
+    width: 500px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
 }
 
 main .features details summary:hover {
@@ -78,6 +96,23 @@ main .features details summary:hover {
 
 }
 
+.chart_d{
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart_options{
+    display: flex;
+    padding-top: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.fcontainer{
+    padding: 10px;
+}
 main .features details summary {
     color: #fff;
     display: block;
@@ -109,7 +144,7 @@ main .profile{
     float: left;
     color: #fff;
     margin-top: 50px;
-    width: 75%;
+    width: 80%;
 }
 
 main .profile h1 {font-size: 50px; color: white; max-width: 1200px;}
@@ -159,7 +194,7 @@ main .profile details summary {
 
 main .profile-graph {
 	display: block;
-	width: 75%;
+	width: 80%;
 }
 
 main .profile-graph img {
@@ -179,12 +214,6 @@ main .profile-graph img {
     text-align: left;
 }
 
-form {
-    margin-left: 32%;
-    width: 500px;
-    margin-top: 50px;
-}
-
 /* ~~~~~~~~~~~~~~~ Таблица ~~~~~~~~~~~~~~*/
 
 table {
@@ -194,7 +223,7 @@ table {
     border-margin: 20px;
 }
 table thead tr {
-    color: #8785A2;
+    color: black;
     font-weight: bold;
 }
 table thead tr td {
@@ -202,7 +231,7 @@ table thead tr td {
     background: #FFCFDF;
 }
 table tbody tr td {
-    color: #8785A2;
+    color: black;
     border: 1px solid #C06C84;
     border-radius: 4px;
     background: #FFD3B6;
@@ -213,11 +242,23 @@ table tbody tr td:hover {
 }
 
 /* ~~~~~~~~~~~~~~~ Инструкторы ~~~~~~~~~~~~~~*/
+.instructors-container{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 .instructors {
-    align-items: center;
 	list-style: none;
 	padding: 0;
+    display: flex;
+    flex-flow: wrap;
+    align-items: center;
+    width: 95%;
+    text-align: center;
+    justify-content: center;
+    margin: 0;
 }
 
 .instructor-wrapper {

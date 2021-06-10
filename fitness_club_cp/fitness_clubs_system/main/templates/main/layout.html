@@ -41,7 +41,7 @@
             {% else %}
             <a href="{% url 'groupclasses' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
             {% endif %}
-            <a href="{% url 'instructors' %}"><li><i class="fas fa-home"></i> Инструкторы</li></a>
+            <a href="{% url 'instructors' %}"><li><i class="fas fa-users"></i> Инструкторы</li></a>
             <a href="{% url 'prices' %}"><li><i class="fa fa-shopping-bag"></i> Цены </li></a>
 
             {% if role.is_guest %}

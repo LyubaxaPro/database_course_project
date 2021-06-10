@@ -10,7 +10,7 @@
 <div class="features">
 <h2>Редактировать личную информацию</h2>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ instructor_form|crispy }}
 

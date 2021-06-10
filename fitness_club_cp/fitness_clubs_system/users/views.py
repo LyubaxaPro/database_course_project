@@ -66,7 +66,7 @@ class InstructorSignUpView(View):
     def post(self, request, *args, **kwargs):
 
         user_form = CustomUserSignUpForm(request.POST)
-        profile_form = InstructorProfileForm(request.POST)
+        profile_form = InstructorProfileForm(request.POST, request.FILES)
 
         if user_form.is_valid() and profile_form.is_valid():
             print("FFFFFF")

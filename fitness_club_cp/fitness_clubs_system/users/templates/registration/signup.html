@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form method="post">
+<form style="padding: 10px;" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ user_form|crispy }}
     <br>
@@ -32,4 +32,5 @@
     <button type="submit" class="button-submit-success">Зарегистрироваться!</button>
 
 </form>
+
 {% endblock %}

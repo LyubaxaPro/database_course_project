@@ -32,7 +32,7 @@ class Customers(models.Model):
     height = models.IntegerField(default=0, verbose_name='Рост')
     measured_weights = ArrayField(models.IntegerField(blank=True, null=True, default=0), default=list())
     measure_dates = ArrayField(models.DateField(blank=True, null=True, default=datetime.date.today), default=list())
-    tariff = models.ForeignKey('Prices', on_delete=models.CASCADE, verbose_name='Тариф')
+    tariff = models.ForeignKey('Prices', on_delete=models.CASCADE, verbose_name='тариф')
     tariff_end_date = models.DateField(verbose_name='Дата окончания срока действия абонемента')
     instructor = models.ForeignKey('Instructors', on_delete=models.CASCADE, blank=True, null=True)
 
@@ -74,7 +74,7 @@ class Instructors(models.Model):
     experience = models.IntegerField( verbose_name='Стаж')
     achievements = ArrayField(models.TextField(blank=True, null=True),  verbose_name='Достижения')  # This field type is a guess.
     specialization = ArrayField(models.TextField(blank=True, null=True),  verbose_name='Специализация')  # This field type is a guess.
-    photo = models.ImageField(upload_to='images/', null=True, default= 'images/default.jpg',  verbose_name='Фото')
+    photo = models.ImageField(upload_to='images/', null=True, default='images/default.jpg',  verbose_name='Фото')
     is_active = models.BooleanField(default=False)
     admin = models.ForeignKey(Administrators, null=True, on_delete=models.CASCADE)
 

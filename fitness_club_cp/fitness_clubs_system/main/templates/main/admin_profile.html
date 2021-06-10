@@ -104,15 +104,15 @@ $(document).ready(function () {
     <p><b>Логин: </b> {{ role.user.login }} </p>
     <p><b>Email: </b> {{ role.user.email }} </p>
     <p><b>Вы работаете в фитнес-клубе по адресу: </b> {{ address }} </p>
+        </div>
  <div class="features">
+     <div class="signups">
     <h2 style="color:orange">Заявки на регистрацию</h2>
     {% if instructors|length == 0 %}
      <p>Заявок на регистрацию нет</p>
     {% else %}
     {% for instructor in instructors %}
      <div id="new_instructor{{ instructor.data.instructor_id }}">
-        <details>
-        <summary>{{ instructor.data.surname }} {{ instructor.data.name }} {{ instructor.data.patronymic }}</summary>
         <div class="profile" >
           <div class="container">
             <div class="row">
@@ -150,21 +150,21 @@ $(document).ready(function () {
             </div>
           </div>
           </div>
-        </details>
+
          </div>
     {% endfor %}
      {% endif %}
-
+     </div>
+     <br>
+     <div class="signups">
      <h2 style="color:orange">Заявки на изменение данных</h2>
     {% if changes_instructors|length == 0 %}
      <p>Заявок на изменение данных нет</p>
     {% else %}
     {% for instructor_change in changes_instructors %}
      <div id="instructor_change{{ instructor_change.pk}}">
-        <details>
-        <summary>{{ instructor_change.change.old_surname }} {{ instructor_change.change.old_name  }} {{  instructor_change.change.old_patronymic }}</summary>
         <div class="profile" >
-          <div class="container">
+          <div class="container" style="width:100%">
             <div class="row">
               <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
                  <p><b>Фото: </b> </p>
@@ -245,14 +245,14 @@ $(document).ready(function () {
             </div>
           </div>
           </div>
-        </details>
+
          </div>
 
      {% endfor %}
      {% endif %}
-
-     <details>
-         <summary><h2 style="color:orange"> Действия инструкторов за последнюю неделю </h2> </summary>
+     </div>
+    <br>
+     <h2 style="color:orange"> Действия инструкторов за последнюю неделю </h2>
      <ul>
      {% for act in instructor_action_logs %}
          <li>
@@ -260,7 +260,5 @@ $(document).ready(function () {
          </li>
      {% endfor %}
      </ul>
-         </details>
  </div>
-    </div>
 {% endblock %}
