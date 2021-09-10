@@ -1,0 +1,36 @@
+<!-- templates/registration/signup.html -->
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form style="padding: 10px;" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form|crispy }}
+    <br>
+    {{ profile_form|crispy }}
+    {% if profile_form.errors %}
+    {% for field in profile_form %}
+    {% for error in field.errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% for error in profile_form.non_field_errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if specializations %}
+    <br>
+
+    {% endif %}
+    <br>
+    <br>
+    <button type="submit" class="button-submit-success">Зарегистрироваться!</button>
+
+</form>
+
+{% endblock %}

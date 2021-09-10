@@ -1,0 +1,21 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Адреса
+{% endblock %}
+
+{% block content %}
+        <div class="features">
+            <h1>Адреса клубов</h1>
+            <ul>
+                {% for club in clubs %}
+                    <li>
+                        <p>{{ club.city }}</p>
+                        <p>{{ club.address}} </p>
+                        <p>{{ club.phone }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+{% endblock %}

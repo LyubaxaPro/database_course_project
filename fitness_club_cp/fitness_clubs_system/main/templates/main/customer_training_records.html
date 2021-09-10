@@ -1,0 +1,393 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Записи
+{% endblock %}
+
+{% block content %}
+
+
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.2.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+    $('.btn_delete_personal').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_personal clicked');
+        var data = $(this).attr("data");
+        console.log(data);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_personal_training_record/?record_id=' + data,
+            success: function (result) {
+                console.log("success")
+                document.getElementById("future_personal_trainings"+data).remove();
+                document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_group_class').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_group_class clicked');
+        var data = $(this).attr("data");
+        console.log(data);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_group_class_record/?record_id=' + data,
+            success: function (result) {
+                console.log("success")
+                document.getElementById("future_group_classes"+data).remove();
+                document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.add_group_class').on('click', function (e) {
+        e.preventDefault();
+        console.log('button add_group_class clicked');
+        var date = $(this).attr("data-date");
+        var shedule_id = $(this).attr("data-shedule-id");
+        console.log("дата");
+        console.log(date);
+        console.log(shedule_id)
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_group_class_record/?shedule_id=' + shedule_id + '&date=' + date,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.add_personal_training').on('click', function (e) {
+        e.preventDefault();
+        console.log('button add_personal_training clicked');
+        var date = $(this).attr("data-date");
+        var i_shedule_id = $(this).attr("data-i-shedule-id");
+        console.log("дата");
+        console.log(date);
+        console.log(i_shedule_id)
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_personal_training_record/?i_shedule_id=' + i_shedule_id + '&date=' + date,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+  $('.appointment_to_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button appointment_to_instructor clicked');
+        instructor_id = $('select#club_instructors').val()
+        console.log(instructor_id)
+
+        $.ajax({
+            type: 'GET',
+            url: '/appointment_to_instructor/?instructor_id=' + instructor_id,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+  $('.delete_appointment_to_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button delete_appointment_to_instructor clicked');
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_appointment_to_instructor/',
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+  $('.replace_appointment_to_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button replace_appointment_to_instructor clicked');
+        instructor_id = $('select#replace_club_instructors').val()
+        console.log(instructor_id)
+
+        $.ajax({
+            type: 'GET',
+            url: '/replace_appointment_to_instructor/?instructor_id=' + instructor_id,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+      $('.btn_select_week').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_select_week clicked');
+        document.location.href = '/customer_training_records/?week_num=' + $('#week').val();
+         });
+});
+
+</script>
+        <div class="features">
+            <details>
+            <summary style="color:#E9967A;">Прошедшие групповые занятия</summary>
+               {% if pass_group_classes|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет прошедших групповых занятий </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for class in pass_group_classes %}
+                    <li>
+                        <p>{{ class.class_name }} {{ class.day_of_week }} {{ class.date }} {{ class.time }}</p>
+                    </li>
+                {% endfor %}
+                </ul>
+            </details>
+
+            <details>
+            <summary style="color:#E9967A;">Запланированные групповые занятия</summary>
+               {% if future_group_classes|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет запланированных групповых занятий </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for class in future_group_classes %}
+                    <div class="future_group_classes" id="future_group_classes{{ class.record_id }}" >
+                    <li>
+                        <p>{{ class.class_name }} {{ class.day_of_week }} {{ class.date }} {{ class.time }}
+                            <button class="btn btn-danger btn-icon btn_delete_group_class" data="{{ class.record_id }}"> <span class="icon"><i class="fas fa-trash"></i></span> Отменить запись </button></p>
+                    </li>
+
+                    </div>
+                {% endfor %}
+
+                </ul>
+            </details>
+
+            <details>
+            <summary style="color:#E9967A;">Прошедшие персональные тренировки</summary>
+                {% if pass_personal_trainings|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет прошедших персональных тренировок </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for train in pass_personal_trainings %}
+                    <a target="_blank" href="{% url 'instructor_detail' train.instructor_pk %}">
+                    <li>
+                        <p>Инструктор {{ train.instructor_name }} {{ train.day_of_week }} {{ train.date }} {{ train.time }} </p>
+                    </li>
+                    </a>
+                {% endfor %}
+                </ul>
+            </details>
+
+            <div class="future_trainings">
+            <details>
+            <summary style="color:#E9967A;">Запланированные персональные тренировки</summary>
+                {% if future_personal_trainings|length == 0 %}
+                <ul>
+                    <li>
+                        <p> У Вас нет запланированных персональных тренировок </p>
+                    </li>
+                </ul>
+                {% endif %}
+                <ul>
+                {% for train in future_personal_trainings %}
+                    <div class="personal_training_record" id="future_personal_trainings{{ train.record_id }}" >
+                    <li>
+                        <p>Инструктор <a target="_blank" href="{% url 'instructor_detail' train.instructor_pk %}">{{ train.instructor_name }}</a> {{ train.day_of_week }} {{ train.date }} {{ train.time }}
+                            <button class="btn btn-danger btn-icon btn_delete_personal"  data="{{ train.record_id }}"> <span class="icon"><i class="fas fa-trash"></i></span> Отменить запись </button></p>
+                    </li>
+
+                    </div>
+                {% endfor %}
+                </ul>
+            </details>
+            </div>
+            <h1 style="color:white"> Запись на тренировки </h1>
+            <label for="week">Выберите дату: </label>
+            <input id="week" type="week" name="week" value="{{ current_week }}">
+            <button class="btn btn-info btn_select_week"> Выбрать неделю </button>
+        {% if have_instructor %}
+
+            <h1>Запись на персональные тренировки</h1>
+            <p> В таблице отображны данные о занятиях которые доступны Вам для записи в соответствии с расписанием тренера к которому Вы прикреплены, Вашим тарифом и имеющимся записям. </p>
+
+
+            <h3> Ваш тренер <a target="_blank" href="{% url 'instructor_detail' instructor_data.instructor_pk %}"> {{ instructor_data.instructor_surname }} {{ instructor_data.instructor_name }} {{ instructor_data.instructor_patronymic }}</a></h3>
+            <h1>Расписание</h1>
+            <table>
+              <thead>
+                <tr>
+                <td>Время</td>
+                {% for day, date in day_of_week_date.items %}
+                  <td>{{ day }} {{ date }}</td>
+                {% endfor %}
+                </tr>
+              </thead>
+              <tbody class="table_body">
+
+              {% for time, tdata in trainings_data.items %}
+                <tr>
+                    <td> {{ time }}</td>
+                    {% for day, value in tdata.items %}
+                        {% if value|length == 0  %}
+                            <td> - </td>
+                        {% else %}
+                            <td>
+                            {% for v in value %}
+                            {% if v.class_not_done %}
+                                <p> Занятие </p>
+                                {% if v.is_training_by_customer %}
+                                    <p> Вы записаны на это занятие </p>
+                                {% else %}
+                                    {% if v.is_training_by_other %}
+                                        <p> Занятие забронировано </p>
+                                    {% else %}
+                                        {% if v.is_in_group_classes_records %}
+                                        <p> Вы не можете посетить это занятие так как Вы записаны на групповое занятие в это время </p>
+                                        {% else %}
+                                        <button class="btn btn-success add_personal_training" data-i-shedule-id='{{ v.i_shedule_id }}' data-date='{{ v.date }}'>Записаться</button>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <p>Занятие прошло и не доступно к записи</p>
+                            {% endif %}
+                            {% endfor %}
+                            </td>
+
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+              {% endfor %}
+
+              </tbody>
+            </table>
+
+        <h2>Вы можете прикрепиться к другому тренеру. В этом случае все запланированные персональные тренировки будут отменены. Вы сможете записаться на тренировки у нового тренера.</h2>
+        <select id="replace_club_instructors">
+        {% for instructor_data in club_instructors_data %}
+            <option value="{{ instructor_data.instructor_id }}">{{instructor_data.surname}} {{instructor_data.name}} {{instructor_data.patronimyc}}</option>
+        {% endfor %}
+        </select>
+         <button type="submit" class="btn btn-primary replace_appointment_to_instructor"> Сменить тренера </button>
+        <h2> Вы можете открепиться от Вашего ведушего тренера. В этом случае все запланированные персональные тренировки будут отменены. Персональные тренировки будут недоступны пока Вы не будете прикреплены. </h2>
+        <button class="btn btn-danger btn-icon delete_appointment_to_instructor"><span class="icon"><i class="fas fa-trash"></i></span>  Открепиться от ведущего тренера </button>
+
+        {% else %}
+            <h1>Запись на персональные тренировки</h1>
+            <h3> У Вас нет ведущего тренера. Для записи на персональное занятие прикрепитесь к тренеру. </h3>
+
+        <select id="club_instructors">
+        {% for instructor_data in club_instructors_data %}
+            <option value="{{ instructor_data.instructor_id }}">{{instructor_data.surname}} {{instructor_data.name}} {{instructor_data.patronimyc}}</option>
+        {% endfor %}
+        </select>
+         <button type="submit" class="btn btn-primary appointment_to_instructor"> Прикрепиться к тренеру</button>
+        {% endif %}
+
+        <h1>Запись на групповые занятия</h1>
+        <p> В таблице отображены групповые тренировки которые доступны Вам для записи в соответствии с расписанием Вашего клуба, Вашим тарифом и имеющимся записям. </p>
+        <h1>Расписание</h1>
+
+        <table>
+          <thead>
+            <tr>
+            <td>Время</td>
+            {% for day, date in day_of_week_date.items %}
+              <td>{{ day }} {{ date }}</td>
+            {% endfor %}
+            </tr>
+          </thead>
+          <tbody class="table_body">
+
+          {% for time, tdata in classes_data.items %}
+            <tr>
+                <td> {{ time }}</td>
+                {% for day, value in tdata.items %}
+
+                    {% if value|length == 0  %}
+                        <td> - </td>
+                    {% else %}
+                        <td>
+                        {%for v in value%}
+                            <p>{{ v.class_name }} {{ v.instructor_name }}</p>
+                            {%if v.class_not_done %}
+                                {% if v.more_than_maximum_quantity and not v.is_in_group_classes_records %}
+                                    <p>На занятие уже записано максимальное количество человек </p>
+                                {% else %}
+                                    {% if v.is_in_personal_trainings_records %}
+                                       <p style="color='red'"> Вы не можете посетить это занятие так как Вы записаны на персональную тренировку в это время</p>
+                                    {% else %}
+                                        {% if v.is_in_group_classes_records %}
+                                        <p style="color=red"> Вы записаны на это занятие</p>
+                                        {% else %}
+                                            <button class="btn btn-success add_group_class" data-shedule-id='{{ v.shedule_id }}' data-date='{{ v.date }}'> Записаться</button>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                            <p>Занятие прошло и не доступно к записи</p>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+
+                    {% endif %}
+                {% endfor %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+
+    </div>
+{% endblock %}

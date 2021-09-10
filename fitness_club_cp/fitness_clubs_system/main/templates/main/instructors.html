@@ -1,0 +1,82 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}
+  Инструкторы
+{% endblock %}
+
+
+{% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    function get_filtered_instructors(response) {
+        var result = ""
+        for (var i = 0; i < response.length; i++){
+            var pk = response[i]['pk'];
+
+            a_with_url = `<a target="_blank" href="{% url 'instructor_detail' 12345 %}">`.replace('12345', pk);
+            result += '<li class="instructor-wrapper">' +
+                a_with_url +
+                    '<div class="instructor-photo">' +
+                        '<img src=' + '/media/' + response[i]['fields']['photo'] + '>' +
+                    '</div>' +
+                    '<div class="instructor">' +
+                        '<p>' + response[i]['fields']['name'] + " " + response[i]['fields']['surname'] + '</p>'
+                    '</div>' +
+                '</a>' +
+                '</li>'
+        }
+        result += '</ul>'
+
+        $(".instructors").prepend(result);
+    }
+
+    $('.btn_get_clubs_instructors').on('click', function (e) {
+        e.preventDefault();
+        console.log('button clicked');
+
+        $.ajax({
+            type: 'GET',
+            url: '/get_club_instructors/?club_id=' + $('#id_address').val(),
+            success: function (result) {
+                $(".instructors").empty()
+                get_filtered_instructors(JSON.parse(result.filtered_instructors))
+            },
+            error: function(error) {
+                alert("Error occured! :(");
+                console.log(error);
+            }
+        });
+    });
+});
+</script>
+<div class="features" >
+    <h1>Наша команда</h1>
+    <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn_get_clubs_instructors knopka">Показать инструкторов</button>
+    </form>
+
+    <div class="instructors-container">
+    <div class="instructors">
+      {% for instructor in instructors %}
+        <li class="instructor-wrapper">
+            <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">
+                <div class="instructor-photo">
+                  <img src="{{ instructor.photo.url}}">
+                </div>
+                <div  class="instructor">
+                    <p>{{ instructor.name }} {{ instructor.surname}}</p>
+    <!--                <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">{{ instructor.name }} {{ instructor.surname}}</a>-->
+                </div>
+            </a>
+        </li>
+        {% endfor %}
+    </div>
+    </div>
+
+</div>
+{% endblock %}

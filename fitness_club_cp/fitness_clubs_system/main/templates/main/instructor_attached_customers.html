@@ -1,0 +1,30 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Услуги
+{% endblock %}
+
+{% block content %}
+        <div class="features">
+            <h1>Прикрепленные клиенты</h1>
+
+            {% for customer in customers_data %}
+                <details>
+                <summary>{{ customer.surname }} {{ customer.name }} {{ customer.patronymic }}</summary>
+                  <p>Дата рождения: {{ customer.day_of_birth }}</p>
+                  <p>Рост:  {{ customer.height }}</p>
+                  {% if customer.is_chart %}
+                      <div class="chart_d">
+                      <p style="font-size:18px;"><b>График изменения веса </b>
+                      <div class="profile-graph">
+                      <img src="data:image/png;base64, {{ customer.chart }}">
+                      </div>
+                      </div>
+                    {% else %}
+                        <p>Данных об измерениях веса нет</p>
+                    {% endif %}
+                </details>
+            {% endfor %}
+        </div>
+{% endblock %}
+

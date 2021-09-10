@@ -1,0 +1,74 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}
+    Записи на занятия
+{% endblock %}
+
+{% block content %}
+
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.2.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+
+      $('.btn_select_week').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_select_week clicked');
+        document.location.href = '/instructor_training_records/?week_num=' + $('#week').val();
+         });
+});
+
+</script>
+<div class="features" >
+<h1>Записи на тренировки</h1>
+<label for="week">Выберите дату: </label>
+        <input id="week" type="week" name="week" value="{{ current_week }}">
+        <button class="btn btn-info btn_select_week"> Выбрать неделю </button>
+  <table>
+    <thead>
+        <tr>
+        <td>Время</td>
+        {% for day, date in day_of_week_date.items %}
+          <td>{{ day }} {{ date }}</td>
+        {% endfor %}
+        </tr>
+    </thead>
+    <tbody class="table_body">
+
+    {% for time, tdata in shedule.items %}
+      <tr>
+          <td> {{ time }}</td>
+          {% for day, value in tdata.items %}
+
+              {% if value|length == 0  %}
+                  <td>
+                  <p>-</p>
+                  </td>
+              {% else %}
+                  <td>
+                  {{ value.name }}
+                  {% if value.is_personal%}
+                    {% if value.customer %}
+                    <p>Клиент: {{ value.customer.surname }} {{ value.customer.name }} {{ value.customer.patronymic }}</p>
+                    {% else %}
+                        <p>Время не забронировано</p>
+                    {% endif %}
+                  {% else %}
+                      <p>Количество записавшихся: {{ value.count }}</p>
+                  {% endif %}
+                  </td>
+
+              {% endif %}
+          {% endfor %}
+      </tr>
+    {% endfor %}
+
+    </tbody>
+  </table>
+  </div>
+{% endblock %}
+
+

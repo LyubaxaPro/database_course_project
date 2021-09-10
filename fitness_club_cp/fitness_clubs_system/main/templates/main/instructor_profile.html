@@ -1,0 +1,217 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+
+{% block title %}
+    Инструктор
+{% endblock %}
+
+{% block content %}
+
+
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.2.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+    $('.btn_add_personal_training').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_add_personal_training clicked');
+        var day = $(this).attr("data-day");
+        var time = $(this).attr("data-time");
+        console.log(day);
+        console.log(time);
+
+        $.ajax({
+            type: 'GET',
+            url: '/instructor_add_personal_training/?day=' + day + '&time=' + time,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/instructor_profile/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_personal_training').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_personal_training clicked');
+        var i_shedule_id = $(this).attr("data-shedule-id");
+        console.log(i_shedule_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/instructor_delete_personal_training/?i_shedule_id=' + i_shedule_id,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/instructor_profile/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_changes').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_changes clicked');
+        var pk = $(this).attr("data-pk");
+        console.log(pk);
+
+        $.ajax({
+            type: 'GET',
+            url: '/instructor_delete_changes/?pk=' + pk,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/instructor_profile/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+});
+
+</script>
+<div class="profile" >
+<h1>Профиль тренера</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <img src="{{ role.instructor.photo.url}}" >
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <p><b style="color:red">Фамилия Имя Отчество: </b> {{ role.instructor.surname }} {{ role.instructor.name }} {{ role.instructor.patronymic }} </p>
+        <p><b style="color:red">Логин: </b> {{ role.user.login }} </p>
+        <p><b style="color:red">Email: </b> {{ role.user.email }} </p>
+        <p><b style="color:red">Стаж: </b> {{role.instructor.experience}} {{ exp_str }}</p>
+        <p><b style="color:red">Образование:</b></p>
+        <ul>
+          {% for i in role.instructor.education %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+
+        <p><b style="color:red">Достижения:</b></p>
+        <ul>
+          {% for i in role.instructor.achievements %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+
+        <p><b style="color:red">Специализация:</b></p>
+        <ul>
+          {% for i in role.instructor.specialization %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+    <br>
+    {% if  is_already_record %}
+    <p><b>Вы уже отправили запрос на изменение данных администратору.Для отправки нового запроса дождитесь обработки запроса или отмените его.</b></p>
+    {% if change_record.change.new_surname %}
+    <p><b style="color:red">Изменение фамилии: </b> {{ change_record.change.new_surname }} </p>
+    {% endif %}
+
+    {% if change_record.change.new_name %}
+    <p><b style="color:red">Изменение имени: </b> {{ change_record.change.new_name }} </p>
+    {% endif %}
+
+    {% if change_record.change.new_patronymic %}
+    <p><b style="color:red">Изменение отчества: </b> {{ change_record.change.new_patronymic }} </p>
+    {% endif %}
+
+    {% if change_record.change.new_experience %}
+    <p><b style="color:red">Изменение стажа: </b> {{ change_record.change.new_experience }}</p>
+    {% endif %}
+
+    {% if change_record.change.new_education %}
+    <p><b style="color:red">Изменение образования: </b></p>
+        <ul>
+          {% for i in change_record.change.new_education %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if change_record.change.new_achievements %}
+    <p><b style="color:red">Изменение достижений: </b></p>
+        <ul>
+          {% for i in change_record.change.new_achievements %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if change_record.change.new_specialization %}
+    <p><b style="color:red">Изменение специализации: </b></p>
+        <ul>
+          {% for i in change_record.change.new_specialization %}
+          <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+    <button class="btn btn-danger btn-icon btn_delete_changes" data-pk='{{ change_record.pk }}'> <span class="icon"><i class="fas fa-trash"></i></span> Отменить изменения </button>
+    {% else %}
+    <p style="font-size:18px;"><a href="{% url 'edit_instructor' %}">Редактировать личную информацию</a></p>
+    {% endif %}
+    <br>
+  </div>
+  <div class="features">
+    <h2>Вы ведете занятия в фитнес-клубе по адресу {{ address }}</h2>
+  <h1>Расписание</h1>
+    <p>Вы можете добавить персональную тренировку в Ваше расписание или удалить занятие из расписания.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <td>Время</td>
+              <td>Понедельник</td>
+              <td>Вторник</td>
+              <td>Среда</td>
+              <td>Четверг</td>
+              <td>Пятница</td>
+              <td>Суббота</td>
+              <td>Воскресенье</td>
+
+            </tr>
+          </thead>
+          <tbody class="table_body">
+
+          {% for time, tdata in shedule.items %}
+            <tr>
+                <td> {{ time }}</td>
+                {% for day, value in tdata.items %}
+
+                    {% if value|length == 0  %}
+                        <td>
+                        <button  type="button"class="btn btn-outline-success btn_add_personal_training btn-floating" data-time='{{ time }}' data-day='{{ day }}'><i class="fas fa-plus"></i></button>
+                        </td>
+
+                    {% else %}
+                        <td>
+                        {{ value.name }}
+                        {% if value.is_editable %}
+                          <button  type="button"class="btn btn-outline-danger btn_delete_personal_training btn-floating" data-shedule-id='{{ value.i_shedule_id }}'><i class="fas fa-trash"></i></button>
+                        {% endif %}
+                        </td>
+
+                    {% endif %}
+                {% endfor %}
+            </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
+    </div>
+{% endblock %}
+

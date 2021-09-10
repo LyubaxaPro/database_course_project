@@ -1,0 +1,354 @@
+body{
+    background: #2c2c2c;
+}
+
+aside {
+    float: left;
+    background: #181818;
+    width: 20%;
+    padding: 2.5%;
+    height: 700vh;
+    color: #fff;
+    border-right: 5px solid #4d4d4d;
+}
+
+aside img{
+    width: 80px;
+    height: 60px;
+    float: left;
+}
+
+aside .logo {
+    font-size: 40px;
+    margin-left: 10px;
+    font-weight: bold;
+    position: relative;
+    top: -5px;
+}
+
+aside h3{
+    margin-top: 50px;
+    font-size: 28px;
+}
+
+aside ul {list-style: none}
+
+aside ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+}
+
+aside ul li:hover, aside ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+main .features{
+    float: left;
+    color: #fff;
+    margin-top: 50px;
+    text-align: center;
+    width: 80%;
+}
+ul {padding: 0;}
+
+main .features h1 {font-size: 50px; color: #eb5959;}
+main .features p {max-width: 1000px; margin: 20px auto;}
+main .features ul {list-style: none;}
+main .features ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    size: 30px;
+}
+
+select {width: 250px;}
+main .features ul li:hover, aside ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+}
+
+.signups{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+}
+
+form {
+    width: 500px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+}
+
+main .features details summary:hover {
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+.chart_d{
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart_options{
+    display: flex;
+    padding-top: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.fcontainer{
+    padding: 10px;
+}
+main .features details summary {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    font-size:22px;
+    outline-style: none;
+}
+
+summary_color {color: green;}
+
+.features .details ul {list-style: none;}
+.features .details ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    font-size:20px;
+}
+
+.features .details ul li:hover, aside ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+}
+
+/* ~~~~~~~~~~~~~~~ Профиль ~~~~~~~~~~~~~~*/
+main .profile{
+    float: left;
+    color: #fff;
+    margin-top: 50px;
+    width: 80%;
+}
+
+main .profile h1 {font-size: 50px; color: white; max-width: 1200px;}
+main .profile p {max-width: 1200px; margin: 20px auto;font-size:18px;}
+main .profile b {max-width: 1200px; margin: 20px auto;font-size:18px;color:#5F9EA0}
+main .profile ul {list-style: none;}
+main .profile ul li {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    transition: transform .6s ease;
+    size: 30px;
+}
+
+main .profile a {
+	position: relative;
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.4em;
+	height: 1.4em;
+	overflow: hidden;
+	color: white
+}
+
+main .profile ul li:hover, aside ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+main .profile details summary:hover {
+    text-decoration: none;
+    transform: scale(1.05);
+
+}
+
+main .profile details summary {
+    color: #fff;
+    display: block;
+    margin-top: 20px;
+    align: center;
+    transition: transform .6s ease;
+    size: 30px;
+    outline-style: none;
+}
+
+main .profile-graph {
+	display: block;
+	width: 80%;
+}
+
+main .profile-graph img {
+    float: center;
+    display: block;
+    margin: 20px auto
+    width: 100%;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+.alert-info{
+    float: left;
+    clear: both;
+    width: 400px;
+    margin: 20px 34%;
+    text-align: left;
+}
+
+/* ~~~~~~~~~~~~~~~ Таблица ~~~~~~~~~~~~~~*/
+
+table {
+    width: 100%;
+    border-collapse:separate;
+    border-spacing: 4px;
+    border-margin: 20px;
+}
+table thead tr {
+    color: black;
+    font-weight: bold;
+}
+table thead tr td {
+    border-radius: 4px 4px 0 0;
+    background: #FFCFDF;
+}
+table tbody tr td {
+    color: black;
+    border: 1px solid #C06C84;
+    border-radius: 4px;
+    background: #FFD3B6;
+}
+table tbody tr td:hover {
+    background: #FAE3D9;
+    transition-duration: 0.2s;
+}
+
+/* ~~~~~~~~~~~~~~~ Инструкторы ~~~~~~~~~~~~~~*/
+.instructors-container{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.instructors {
+	list-style: none;
+	padding: 0;
+    display: flex;
+    flex-flow: wrap;
+    align-items: center;
+    width: 95%;
+    text-align: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.instructor-wrapper {
+	display: block;
+	width: 400px;
+	float: left;
+	padding: 30px;
+}
+
+.instructor-photo {
+	display: block;
+	width: 100%;
+}
+
+.instructor-photo img {
+      display: block;
+      width: 340px;
+      height: 400px;
+}
+
+.instructor {
+	display: block;
+	border: 1px solid #b5e9a7;
+	border-radius: 3px;
+	position: relative;
+	background: #fff;
+	text-decoration: none;
+	color: #474747;
+}
+
+.instructor:hover .instructor-photo img {
+	transform: scale(1.05);
+}
+
+.instructor p {
+	position: relative;
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.4em;
+	height: 1.4em;
+	overflow: hidden;
+}
+
+.instructor a {
+	position: relative;
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.4em;
+	height: 1.4em;
+	overflow: hidden;
+	color: black
+}
+
+/* ~~~~~~~~~~~~~~~ Информация об инструкторе ~~~~~~~~~~~~~~*/
+
+.container img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.container h1 {
+  font-size: 50px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+.container p {
+  font-size: 18px;
+}
+
+/* ~~~~~~~~~~~~~~~ кнопка ~~~~~~~~~~~~~~*/
+button.knopka {
+    color: #fff;
+    background: #FFA500;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid #FF8247;
+}
+button.knopka:hover {
+    background: #FF6347;
+}
+
+.btn-icon {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.btn > .icon {
+    position: relative;
+    left: -.75rem;
+    display: inline-block;
+    padding: .375rem .75rem;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: .25rem 0 0 .25rem;
+}

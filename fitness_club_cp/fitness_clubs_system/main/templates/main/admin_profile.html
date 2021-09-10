@@ -1,0 +1,264 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}
+    {{ Профиль }}
+{% endblock %}
+
+{% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+
+$(document).ready(function () {
+
+    $('.btn_add_new_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_add_new_instructor clicked');
+        instructor_id = $(this).attr("data-instructor-id");
+        console.log(instructor_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_new_instructor/?instructor_id=' + instructor_id,
+            success: function (result) {
+                document.getElementById("new_instructor"+instructor_id).remove();
+                console.log('success');
+
+            },
+            error: function(error) {
+                alert("Error occured! :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_new_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_new_instructor clicked');
+        user_id = $(this).attr("data-user-id");
+        instructor_id = $(this).attr("data-instructor-id");
+        console.log(user_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_new_instructor/?user_id=' + user_id,
+            success: function (result) {
+                document.getElementById("new_instructor"+instructor_id).remove();
+                console.log('success');
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_change_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_change_instructor clicked');
+        pk = $(this).attr("data-pk");
+        console.log(pk);
+
+        $.ajax({
+            type: 'GET',
+            url: '/btn_change_instructor/?pk=' + pk,
+            success: function (result) {
+                document.getElementById("instructor_change"+pk).remove();
+                console.log('success');
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_not_change_instructor').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_not_change_instructor clicked');
+        pk = $(this).attr("data-pk");
+        console.log(pk);
+
+        $.ajax({
+            type: 'GET',
+            url: '/btn_not_change_instructor/?pk=' + pk,
+            success: function (result) {
+            document.getElementById("instructor_change"+pk).remove();
+
+                console.log('success');
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+});
+</script>
+
+    <div class="profile">
+    <h1>Профиль администратора</h1>
+    <p><b>Фамилия Имя Отчество: </b> {{ admin.surname }} {{ admin.name }} {{ admin.patronym}} </p>
+    <p><b>Логин: </b> {{ role.user.login }} </p>
+    <p><b>Email: </b> {{ role.user.email }} </p>
+    <p><b>Вы работаете в фитнес-клубе по адресу: </b> {{ address }} </p>
+        </div>
+ <div class="features">
+     <div class="signups">
+    <h2 style="color:orange">Заявки на регистрацию</h2>
+    {% if instructors|length == 0 %}
+     <p>Заявок на регистрацию нет</p>
+    {% else %}
+    {% for instructor in instructors %}
+     <div id="new_instructor{{ instructor.data.instructor_id }}">
+        <div class="profile" >
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <img src="{{ instructor.data.photo.url}}" >
+              </div>
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <p><b>Фамилия Имя Отчество: </b> {{ instructor.data.surname }} {{ instructor.data.name }} {{ instructor.data.patronymic }} </p>
+                <p><b>Логин: </b> {{ instructor.user.login }} </p>
+                <p><b>Email: </b> {{ instructor.user.email }} </p>
+                <p><b>Стаж: </b> {{instructor.data.experience}}</p>
+                <p><b>Образование:</b></p>
+                <ul>
+                  {% for i in instructor.data.education %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                <p><b>Достижения:</b></p>
+                <ul>
+                  {% for i in instructor.data.achievements %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                <p><b>Специализация:</b></p>
+                <ul>
+                  {% for i in instructor.data.specialization %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+        <button class="btn btn-success btn-icon btn_add_new_instructor"  data-instructor-id='{{ instructor.data.instructor_id }}'> <span class="icon"><i class="fas fa-plus"></i></span>Разрешить запрос на регистрацию </button>
+        <button class="btn btn-danger btn-icon btn_delete_new_instructor" data-instructor-id='{{ instructor.data.instructor_id }}' data-user-id='{{ instructor.user.id }}'> <span class="icon"><i class="fas fa-trash"></i></span> Отклонить запрос на регистрацию </button>
+              </div>
+            </div>
+          </div>
+          </div>
+
+         </div>
+    {% endfor %}
+     {% endif %}
+     </div>
+     <br>
+     <div class="signups">
+     <h2 style="color:orange">Заявки на изменение данных</h2>
+    {% if changes_instructors|length == 0 %}
+     <p>Заявок на изменение данных нет</p>
+    {% else %}
+    {% for instructor_change in changes_instructors %}
+     <div id="instructor_change{{ instructor_change.pk}}">
+        <div class="profile" >
+          <div class="container" style="width:100%">
+            <div class="row">
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                 <p><b>Фото: </b> </p>
+                <img src="/media/{{instructor_change.change.old_photo}}" >
+              </div>
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                  <p><b>Фамилия: </b> {{ instructor_change.change.old_surname }} </p>
+                  {% if instructor_change.change.new_surname %}
+                  <p><b style="color: red">Изменение фамилии: </b> {{ instructor_change.change.new_surname }} </p>
+                  {% endif %}
+
+                  <p><b>Имя: </b> {{ instructor_change.change.old_name }} </p>
+                  {% if instructor_change.change.new_name %}
+                  <p><b style="color: red">Изменение имени: </b> {{ instructor_change.change.new_name }} </p>
+                  {% endif %}
+
+                  <p><b>Отчество: </b> {{ instructor_change.change.old_patronymic }} </p>
+                  {% if instructor_change.change.new_patronymic %}
+                  <p><b style="color: red">Изменение отчества: </b> {{ instructor_change.change.new_patronymic }} </p>
+                  {% endif %}
+
+                  <p><b>Стаж: </b> {{ instructor_change.change.old_experience }} </p>
+                  {% if instructor_change.change.new_experience %}
+                  <p><b style="color: red">Изменение стажа: </b> {{ instructor_change.change.new_experience }} </p>
+                  {% endif %}
+
+                  <p><b>Образование:</b></p>
+                <ul>
+                  {% for i in instructor_change.change.old_education %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                {% if instructor_change.change.new_education %}
+                  <p><b style="color: red">Изменение образования:</b></p>
+                <ul>
+                  {% for i in instructor_change.change.new_education %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+
+                  <p><b>Достижения:</b></p>
+                <ul>
+                  {% for i in instructor_change.change.old_achievements  %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                {% if instructor_change.change.new_achievements  %}
+                  <p><b style="color: red">Изменение достижений:</b></p>
+                <ul>
+                  {% for i in instructor_change.change.achievements%}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+
+                  <p><b>Специализация:</b></p>
+                <ul>
+                  {% for i in instructor_change.change.old_specialization %}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+
+                {% if instructor_change.change.new_specialization %}
+                  <p><b style="color: red">Изменение специализации:</b></p>
+                <ul>
+                  {% for i in instructor_change.change.new_specialization%}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+
+        <button class="btn btn-success btn-icon btn_change_instructor" data-pk='{{ instructor_change.pk }}'> <span class="icon"><i class="fas fa-plus"></i></span>Разрешить изменения</button>
+        <button class="btn btn-danger btn-icon btn_not_change_instructor" data-pk='{{ instructor_change.pk }}'> <span class="icon"><i class="fas fa-trash"></i></span> Отклонить изменения </button>
+              </div>
+            </div>
+          </div>
+          </div>
+
+         </div>
+
+     {% endfor %}
+     {% endif %}
+     </div>
+    <br>
+     <h2 style="color:orange"> Действия инструкторов за последнюю неделю </h2>
+     <ul>
+     {% for act in instructor_action_logs %}
+         <li>
+        <p>{{act.act_date}} <a target="_blank" href="{% url 'instructor_detail' act.instructor.pk %}"> {{act.instructor.surname }} {{act.instructor.name }} </a> {{ act.description }}</p>
+         </li>
+     {% endfor %}
+     </ul>
+ </div>
+{% endblock %}

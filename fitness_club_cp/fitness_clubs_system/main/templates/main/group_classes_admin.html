@@ -1,0 +1,177 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    Групповые занятия
+{% endblock %}
+
+{% block content %}
+<script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+
+	$('#selectModal').on('show.bs.modal', function (event) {
+    var time = $(event.relatedTarget).attr("data-time");
+    var day = $(event.relatedTarget).attr("data-day");
+    var busy_instructors = $(event.relatedTarget).attr("data-busy-instructors");
+    console.log(busy_instructors)
+    var modal = $(this)
+    document.getElementById('btn_submit').setAttribute('data-time', time)
+    document.getElementById('btn_submit').setAttribute('data-day', day)
+    document.getElementById('btn_submit').setAttribute('data-busy-instructors', busy_instructors)
+
+    })
+
+    $('.btn_submit').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_submit clicked');
+        var class_id = $('#select_group_class').val();
+        var instructor_id = $('#select_instructor').val();
+        var maximum_quantity = $('#select_maximum_quantity').val();
+        var time =  $(this).attr("data-time");
+        var day = $(this).attr("data-day");
+        var busy_instructors = $(this).attr("data-busy-instructors");
+        console.log(class_id);
+        console.log(instructor_id);
+        console.log(time);
+        console.log(day);
+        console.log(busy_instructors)
+        console.log(maximum_quantity);
+        if (maximum_quantity <= 0 || maximum_quantity > 40){
+            alert("Максимальное количество человек должно быть положительным целым числом и не превышать 40");
+            return
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: '/add_group_class_in_shedule/?class_id=' + class_id + '&instructor_id=' + instructor_id + '&time=' +
+             time + '&day=' + day + '&club_id=' + {{ club_id }} + '&maximum_quantity=' + maximum_quantity +
+             '&busy_instructors=' + busy_instructors,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/group_classes_admin/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+
+    $('.btn_delete_class_by_admin').on('click', function (e) {
+        e.preventDefault();
+        console.log('button btn_delete_class_by_admin clicked');
+        var shedule_id =  $(this).attr("data-shedule-id");
+
+        console.log(shedule_id);
+
+        $.ajax({
+            type: 'GET',
+            url: '/delete_group_class_in_shedule/?shedule_id=' + shedule_id,
+            success: function (result) {
+                console.log("success")
+                document.location.href = '/group_classes_admin/';
+            },
+            error: function(error) {
+                alert("Введите корректные данные :(");
+                console.log(error);
+            }
+        });
+    });
+});
+</script>
+    <div class="features">
+        <h1>Расписание групповых занятий</h1>
+        <p>Расписание для клуба по адресу {{ address }}</p>
+        <table>
+          <thead>
+            <tr>
+              <td>Время</td>
+              <td>Понедельник</td>
+              <td>Вторник</td>
+              <td>Среда</td>
+              <td>Четверг</td>
+              <td>Пятница</td>
+              <td>Суббота</td>
+              <td>Воскресенье</td>
+
+            </tr>
+          </thead>
+          <tbody class="table_body">
+
+          {% for time, tdata in classes_data.items %}
+            <tr>
+                <td> {{ time }}</td>
+                {% for day, value in tdata.items %}
+
+                    {% if value.data|length == 0  %}
+                        <td>
+                         <button  type="button" class="btn btn-outline-success btn_add_class_by_admin btn-floating" data-toggle="modal" data-target="#selectModal" data-time='{{ time }}' data-busy-instructors='{{value.busy_instructors }}' data-day='{{ day }}'><i class="fas fa-plus"></i></button>
+                        </td>
+                        {% else %}
+                        <td>
+
+                        {%for v in value.data %}
+                            <p>{{ v.class_name }} {{ v.instructor_name }}</p>
+                            <button  type="button"class="btn btn-outline-danger btn_delete_class_by_admin btn-floating" data-shedule-id='{{ v.shedule_id }}'><i class="fas fa-trash"></i></button>
+                        {% endfor %}
+                         <button  type="button" class="btn btn-outline-success btn_add_class_by_admin btn-floating" data-toggle="modal" data-target="#selectModal" data-time='{{ time }}' data-day='{{ day }}' data-busy-instructors='{{ value.busy_instructors }}'><i class="fas fa-plus"></i></button>
+                         </td>
+
+                    {% endif %}
+                {% endfor %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+        <h2>Описание занятий</h2>
+        {% for i in classes %}
+            <details>
+            <summary>{{ i.class_name }}</summary>
+                <p>Длительнось занятия: {{ i.duration }} минут</p>
+                <p>{{ i.description }}</p>
+            </details>
+        {% endfor %}
+        </div>
+</div>
+<div class="modal fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="selectModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" style="margin-left:0" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="selectModalLabel">Выберите тренера и занятие</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label class="control-label">Занятие</label>
+          <select id="select_group_class">
+              {% for class in classes %}
+              <option value={{ class.class_id }} > {{ class.class_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        <div class="form-group">
+            <label class="control-label">Занятие</label>
+          <select id="select_instructor">
+              {% for instructor in instructors %}
+              <option value={{ instructor.instructor_id }} >{{ instructor.surname }} {{ instructor.name }} {{ instructor.patronymic }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        <div class="form-group">
+            <label class="control-label">Максимальное количество человек</label>
+          <input id="select_maximum_quantity" type="number" min="1" max="40" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn_submit" data-dismiss="modal" id="btn_submit">Добавить занятие</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

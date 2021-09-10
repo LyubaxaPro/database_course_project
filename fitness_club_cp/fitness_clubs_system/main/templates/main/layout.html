@@ -1,0 +1,67 @@
+{% load static %}
+
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+</head>
+<body>
+    <aside>
+        <h3>Навигация</h3>
+        <ul>
+            {% if role.is_customer %}
+            <a href="{% url 'customer_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.customer.name }}</li></a>
+            <a href="{% url 'customer_training_records' %}"><li><i class="fas fa-calendar-check"></i> Записи на тренировки </li></a>
+            {% else %}
+                {% if role.is_instructor and role.instructor.is_active %}
+                <a href="{% url 'instructor_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль {{ role.instructor.name }}</li></a>
+                <a href="{% url 'instructor_attached_customers' %}"><li><i class="fas fa-address-card"></i> Прикреплённые клиенты </li></a>
+                <a href="{% url 'instructor_training_records' %}"><li><i class="fas fa-calendar-check"></i> Записи </li></a>
+                {% else %}
+
+                    {% if role.is_admin %}
+                    <a href="{% url 'admin_profile' %}"><li><i class="fas fa-user-circle"></i> Профиль администратора</li></a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
+            <a href="{% url 'home' %}"><li><i class="fas fa-home"></i> Главная</li></a>
+            <a href="{% url 'address' %}"><li><i class="fa fa-map-marker"></i> Адреса</li></a>
+            <a href="{% url 'services' %}"><li><i class="fa fa-bicycle"></i> Услуги</li></a>
+            {% if role.is_admin %}
+             <a href="{% url 'group_classes_admin' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
+            <a href="{% url 'group_class_statistics' %}"><li><i class="fas fa-futbol"></i> Статистика посещения групповых занятий</li></a>
+            {% else %}
+            <a href="{% url 'groupclasses' %}"><li><i class="fas fa-futbol"></i> Групповые занятия</li></a>
+            {% endif %}
+            <a href="{% url 'instructors' %}"><li><i class="fas fa-users"></i> Инструкторы</li></a>
+            <a href="{% url 'prices' %}"><li><i class="fa fa-shopping-bag"></i> Цены </li></a>
+
+            {% if role.is_guest %}
+            <a href="{% url 'login' %}"><li><i class="fas fa-home"></i> Вход</li></a>
+            <a href="{% url 'signup_instructor' %}"><li><i class="fas fa-home"></i> Зарегистрироваться как инструктор</li></a>
+            <a href="{% url 'signup_customer' %}"><li><i class="fas fa-home"></i> Зарегистрироваться как клиент</li></a>
+            {% endif %}
+
+            {% if not role.is_guest %}
+            <a href="{% url 'logout' %}"><li><i class="fas fa-home"></i> Выход</li></a>
+            {% endif %}
+
+        </ul>
+    </aside>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+</body>
+</html>
