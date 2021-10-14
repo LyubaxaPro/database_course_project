@@ -4,6 +4,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
 
+
 class CustomUserManager(BaseUserManager):
 
     def create_user(self, email, password, role=None, **extra_fields):
@@ -31,7 +32,8 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(email=email, password=password, role= role, **extra_fields)
+        return self.create_user(email=email, password=password, role=role, **extra_fields)
+
 
 class FitnessClubs(models.Model):
     CLUB_CHOICES = (
@@ -53,8 +55,8 @@ class FitnessClubs(models.Model):
     class Meta:
         db_table = 'fitness_clubs'
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
 
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     CUSTOMER = 0
     INSTRUCTOR = 1
     ADMIN = 2
@@ -82,10 +84,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name='email', unique=True)
     login = models.CharField(verbose_name='login', max_length=40, unique=True)
     role = models.PositiveSmallIntegerField(verbose_name='Роль',
-        choices=ROLE_CHOICES, default=GUEST)
+                                            choices=ROLE_CHOICES, default=GUEST)
     club = models.PositiveSmallIntegerField(verbose_name='Фитнес клуб',
-                                               choices=CLUB_CHOICES, default=1)
-  #  phone = models.CharField(verbose_name='Телефон', max_length=40)
+                                            choices=CLUB_CHOICES, default=1)
+    #  phone = models.CharField(verbose_name='Телефон', max_length=40)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -99,4 +101,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-

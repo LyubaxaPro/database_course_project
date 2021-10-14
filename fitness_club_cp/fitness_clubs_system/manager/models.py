@@ -1,5 +1,5 @@
 import datetime
-
+from unittest.mock import MagicMock
 from django.db import models
 
 from users.models import CustomUser, FitnessClubs

@@ -1,8 +1,3 @@
-
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO guest;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO instructor;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO customer;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO administrator;
 --------------------------------------------------------------
 
 CREATE ROLE GUEST WITH LOGIN PASSWORD 'quest_password';
@@ -122,43 +117,7 @@ GRANT INSERT ON special_offers to administrator;
 GRANT DELETE ON special_offers to administrator;
 ----------------------------------------------------------
 
+ALTER USER guest CREATEDB;
+ALTER USER instructor CREATEDB;
+ALTER USER customer CREATEDB;
 
-GRANT ALL ON auth_group to guest;
-GRANT ALL ON auth_group_permissions to guest;
-GRANT ALL ON auth_permission to guest;
-GRANT ALL ON django_admin_log to guest;
-GRANT ALL ON django_content_type to guest;
-GRANT ALL ON django_migrations to guest;
-GRANT ALL ON django_session to guest;
-GRANT ALL ON users_customuser_groups to guest;
-GRANT ALL ON users_customuser_user_permissions to guest;
-
-GRANT ALL ON auth_group to customer;
-GRANT ALL ON auth_group_permissions to customer;
-GRANT ALL ON auth_permission to customer;
-GRANT ALL ON django_admin_log to customer;
-GRANT ALL ON django_content_type to customer;
-GRANT ALL ON django_migrations to customer;
-GRANT ALL ON django_session to customer;
-GRANT ALL ON users_customuser_groups to customer;
-GRANT ALL ON users_customuser_user_permissions to customer;
-
-GRANT ALL ON auth_group to instructor;
-GRANT ALL ON auth_group_permissions to instructor;
-GRANT ALL ON auth_permission to instructor;
-GRANT ALL ON django_admin_log to instructor;
-GRANT ALL ON django_content_type to instructor;
-GRANT ALL ON django_migrations to instructor;
-GRANT ALL ON django_session to instructor;
-GRANT ALL ON users_customuser_groups to instructor;
-GRANT ALL ON users_customuser_user_permissions to instructor;
-
-GRANT ALL ON auth_group to administrator;
-GRANT ALL ON auth_group_permissions to administrator;
-GRANT ALL ON auth_permission to administrator;
-GRANT ALL ON django_admin_log to administrator;
-GRANT ALL ON django_content_type to administrator;
-GRANT ALL ON django_migrations to administrator;
-GRANT ALL ON django_session to administrator;
-GRANT ALL ON users_customuser_groups to administrator;
-GRANT ALL ON users_customuser_user_permissions to administrator;

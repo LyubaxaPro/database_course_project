@@ -1,0 +1,19 @@
+[{"model": "manager.customers", "pk": 1, "fields": {"user": 14, "sex": "man", "name": "Григорий", "surname": "Владимирский", "patronymic": "Антонович", "day_of_birth": "1989-05-23", "height": 177, "measured_weights": "[\"106\"]", "measure_dates": "[\"2019-01-01\"]", "tariff": 1, "tariff_end_date": "2021-08-14", "instructor": null}},
+  {"model": "manager.customers", "pk": 2, "fields": {"user": 15, "sex": "man", "name": "Дмитрий", "surname": "Воскобойников", "patronymic": "Егорович", "day_of_birth": "1971-08-05", "height": 146, "measured_weights": "[\"117\", \"117\", \"117\", \"124\", \"128\"]", "measure_dates": "[\"2020-03-25\", \"2021-02-01\", \"2021-02-15\", \"2021-02-21\", \"2021-03-15\"]", "tariff": 3, "tariff_end_date": "2022-05-13", "instructor": null}},
+  {"model": "manager.customers", "pk": 3, "fields": {"user": 16, "sex": "woman", "name": "Яна", "surname": "Обломова", "patronymic": "Игоревна", "day_of_birth": "1978-03-08", "height": 151, "measured_weights": "[\"82\", \"75\", \"85\", \"77\", \"84\", \"76\"]", "measure_dates": "[\"2019-06-08\", \"2020-07-08\", \"2020-10-06\", \"2020-10-27\", \"2021-01-26\", \"2021-04-04\"]", "tariff": 2, "tariff_end_date": "2021-06-16", "instructor": 3}},
+  {"model": "manager.customers", "pk": 4, "fields": {"user": 17, "sex": "man", "name": "Марк", "surname": "Арский", "patronymic": "Наумович", "day_of_birth": "1970-05-20", "height": 176, "measured_weights": "[\"139\", \"140\", \"134\", \"133\", \"140\"]", "measure_dates": "[\"2019-03-29\", \"2019-06-04\", \"2019-10-09\", \"2020-08-30\", \"2020-09-20\"]", "tariff": 4, "tariff_end_date": "2022-07-20", "instructor": null}},
+  {"model": "manager.customers", "pk": 5, "fields": {"user": 18, "sex": "woman", "name": "Ирина", "surname": "Софийская", "patronymic": "Васильевна", "day_of_birth": "1970-01-20", "height": 161, "measured_weights": "[\"108\", \"116\", \"119\", \"116\"]", "measure_dates": "[\"2020-03-13\", \"2020-04-20\", \"2020-10-19\", \"2021-04-21\"]", "tariff": 3, "tariff_end_date": "2021-09-12", "instructor": 5}}]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
