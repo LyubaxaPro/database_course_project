@@ -76,6 +76,7 @@ GRANT SELECT ON special_offers to instructor;
 GRANT SELECT ON administrators to instructor;
 GRANT DELETE ON instructor_shedule_customers to instructor;
 GRANT SELECT ON group_classes_customers_records to instructor;
+GRANT SELECT ON services to instructor;
 
 
 ------------------------------------------------------------------------

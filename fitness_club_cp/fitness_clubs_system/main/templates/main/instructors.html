@@ -5,7 +5,6 @@
   Инструкторы
 {% endblock %}
 
-
 {% block content %}
 <script rel="javascript" type="text/javascript" href="js/jquery-1.11.3.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
@@ -14,16 +13,16 @@ $(document).ready(function () {
     function get_filtered_instructors(response) {
         var result = ""
         for (var i = 0; i < response.length; i++){
-            var pk = response[i]['pk'];
+            var pk = response[i]['instructor_id'];
 
             a_with_url = `<a target="_blank" href="{% url 'instructor_detail' 12345 %}">`.replace('12345', pk);
             result += '<li class="instructor-wrapper">' +
                 a_with_url +
                     '<div class="instructor-photo">' +
-                        '<img src=' + '/media/' + response[i]['fields']['photo'] + '>' +
+                        '<img src=' + response[i]['photo'] + '>' +
                     '</div>' +
                     '<div class="instructor">' +
-                        '<p>' + response[i]['fields']['name'] + " " + response[i]['fields']['surname'] + '</p>'
+                        '<p>' + response[i]['name'] + " " + response[i]['surname'] + '</p>'
                     '</div>' +
                 '</a>' +
                 '</li>'
@@ -42,7 +41,7 @@ $(document).ready(function () {
             url: '/get_club_instructors/?club_id=' + $('#id_address').val(),
             success: function (result) {
                 $(".instructors").empty()
-                get_filtered_instructors(JSON.parse(result.filtered_instructors))
+                get_filtered_instructors(result.filtered_instructors)
             },
             error: function(error) {
                 alert("Error occured! :(");
@@ -64,13 +63,13 @@ $(document).ready(function () {
     <div class="instructors">
       {% for instructor in instructors %}
         <li class="instructor-wrapper">
-            <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">
+<!--            <a target="_blank" href="{% url 'instructor_detail' instructor.instructor_id %}">-->
                 <div class="instructor-photo">
                   <img src="{{ instructor.photo.url}}">
                 </div>
                 <div  class="instructor">
-                    <p>{{ instructor.name }} {{ instructor.surname}}</p>
-    <!--                <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">{{ instructor.name }} {{ instructor.surname}}</a>-->
+<!--                    <p>{{ instructor.name }} {{ instructor.surname}}</p>-->
+                    <a target="_blank" href="{% url 'instructor_detail' instructor.pk %}">{{ instructor.name }} {{ instructor.surname}}</a>
                 </div>
             </a>
         </li>

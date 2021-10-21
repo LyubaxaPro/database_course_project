@@ -41,12 +41,17 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'users.apps.UsersConfig',
     'manager.apps.ManagerConfig',
-    'crispy_forms'
+    'crispy_forms',
+    'rest_framework',
+    'corsheaders',
+    'rest_framework_swagger',
+    'api.apps.ApiConfig',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -185,3 +190,8 @@ LOGOUT_REDIRECT_URL = 'home'
 LOGIN_REDIRECT_URL = 'home'
 MEDIA_URL = '/media/'  # является путем файловой системы, куда пользователи будут загружать файлы;
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # представляет собой URL, который мы можем использовать в шаблонах для файлов.
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8081',
+)
