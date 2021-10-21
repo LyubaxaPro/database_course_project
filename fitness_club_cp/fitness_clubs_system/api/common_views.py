@@ -1,27 +1,10 @@
-from django.http import JsonResponse
-from rest_framework import status
-
 from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
     GroupClassesSheduleRepository, InstructorsRepository, SpecialOffersRepository, PricesRepository, \
     GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
     AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, CustomUserRepository
-
-from manager.models import AdminRecords
-
-#from ..utils import get_plot
-from .simple_data import *
-from .customer import *
-from .instructor import *
 from .admin_funcs import *
-
-from django.shortcuts import render
-
-from rest_framework.response import Response
-
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from django.http import JsonResponse
 
 class IndexView(APIView):
     """

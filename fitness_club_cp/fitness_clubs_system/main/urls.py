@@ -2,6 +2,8 @@ from django.conf.urls import url
 from django.urls import path
 from .views import *
 from .common_views import *
+from .customer_views import *
+
 urlpatterns = [
     path('', index, name='home'),
     path('address/', address, name='address'),

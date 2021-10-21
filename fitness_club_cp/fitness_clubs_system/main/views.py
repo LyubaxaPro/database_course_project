@@ -18,103 +18,9 @@ from api.form_classes_data import form_classes_data
 from api.instructor_schedule import form_instructors_shedule
 from api.role import get_role_json
 from api.admin_funcs import statistics_of_traininng_func
-# def customer_profile(request):
-#     return render(request, "main/customer_profile.html", customer_profile_func(request))
-#
-# def customer_profile_func(request):
-#     role = get_role_json(request)
-#     is_chart = True
-#
-#     x = role['customer']['measure_dates']
-#     y = role['customer']['measured_weights']
-#     if len(x) == 0:
-#         is_chart = False
-#
-#     chart = get_plot(x, y)
-#
-#     today = datetime.datetime.today().strftime('%Y-%m-%d')
-#
-#     instructor_action_logs = []
-#     have_instructor = False
-#     if role['customer']['instructor_id']:
-#         have_instructor = True
-#         instructor_action_records = InstructorPersonalTrainingsLogsRepository.read_join_filtered(request.user,
-#                                                                                                   'instructor',
-#                                                                      {'instructor': role['customer']['instructor_id']})
-#
-#         for cur in instructor_action_records:
-#             if cur.act_date + datetime.timedelta(days=7) >= timezone.now():
-#                 instructor_action_logs.append(cur)
-#
-#     group_classes_logs = []
-#     admin_action_records = AdminGroupClassesLogsRepository.read_join_filtered(request.user, 'group_class',
-#                                                                          {'club': role['user']['club']})
-#     for cur in admin_action_records:
-#         if cur.act_date + datetime.timedelta(days=7) >= timezone.now():
-#             group_classes_logs.append(cur)
-#
-#     return {'role': get_role_json(request), 'address': address, 'chart': chart,
-#                                                           'form':AddMeasureForm(),
-#                                                           'today': today,
-#                                                           'is_chart': is_chart,
-#                                                           'instructor_action_logs': instructor_action_logs,
-#                                                           'group_classes_logs': group_classes_logs,
-#                                                           'have_instructor': have_instructor}
-#
-# def edit_customer_profile(request):
-#     role = get_role_json(request)
-#
-#     if request.method == 'POST':
-#
-#         customer_form = CustomerEditProfileForm(request.POST, instance=role['customer'])
-#         customer_form.actual_user = request.user
-#
-#
-#         if customer_form.is_valid():
-#
-#             CustomersRepository.update_by_pk(request.user,
-#                                           role['customer']['pk'],
-#                                           customer_form.cleaned_data)
-#
-#             return redirect('customer_profile')
-#     else:
-#         customer_form = CustomerEditProfileForm(instance=role['customer'])
-#
-#     return render(request, 'main/edit_customer.html', {'customer_form': customer_form, 'role': role})
-#
-# def add_measure(request):
-#     weight = request.GET.get("weight")
-#     date = request.GET.get("date")
-#
-#     customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
-#     old_weights = customer.measured_weights
-#     old_dates = customer.measure_dates
-#
-#     old_weights.append(int(weight))
-#     old_dates.append(datetime.datetime.strptime(date, "%Y-%m-%d").date())
-#
-#     measure = []
-#     for i in range(len(old_dates)):
-#         measure.append((old_dates[i], old_weights[i]))
-#
-#     sorted_measure = sorted(measure)
-#
-#     new_weights = []
-#     new_dates = []
-#     for i in range(len(sorted_measure)):
-#         new_dates.append(sorted_measure[i][0])
-#         new_weights.append(sorted_measure[i][1])
-#
-#     CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': new_weights,
-#                                                         'measure_dates': new_dates})
-#     customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
-#
-#     is_chart = 1
-#     if len(customer.measure_dates) == 0:
-#         is_chart = 0
-#
-#     chart = get_plot(customer.measure_dates, customer.measured_weights)
-#     return JsonResponse({'chart': chart, 'is_chart': is_chart}, safe=False)
+
+
+
 #
 # def delete_measure(request):
 #     customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
@@ -460,23 +366,8 @@ def statistics_of_traininng(request):
 # def btn_not_change_instructor(request):
 #     pk = request.GET.get("pk")
 #     AdminRecordsRepository.update_by_pk(request.user, pk, {'status': AdminRecords.DECLINED})
-#     return JsonResponse({'q': []}, safe=False)
-#
-def customer_profile(request):
-    return render(request, "main/customer_profile.html", {'a':1})
+#     return JsonResponse({'q': []}, safe=False)def edit_customer_profile(request)
 
-def edit_customer_profile(request):
-
-    if request.method == 'POST':
-            return redirect('customer_profile')
-
-    return render(request, 'main/edit_customer.html', {'a':1})
-
-def add_measure(request):
-    return JsonResponse({'a':1}, safe=False)
-
-def delete_measure(request):
-    return JsonResponse({'a':1}, safe=False)
 
 def customer_training_records(request):
     return render(request, "main/customer_training_records.html", {'a':1})
