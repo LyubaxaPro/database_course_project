@@ -9,7 +9,9 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
     GroupClassesSheduleRepository, InstructorsRepository, SpecialOffersRepository, PricesRepository, \
     GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
     AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, CustomUserRepository, \
-    AdminGroupClassesLogsRepository, CustomersRepository
+    AdminGroupClassesLogsRepository, CustomersRepository, InstructorSheduleRepository
+
+from manager.models import GroupClassesCustomersRecords, InstructorSheduleCustomers
 
 class CustomerProfileView(APIView):
     """
@@ -186,3 +188,337 @@ class CustomerEditProfileDeleteMeasureView(APIView):
         data = {'chart': chart, 'is_chart': is_chart}
 
         return Response(data)
+
+def pass_future_group(request, date_today, time_today, customer_id):
+    group_classes_records = GroupClassesCustomersRecordsRepository.read_join_filtered(request.user, "shedule",
+                                                                                      {'customer_id': customer_id})
+    pass_classes = []
+    future_classes = []
+
+    for group_class in group_classes_records:
+
+        data = {'date': group_class.class_date, 'day_of_week': days[group_class.shedule.day_of_week],
+                'time': group_class.shedule.class_time,
+                'class_name': group_class.shedule.class_field.class_name,
+                'record_id': group_class.record_id}
+
+        if date_today > data['date']:
+            pass_classes.append(data)
+        elif date_today == data['date'] and time_today >= data['time']:
+            pass_classes.append(data)
+        else:
+            future_classes.append(data)
+
+    return pass_classes, future_classes
+
+def pass_future_personal(request, date_today, time_today, customer_id):
+    personal_records = InstructorSheduleCustomersRepository.read_join_filtered(request.user, "i_shedule",
+                                                                               {'customer_id': customer_id})
+    pass_personal_trainings = []
+    future_personal_trainings = []
+
+    for train in personal_records:
+        instructor = \
+            InstructorsRepository.read_filtered(request.user, {'instructor_id': train.i_shedule.instructor_id})[0]
+        name = instructor.surname + " " + instructor.name + " " + instructor.patronymic
+        data = {'date': train.training_date, 'day_of_week': days[train.i_shedule.day_of_week],
+                'time': train.i_shedule.training_time, 'instructor_name': name, 'instructor_pk': instructor.pk,
+                'record_id': train.record_id}
+
+        if date_today > data['date']:
+            pass_personal_trainings.append(data)
+        elif date_today > data['date'] and time_today >= data['time']:
+            pass_personal_trainings.append(data)
+        else:
+            future_personal_trainings.append(data)
+
+    return pass_personal_trainings, future_personal_trainings
+
+
+class CustomerTrainingRecordsView(APIView):
+    """
+    get:
+        get customer training records
+    """
+    def get(self, request):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        week = get_week()
+        selected_week = request.GET.get('week_num')
+        if selected_week:
+            week = selected_week
+
+        date_today = datetime.date.today()
+        time_today = datetime.datetime.now().time()
+
+        pass_classes, future_classes = pass_future_group(request, date_today, time_today,
+                                                         role['customer']['customer_id'])
+
+        pass_personal_trainings, future_personal_trainings = pass_future_personal(request, date_today, time_today,
+                                                                                  role['customer']['customer_id'])
+
+
+
+        tarif = PricesRepository.read_filtered(request.user, {'tariff_id': role['customer']['tariff']})[0]
+        classes_data, dates = form_classes_data_for_tarif_group_classes(request.user,
+                                                                        role['customer']['customer_id'],
+                                                                        role['user']['club'], tarif, week)
+
+        trainings_data = []
+        instructor_data = {}
+        have_instructor = False
+        if role['customer']['instructor']:
+            trainings_data, dates = form_instructors_shedule_for_tarif(request.user,
+                                                                       role['customer']['instructor'], tarif,
+                                                                       week, role['customer']['customer_id'])
+            have_instructor = True
+            customers_instructor = \
+            InstructorsRepository.read_filtered(request.user, {'instructor_id': role['customer']['instructor']})[
+                0]
+            instructor_data = {'instructor_name': customers_instructor.name,
+                               'instructor_surname': customers_instructor.surname,
+                               'instructor_patronymic': customers_instructor.patronymic,
+                               'instructor_pk': customers_instructor.pk}
+
+        day_of_week_date = {}
+        for i in range(len(tarif.days_of_week)):
+            day_of_week_date.update({days[tarif.days_of_week[i]]: dates[i]})
+
+        club_id = role['user']['club']
+        users_instructors = CustomUserRepository.read_filtered(request.user, {"club": club_id, 'role': 1})
+        user_id_list = []
+        for user in users_instructors:
+            user_id_list.append(user.id)
+        club_instructors = InstructorsRepository.read_filtered(request.user,
+                                                               {'user__in': user_id_list, 'is_active': True})
+        club_instructors_data = []
+        for instr in club_instructors:
+            data = {'name': instr.name, 'surname': instr.surname, 'patronimyc': instr.patronymic,
+                    'instructor_id': instr.instructor_id,
+                    'instructor_pk': instr.pk
+                    }
+            club_instructors_data.append(data)
+        data = {'role': get_role_json(request), 'pass_group_classes': pass_classes,
+                   'future_group_classes': future_classes,
+                   'pass_personal_trainings': pass_personal_trainings,
+                   'future_personal_trainings': future_personal_trainings,
+                   'classes_data': classes_data,
+                   'day_of_week_date': day_of_week_date,
+                   'current_week': week,
+                   'trainings_data': trainings_data,
+                   'have_instructor': have_instructor,
+                   'instructor_data': instructor_data,
+                   'club_instructors_data': club_instructors_data
+                   }
+
+        return Response(data)
+
+class CustomerDeletePersonalTrainingRecordView(APIView):
+    """
+    delete:
+        delete record for personal training by record_id
+    """
+    def delete(self, request, *args, **kwargs):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        record_id = kwargs["record_id"]
+
+        date_today = datetime.date.today()
+        time_today = datetime.datetime.now().time()
+
+        pass_personal_trainings, future_personal_trainings = pass_future_personal(request, date_today, time_today,
+                                                                                  role['customer']['customer_id'])
+
+        for trainig in future_personal_trainings:
+            if int(record_id) == trainig['record_id']:
+                InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record_id})
+                return JsonResponse({'status': 'Ok', 'message': 'You delete personal training'}, status=200)
+
+        return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
+
+class CustomerAddPersonalTrainingRecordView(APIView):
+    """
+    post:
+        create new record for personal training
+    """
+    def post(self, request, *args, **kwargs):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        i_shedule_id = kwargs["i_shedule_id"]
+        date_raw = kwargs["date_raw"]
+
+        date = datetime.datetime.strptime(date_raw, "%Y-%m-%d").date()
+        new_record = InstructorSheduleCustomers()
+        role = get_role_json(request)
+        new_record.customer_id = role['customer']['customer_id']
+        new_record.training_date = date
+        new_record.i_shedule_id = i_shedule_id
+
+        if role['customer']['instructor'] == None:
+            return JsonResponse({'status': 'Ok', 'message': "User don't have instructor"}, status=405)
+
+        club_schedule = InstructorSheduleRepository.read_filtered(request.user,
+                                                                    {'i_shedule_id': i_shedule_id,
+                                                                     'instructor': role['customer']['instructor']})
+
+        if len(club_schedule) > 0:
+            InstructorSheduleCustomersRepository.create(request.user, new_record)
+            return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
+
+        return JsonResponse({'status': 'false', 'message': 'Wrong i_schedule_id'}, status=405)
+
+
+class CustomerAddGroupClassesRecordView(APIView):
+    """
+    post:
+        create new record for group classes
+    """
+    def post(self, request, *args, **kwargs):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        new_record = GroupClassesCustomersRecords()
+        date_raw = kwargs["date_raw"]
+        date = datetime.datetime.strptime(date_raw, "%Y-%m-%d").date()
+        new_record.class_date = date
+        shedule_id = kwargs["shedule_id"]
+
+        club_id = role['user']['club']
+        club_schedule = GroupClassesSheduleRepository.read_filtered(request.user, {'shedule_id': shedule_id, "club_id": club_id})
+
+        if len(club_schedule) > 0:
+            new_record.shedule_id = kwargs["shedule_id"]
+            new_record.customer_id = role['customer']['customer_id']
+
+            GroupClassesCustomersRecordsRepository.create(request.user, new_record)
+            return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
+
+        return JsonResponse({'status': 'false', 'message': 'Wrong schedule_id'}, status=405)
+
+class CustomerDeleteGroupTrainingRecordView(APIView):
+    """
+    delete:
+        delete record for group training by record_id
+    """
+    def delete(self, request, *args, **kwargs):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        record_id = kwargs["record_id"]
+
+        date_today = datetime.date.today()
+        time_today = datetime.datetime.now().time()
+
+        pass_classes, future_classes = pass_future_group(request, date_today, time_today,
+                                                         role['customer']['customer_id'])
+
+        for trainig in future_classes:
+            if int(record_id) == trainig['record_id']:
+                GroupClassesCustomersRecordsRepository.delete_filtered(request.user, {'record_id': record_id})
+                return JsonResponse({'status': 'Ok', 'message': 'You delete personal training'}, status=200)
+
+        return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
+
+class CustomerAppointmentToInstructorView(APIView):
+    """
+    put:
+        appoint customer to instructor
+    """
+    def put(self, request, *args, **kwargs):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+        instructor_id = kwargs["instructor_id"]
+        instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
+        if len(instructor) == 0:
+            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
+        instructor_club = CustomUserRepository.read_filtered(request.user, {'email' : instructor[0].user})[0].club
+
+        club_id = role['user']['club']
+
+        if (club_id == instructor_club):
+            CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk},
+                                                {'instructor_id': instructor_id})
+            return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
+
+        return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=405)
+
+class CustomerChangeAppointmentToInstructorView(APIView):
+    """
+    put:
+        change appoint customer to instructor
+    """
+    def put(self, request, *args, **kwargs):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        instructor_id = kwargs["instructor_id"]
+        instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
+        if len(instructor) == 0:
+            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
+        instructor_club = CustomUserRepository.read_filtered(request.user, {'email' : instructor[0].user})[0].club
+
+        club_id = role['user']['club']
+
+        if (club_id == instructor_club):
+            delete_future_records_for_personal_trainings(request)
+            CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk},
+                                                {'instructor_id': instructor_id})
+            return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
+
+        return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=405)
+
+def delete_future_records_for_personal_trainings(request):
+    role = get_role_json(request)
+    instructors_shedule = InstructorSheduleRepository.read_filtered(request.user,
+                                                                    {'instructor_id': role['customer']['instructor']})
+    shedule_id_list = []
+    for sh in instructors_shedule:
+        shedule_id_list.append(sh.i_shedule_id)
+
+    records = InstructorSheduleCustomersRepository.read_filtered(request.user, {'i_shedule_id__in': shedule_id_list,
+                                                                                'customer_id': role['customer']['customer_id']})
+
+    date_today = datetime.date.today()
+    time_today = datetime.datetime.now().time()
+
+    for record in records:
+        if record.training_date > date_today:
+            InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record.record_id})
+        if record.training_date == date_today:
+            shedule_time = InstructorSheduleRepository.read_filtered(request.user,
+                                                                     {'i_shedule_id': record.i_shedule_id})
+            if len(shedule_time) != 0 and shedule_time[0].training_time > time_today:
+                InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record.record_id})
+
+class CustomerDeleteAppointmentToInstructorView(APIView):
+    """
+    delete:
+        delete appoint customer to instructor
+    """
+    def delete(self, request):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        delete_future_records_for_personal_trainings(request)
+        CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': None})
+
+        return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)

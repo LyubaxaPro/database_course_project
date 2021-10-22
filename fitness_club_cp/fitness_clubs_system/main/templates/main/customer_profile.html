@@ -74,7 +74,7 @@ $(document).ready(function () {
     {% if role.customer.instructor == None %}
         <p><b>У Вас нет ведущего тренера. </b> </p>
         {% else %}
-            <p><b>Ваш ведущий тренер: </b> <a target="_blank" href="{% url 'instructor_detail' role.customer.instructor.pk %}">{{ role.customer.instructor.surname }} {{ role.customer.instructor.name }} {{ role.customer.instructor.patronymic }}</p>
+            <p><b>Ваш ведущий тренер: </b> <a target="_blank" href="{% url 'instructor_detail' role.customer.instructor %}">{{ role.customer.instructor.surname }} {{ role.customer.instructor.name }} {{ role.customer.instructor.patronymic }}</p>
              </a>
     {% endif %}
     <p><b>Рост: </b> {{ role.customer.height }} см.</p>
@@ -105,7 +105,7 @@ $(document).ready(function () {
      <ul>
      {% for act in instructor_action_logs %}
          <li>
-        <p>{{act.act_date}} <a target="_blank" href="{% url 'instructor_detail' act.instructor.pk %}"> {{act.instructor.surname }} {{act.instructor.name }} </a> {{ act.description }}</p>
+        <p>{{act.act_date}} <a target="_blank" href="{% url 'instructor_detail' act.instructor %}"> {{act.instructor.surname }} {{act.instructor.name }} </a> {{ act.description }}</p>
          </li>
      {% endfor %}
      </ul>
