@@ -1,4 +1,6 @@
-from .customer import *
+from .role import *
+from .form_classes_data import *
+from .instructor_schedule import *
 from .utils import *
 from .week import *
 from django.utils import timezone
@@ -12,7 +14,6 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
     AdminGroupClassesLogsRepository, CustomersRepository, InstructorSheduleRepository
 
 from manager.models import GroupClassesCustomersRecords, InstructorSheduleCustomers
-
 class CustomerProfileView(APIView):
     """
     get:

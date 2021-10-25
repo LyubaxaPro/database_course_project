@@ -46,7 +46,6 @@ class UserLoginView(auth_views.LoginView):
         else:
             return resolve_url('home')
 
-
 class InstructorSignUpView(View):
     template_name = 'registration/signup.html'
 
@@ -69,7 +68,6 @@ class InstructorSignUpView(View):
         profile_form = InstructorProfileForm(request.POST, request.FILES)
 
         if user_form.is_valid() and profile_form.is_valid():
-            print("FFFFFF")
 
             user = user_form.save(commit=False)
             user.role = CustomUser.INSTRUCTOR
@@ -79,7 +77,6 @@ class InstructorSignUpView(View):
             InstructorsRepository.create(user, instructor)
             auth_manually(self.request)
             return redirect('home')
-
 
         return render(request, self.template_name,
                       {'role': 'guest', 'user_form': user_form, 'profile_form': profile_form})
@@ -106,7 +103,6 @@ class CustomerSignUpView(View):
         profile_form = CustomerProfileForm(request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
-            print("FFFFFF")
 
             user = user_form.save(commit=False)
             user.role = CustomUser.CUSTOMER
@@ -116,7 +112,6 @@ class CustomerSignUpView(View):
             CustomersRepository.create(user, customer)
             auth_manually(self.request)
             return redirect('home')
-
 
         return render(request, self.template_name,
                       {'role': 'guest', 'user_form': user_form, 'profile_form': profile_form})

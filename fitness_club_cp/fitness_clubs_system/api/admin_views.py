@@ -1,6 +1,5 @@
-from .customer import *
-from .utils import *
-from .week import *
+from .role import *
+from .form_classes_data import *
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -270,11 +269,11 @@ class AdminStatisticsView(APIView):
 
 class AdminActivateInstructorView(APIView):
     """
-    put:
+    patch:
         create new instructor
     """
 
-    def put(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},

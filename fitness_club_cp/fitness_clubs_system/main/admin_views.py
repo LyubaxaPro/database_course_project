@@ -66,7 +66,7 @@ def add_new_instructor(request):
     instructor_id = request.GET.get("instructor_id")
 
     view = AdminActivateInstructorView()
-    view.put(request, **{'instructor_id': instructor_id})
+    view.patch(request, **{'instructor_id': instructor_id})
     return JsonResponse({'q': []}, safe=False)
 
 def delete_new_instructor(request):

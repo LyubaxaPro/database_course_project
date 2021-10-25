@@ -1,4 +1,5 @@
-from .customer import *
+from .role import *
+from .instructor_schedule import *
 from .utils import *
 from .week import *
 from django.utils import timezone

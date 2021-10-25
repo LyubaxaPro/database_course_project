@@ -2,9 +2,11 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
     GroupClassesSheduleRepository, InstructorsRepository, SpecialOffersRepository, PricesRepository, \
     GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
     AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, CustomUserRepository
-from .admin_funcs import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from .role import *
+from .form_classes_data import *
+from .instructor_schedule import *
 
 class IndexView(APIView):
     """
