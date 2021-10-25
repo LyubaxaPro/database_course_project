@@ -2,6 +2,7 @@ from django.urls import path
 from .common_views import *
 from .customer_views import *
 from .instructor_views import *
+from .admin_views import *
 urlpatterns = [
     # common urls
     path('info/index/', IndexView.as_view()),
@@ -43,4 +44,15 @@ urlpatterns = [
     path('instructor/profile/delete_changes/<int:pk>', InstructorDeleteProfileChangesView.as_view()),
     path('instructor/personal_training/delete/<int:i_shedule_id>', InstructorDeletePersonalTrainingView.as_view()),
     path('instructor/records/<str:week_num>', InstructorTrainingRecordsView.as_view()),
+    # admin urls
+    path('administrator/profile/', AdminProfileView.as_view()),
+    path('administrator/group_classes/', AdminGroupClassesView.as_view()),
+    path('administrator/group_classes/add/<str:day>/<str:time>/<int:class_id>/<int:maximum_quantity>/<int:instructor_id>/',
+         AdminAddGroupClassesView.as_view()),
+    path('administrator/group_classes/delete/<int:shedule_id>/', AdminDeleteGroupClassesView.as_view()),
+    path('administrator/special_offers/create/<str:offer_name>/<str:offer_id>/', AdminAdminSpecialOfferView.as_view()),
+    path('administrator/special_offers/delete/<str:offer_name>/', AdminDeleteSpecialOfferView.as_view()),
+    path('administrator/statistics/<str:week_num>/', AdminStatisticsView.as_view()),
+    path('administrator/instructors/activate/<int:instructor_id>/', AdminActivateInstructorView.as_view()),
+    path('administrator/instructors/reject/<int:user_id>/', AdminRejectInstructorView.as_view())
 ]

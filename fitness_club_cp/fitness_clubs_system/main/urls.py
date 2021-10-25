@@ -4,6 +4,7 @@ from .views import *
 from .common_views import *
 from .customer_views import *
 from .instructor_views import *
+from .admin_views import *
 
 urlpatterns = [
     path('', index, name='home'),
@@ -42,7 +43,5 @@ urlpatterns = [
     path('group_class_statistics/', statistics_of_traininng, name='group_class_statistics'),
     path('add_new_instructor/', add_new_instructor, name='add_new_instructor'),
     path('delete_new_instructor/', delete_new_instructor, name='delete_new_instructor'),
-    path('btn_change_instructor/', btn_change_instructor, name='btn_change_instructor'),
-    path('btn_not_change_instructor/', btn_not_change_instructor, name='btn_not_change_instructor'),
     path('instructor_delete_changes/', instructor_delete_changes, name='instructor_delete_changes')
 ]

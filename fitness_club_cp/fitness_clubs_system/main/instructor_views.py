@@ -48,7 +48,7 @@ def instructor_add_personal_training(request):
     time_raw = request.GET.get("time")
 
     view = InstructorAddPersonalTrainingView()
-    view.put(request, **{"day": day, "time": time_raw})
+    view.post(request, **{"day": day, "time": time_raw})
 
     return JsonResponse({'q': []}, safe=False)
 

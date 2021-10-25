@@ -120,72 +120,20 @@ class InstructorEditProfilePostView(APIView):
             cleaned_data['achievements'] = cleaned_data['achievements'].split(';')
             cleaned_data['specialization'] = cleaned_data['specialization'].split(';')
         print(cleaned_data)
-        admin_record = AdminRecords()
-        admin_record.creation_datetime = datetime.datetime.now()
-        admin_record.status = AdminRecords.PENDING
-        instructor = InstructorsRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
-        admin_record.instructor = instructor
-        admin_record.admin = instructor.admin
-        admin_record.change = {}
-        old_instructor_data = InstructorsRepository.read_filtered(request.user,
-                                                                  {'instructor_id': role['instructor']['instructor_id']})[0]
-
-        admin_record.change.update({'old_name': old_instructor_data.name})
-        admin_record.change.update({'old_surname': old_instructor_data.surname})
-        admin_record.change.update({'old_patronymic': old_instructor_data.patronymic})
-        admin_record.change.update({'old_education': old_instructor_data.education})
-        admin_record.change.update({'old_experience': old_instructor_data.experience})
-        admin_record.change.update({'old_achievements': old_instructor_data.achievements})
-        admin_record.change.update({'old_specialization': old_instructor_data.specialization})
-        admin_record.change.update({'old_photo': str(old_instructor_data.photo)})
-
-        if (old_instructor_data.name != cleaned_data['name']):
-            admin_record.change.update({'new_name': cleaned_data['name']})
-        else:
-            admin_record.change.update({'new_name': ''})
-        if (old_instructor_data.surname != cleaned_data['surname']):
-            admin_record.change.update({'new_surname': cleaned_data['surname']})
-        else:
-            admin_record.change.update({'new_surname': ''})
-        if (old_instructor_data.patronymic != cleaned_data['patronymic']):
-            admin_record.change.update({'new_patronymic': cleaned_data['patronymic']})
-        else:
-            admin_record.change.update({'new_patronymic': ''})
-        if (old_instructor_data.education != cleaned_data['education']):
-            admin_record.change.update({'new_education': cleaned_data['education']})
-        else:
-            admin_record.change.update({'new_education': ''})
-        if (old_instructor_data.experience != cleaned_data['experience']):
-            admin_record.change.update({'new_experience': cleaned_data['experience']})
-        else:
-            admin_record.change.update({'new_experience': ''})
-        if (old_instructor_data.achievements != cleaned_data['achievements']):
-            admin_record.change.update({'new_achievements': cleaned_data['achievements']})
-        else:
-            admin_record.change.update({'new_achievements': ''})
-        if (old_instructor_data.achievements != cleaned_data['achievements']):
-            admin_record.change.update({'new_achievements': cleaned_data['achievements']})
-        else:
-            admin_record.change.update({'new_achievements': ''})
-        if (old_instructor_data.specialization != cleaned_data['specialization']):
-            admin_record.change.update({'new_specialization': cleaned_data['specialization']})
-        else:
-            admin_record.change.update({'new_specialization': ''})
-
-        AdminRecordsRepository.create(request.user, admin_record)
-
+        InstructorsRepository.update_by_pk(request.user,
+                                      role['instructor']['instructor_id'], cleaned_data)
         return JsonResponse({'status': 'Ok'},
                             status=200)
 
 class InstructorAddPersonalTrainingView(APIView):
     """
-    put:
+    post:
         add personal training to instructor's schedule
         day - day of week
         time from 9:00 to 20:00
     """
 
-    def put(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         role = get_role_json(request)
         if not role['is_instructor']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
