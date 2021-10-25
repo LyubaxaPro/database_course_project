@@ -96,8 +96,6 @@ class CustomerEditProfilePutView(APIView):
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
         cleaned_data = kwargs
-        print(kwargs)
-        role = get_role_json(request)
         if type(cleaned_data['day_of_birth']) == str:
             dt_string = cleaned_data['day_of_birth']
             format = "%Y-%m-%d"

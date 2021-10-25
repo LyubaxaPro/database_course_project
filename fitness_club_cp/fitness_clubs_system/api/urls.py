@@ -36,4 +36,11 @@ urlpatterns = [
          CustomerChangeAppointmentToInstructorView.as_view()),
     # instructor urls
     path('instructor/', InstructorView.as_view()),
+    path('instructor/attached_customers', InstructorAttachedCustomersView.as_view()),
+    path('instructor/profile/edit/<str:name>/<str:surname>/<str:patronymic>/<str:education>/<int:experience>/<str:achievements>/<str:specialization>/',
+         InstructorEditProfilePostView.as_view()),
+    path('instructor/personal_training/add/<str:day>/<str:time>/', InstructorAddPersonalTrainingView.as_view()),
+    path('instructor/profile/delete_changes/<int:pk>', InstructorDeleteProfileChangesView.as_view()),
+    path('instructor/personal_training/delete/<int:i_shedule_id>', InstructorDeletePersonalTrainingView.as_view()),
+    path('instructor/records/<str:week_num>', InstructorTrainingRecordsView.as_view()),
 ]
