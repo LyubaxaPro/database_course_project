@@ -28,7 +28,7 @@ class InstructorView(APIView):
     def get(self, request):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
 
         fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user']['club']})
         address = fitness_club[0].city + ", " + fitness_club[0].address
@@ -64,7 +64,7 @@ class InstructorAttachedCustomersView(APIView):
     def get(self, request):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         customers_data = []
         customers = CustomersRepository.read_filtered(request.user, {'instructor_id': role['instructor']['instructor_id']})
@@ -96,7 +96,7 @@ class InstructorEditProfileView(APIView):
     def get(self, request):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         data = {'role': role}
 
@@ -105,15 +105,15 @@ class InstructorEditProfileView(APIView):
 
 class InstructorEditProfilePostView(APIView):
     """
-    post:
-        create new record to admin_records with new information about instructor
+    put:
+        edit instructor info
         education, achievements, specialization with ;
     """
 
-    def post(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         cleaned_data = kwargs
         if type(cleaned_data['education']) == str:
@@ -137,7 +137,7 @@ class InstructorAddPersonalTrainingView(APIView):
     def post(self, request, *args, **kwargs):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         day = kwargs["day"]
         time_raw = kwargs["time"]
@@ -148,7 +148,7 @@ class InstructorAddPersonalTrainingView(APIView):
                                                                             "training_time": time})
         if len(flag_rec) > 0:
             return JsonResponse({'status': 'false', 'message': 'This time is already busy'},
-                                status=404)
+                                status=405)
 
         flag_group_classes_rec = GroupClassesSheduleRepository.read_filtered(request.user,
                                                                 {"instructor": role['instructor']['instructor_id'],
@@ -157,7 +157,7 @@ class InstructorAddPersonalTrainingView(APIView):
 
         if len(flag_group_classes_rec) > 0:
             return JsonResponse({'status': 'false', 'message': 'This time is already busy'},
-                                status=404)
+                                status=405)
 
         new_record = InstructorShedule()
 
@@ -179,13 +179,13 @@ class InstructorDeleteProfileChangesView(APIView):
     def delete(self, request, *args, **kwargs):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         pk = kwargs["pk"]
         flag = AdminRecordsRepository.read_filtered(request.user, {"pk": pk})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "This record doesn't exist"},
-                                status=404)
+                                status=405)
 
         AdminRecordsRepository.delete_by_pk(request.user, pk)
 
@@ -201,13 +201,13 @@ class InstructorDeletePersonalTrainingView(APIView):
     def delete(self, request, *args, **kwargs):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         i_shedule_id = kwargs["i_shedule_id"]
         flag = InstructorSheduleRepository.read_filtered(request.user, {"i_shedule_id": i_shedule_id})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "This record doesn't exist"},
-                                status=404)
+                                status=405)
 
         InstructorSheduleRepository.delete_filtered(request.user, {'i_shedule_id': i_shedule_id})
 
@@ -224,7 +224,7 @@ class InstructorTrainingRecordsView(APIView):
     def get(self, request, *args, **kwargs):
         role = get_role_json(request)
         if not role['is_instructor']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         week = get_week()
         selected_week = kwargs['week_num']

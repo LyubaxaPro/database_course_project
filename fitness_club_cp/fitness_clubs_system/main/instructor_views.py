@@ -33,7 +33,7 @@ def edit_instructor(request):
         if instructor_form.is_valid():
             view = InstructorEditProfilePostView()
             cleaned_data = instructor_form.cleaned_data
-            view.post(request=request, **cleaned_data)
+            view.put(request=request, **cleaned_data)
 
             return redirect('instructor_profile')
     else:
@@ -68,8 +68,6 @@ def instructor_delete_personal_training(request):
 
 def instructor_training_records(request):
     selected_week = request.GET.get('week_num')
-    print(selected_week)
-    print(type(selected_week))
     view = InstructorTrainingRecordsView()
     data = view.get(request, **{"week_num": selected_week}).data
     return render(request, "main/instructor_training_records.html", data)

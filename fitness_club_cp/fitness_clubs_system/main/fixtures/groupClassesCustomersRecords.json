@@ -42,5 +42,6 @@
 {"model": "manager.groupclassescustomersrecords", "pk": 42, "fields": {"shedule": 13, "customer": 5, "class_date": "2021-07-04"}},
 {"model": "manager.groupclassescustomersrecords", "pk": 43, "fields": {"shedule": 14, "customer": 2, "class_date": "2021-07-04"}},
 {"model": "manager.groupclassescustomersrecords", "pk": 44, "fields": {"shedule": 14, "customer": 3, "class_date": "2021-07-11"}},
-{"model": "manager.groupclassescustomersrecords", "pk": 45, "fields": {"shedule": 14, "customer": 5, "class_date": "2021-06-06"}}]
+{"model": "manager.groupclassescustomersrecords", "pk": 45, "fields": {"shedule": 14, "customer": 5, "class_date": "2021-06-06"}},
+{"model": "manager.groupclassescustomersrecords", "pk": 46, "fields": {"shedule": 14, "customer": 3, "class_date": "2021-12-26"}}]
 

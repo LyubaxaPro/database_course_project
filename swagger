@@ -1,0 +1,1022 @@
+swagger: "2.0"
+info:
+  description: "A personal project aimed at working with a network of fitness clubs in three roles: user, instructors, administrator."
+  version: "1.0.0"
+  title: "Swagger Fitness club system"
+  termsOfService: "https://smartbear.com/terms-of-use/"
+  contact:
+    email: "lyubaxova@mail.ru"
+  license:
+    name: "BSD License"
+host: "127.0.0.1:8000"
+basePath: "/api"
+tags:
+- name: "info"
+  description: "Info about fitness club"
+- name: "customer"
+  description: "Actions available to the customer"
+- name: "instructor"
+  description: "Actions available to the instructor"
+- name: "admin"
+  description: "Actions available to the admin"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+schemes:
+- "http"
+paths:
+  /info/index/:
+    get:
+      tags:
+      - "info"
+      summary: "Return home page info"
+      operationId: "index"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+  /info/address/:
+    get:
+      tags:
+      - "info"
+      summary: "Return address of clubs"
+      operationId: "address"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+  /info/services/:
+    get:
+      tags:
+      - "info"
+      summary: "Return list of services of clubs"
+      operationId: "services"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+  /info/groupclasses_schedule/:
+    get:
+      tags:
+      - "info"
+      summary: "get classes data for club with club_id = 1"
+      operationId: "groupclasses_schedule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+  /info/groupclasses_schedule/{club_id}:
+    parameters:
+    - in: path
+      name: club_id
+      required: true
+      type: integer
+      minimum: 1
+      maximum: 8
+    get:
+      tags:
+      - "info"
+      summary: "get classes data for club with club_id"
+      operationId: "club_id"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "405":
+          description: "Wrong club_id"
+  /info/instructors/:
+    get:
+      tags:
+      - "info"
+      summary: "get list of club instrutors"
+      operationId: "instructors"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+  /info/instructors/{pk}:
+    parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+    get:
+      tags:
+      - "info"
+      summary: "get detail information about instructor"
+      operationId: "instructors_pk"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+  /info/prices/:
+    get:
+      tags:
+      - "info"
+      summary: "get prices and special offers"
+      operationId: "prices"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+  /customer/profile/:
+    get:
+      tags:
+      - "customer"
+      summary: "get information for customer profile"
+      operationId: "customer profile"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /customer/profile/edit/{name}/{surname}/{patronymic}/{day_of_birth}/{height}/:
+    parameters:
+    - in: path
+      name: name
+      required: true
+      type: string
+      
+    - in: path
+      name: surname
+      required: true
+      type: string    
+
+    - in: path
+      name: patronymic
+      required: true
+      type: string  
+
+    - in: path
+      name: day_of_birth
+      required: true
+      type: string  
+
+    - in: path
+      name: height
+      required: true
+      type: integer
+    put:
+      tags:
+      - "customer"
+      summary: "put new information to render page with edit form"
+      description: "day_of_birth format is 1999-12-9"
+      operationId: "customer profile_edit"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /customer/profile/edit/add_measure/{weight}/{date}/:
+    parameters:
+    - in: path
+      name: weight
+      required: true
+      type: integer
+      minimum: 1
+
+    - in: path
+      name: date
+      required: true
+      type: string  
+    put:
+      tags:
+      - "customer"
+      summary: "add new measure to customers measures"
+      description: "date format is 1999-12-9"
+      operationId: "customer add measure"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /customer/profile/edit/delete_measure/:
+    delete:
+      tags:
+      - "customer"
+      summary: "delete last measure from customers measures"
+      operationId: "customer delete last measure"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /customer/training_records/:
+    get:
+      tags:
+      - "customer"
+      summary: "get customer training records"
+      operationId: "customer training_records"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /customer/training_records/personal_training/delete/{record_id}/:
+    parameters:
+    - in: path
+      name: record_id
+      required: true
+      type: integer
+      minimum: 1
+    delete:
+      tags:
+      - "customer"
+      summary: "delete record for personal training by record_id"
+      operationId: "customer delete record for personal training"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Wrong record_id!"
+  /customer/training_records/personal_training/create_record/{date_raw}/{i_shedule_id}/:
+    parameters:
+    - in: path
+      name: date_raw
+      required: true
+      type: string
+    - in: path
+      name: i_shedule_id
+      required: true
+      type: integer
+      minimum: 1
+    post:
+      tags:
+      - "customer"
+      summary: "create new record for personal training"
+      operationId: "customer create new record for personal training"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Wrong i_schedule_id!"
+  /customer/training_records/group_classes/delete/{record_id}/:
+    parameters:
+    - in: path
+      name: record_id
+      required: true
+      type: integer
+      minimum: 1
+    delete:
+      tags:
+      - "customer"
+      summary: "delete record for group training by record_id"
+      operationId: "customer delete record for group"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Wrong record_id!"
+  /customer/training_records/group_classes/create_record/{date_raw}/{shedule_id}/:
+    parameters:
+    - in: path
+      name: date_raw
+      required: true
+      type: string
+    - in: path
+      name: shedule_id
+      required: true
+      type: integer
+      minimum: 1
+    post:
+      tags:
+      - "customer"
+      summary: "create new record for group classes"
+      operationId: "customer create new record for group classes"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Wrong schedule_id!"
+          
+  /customer/training_records/instructor/appoint/{instructor_id}/:
+    parameters:
+    - in: path
+      name: instructor_id
+      required: true
+      type: integer
+      minimum: 1
+    put:
+      tags:
+      - "customer"
+      summary: "appoint customer to instructor"
+      operationId: "customer appoint customer to instructor"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Instructor work in other club!"
+  /customer/training_records/instructor/delete_appoint/:
+    put:
+      tags:
+      - "customer"
+      summary: "appoint customer to instructor"
+      operationId: "customer delete appoint customer to instructor"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /customer/training_records/instructor/change_appoint/{instructor_id}/:
+    parameters:
+    - in: path
+      name: instructor_id
+      required: true
+      type: integer
+      minimum: 1
+    put:
+      tags:
+      - "customer"
+      summary: "change appoint customer to instructor"
+      operationId: "customer change appoint customer to instructor"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Instructor work in other club!"
+  /instructor/profile/:
+    get:
+      tags:
+      - "instructor"
+      summary: "get information for instructor profile"
+      operationId: "instructor profile"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /instructor/attached_customers/:
+    get:
+      tags:
+      - "instructor"
+      summary: "get information for attached customers"
+      operationId: "instructor attached_customers"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /instructor/profile/edit/{name}/{surname}/{patronymic}/{education}/{experience}/{achievements}/{specialization}/:
+    parameters:
+    - in: path
+      name: name
+      required: true
+      type: string
+    - in: path
+      name: surname
+      required: true
+      type: string
+    - in: path
+      name: patronymic
+      required: true
+      type: string
+    - in: path
+      name: education
+      required: true
+      type: string   
+    - in: path
+      name: experience
+      required: true
+      type: integer  
+      minimum: 1
+    - in: path
+      name: achievements
+      required: true
+      type: string  
+    - in: path
+      name: specialization
+      required: true
+      type: string  
+    get:
+      tags:
+      - "instructor"
+      summary: "edit instructor info"
+      operationId: "instructor edit profile"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /instructor/personal_training/add/{day}/{time}/:
+    parameters:
+    - in: path
+      name: day
+      required: true
+      type: string
+    - in: path
+      name: time
+      required: true
+      type: string
+    post:
+      tags:
+      - "instructor"
+      summary: "add personal training to instructor's schedule"
+      description: "day - day of week; time from 9:00 to 20:00"
+      operationId: "instructor add personal training to instructor's schedule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "This time is already busy"
+  /instructor/profile/delete_changes/{pk}/:
+    parameters:
+    - in: path
+      name: pk
+      required: true
+      type: integer
+      minimum: 1
+    delete:
+      tags:
+      - "instructor"
+      summary: "delete changes in instructor's profile"
+      operationId: "instructor delete changes in instructor's profile"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "This record doesn't exist"          
+  /instructor/personal_training/delete/{i_shedule_id}/:
+    parameters:
+    - in: path
+      name: i_shedule_id
+      required: true
+      type: integer
+      minimum: 1
+    delete:
+      tags:
+      - "instructor"
+      summary: "delete personal training from schedule"
+      operationId: "instructor delete personal training from schedule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "This record doesn't exist"           
+  /instructor/records/{week_num}/:
+    parameters:
+    - in: path
+      name: week_num
+      required: true
+      type: string
+    get:
+      tags:
+      - "instructor"
+      summary: "get records from customers for week"
+      operationId: "instructor get records from customers for week"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /administrator/profile/:
+    get:
+      tags:
+      - "admin"
+      summary: "get information for admin profile"
+      operationId: "admin profile"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /administrator/group_classes/:
+    get:
+      tags:
+      - "admin"
+      summary: "get group classes schedule"
+      operationId: "admin get group classes schedule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /administrator/group_classes/add/{day}/{time}/{class_id}/{maximum_quantity}/{instructor_id}/:
+    parameters:
+    - in: path
+      name: day
+      required: true
+      type: string
+    - in: path
+      name: time
+      required: true
+      type: string
+    - in: path
+      name: class_id
+      required: true
+      type: integer
+      minimum: 1
+    - in: path
+      name: maximum_quantity
+      required: true
+      type: integer
+      minimum: 1
+    - in: path
+      name: instructor_id
+      required: true
+      type: integer
+      minimum: 1
+    post:
+      tags:
+      - "admin"
+      summary: "create group class"
+      operationId: "admin create group class"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "This instructor already busy"
+  /administrator/group_classes/delete/{shedule_id}/:
+    parameters:
+    - in: path
+      name: shedule_id
+      required: true
+      type: integer
+      minimum: 1
+    delete:
+      tags:
+      - "admin"
+      summary: "delete group class"
+      operationId: "admin delete group class"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /administrator/special_offers/create/{offer_name}/{offer_description}/:
+    parameters:
+    - in: path
+      name: offer_name
+      required: true
+      type: string
+    - in: path
+      name: offer_description
+      required: true
+      type: string
+    post:
+      tags:
+      - "admin"
+      summary: "create special offer"
+      operationId: "admin create special offer"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /administrator/special_offers/delete/{offer_name}/:
+    parameters:
+    - in: path
+      name: offer_name
+      required: true
+      type: string
+    delete:
+      tags:
+      - "admin"
+      summary: "delete special offer"
+      operationId: "admin "
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Don't have this record"
+  /administrator/statistics/{week_num}/:
+    parameters:
+    - in: path
+      name: week_num
+      required: true
+      type: string
+    get:
+      tags:
+      - "admin"
+      summary: "get trainings statistics"
+      operationId: "admin get trainings statistics"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /administrator/instructors/activate/{instructor_id}/:
+    parameters:
+    - in: path
+      name: instructor_id
+      required: true
+      type: integer
+      minimum: 1
+    patch:
+      tags:
+      - "admin"
+      summary: "activate new instructor"
+      operationId: "admin activate new instructor"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+  /administrator/instructors/reject/{user_id}/:
+    parameters:
+    - in: path
+      name: user_id
+      required: true
+      type: integer
+      minimum: 1
+    delete:
+      tags:
+      - "admin"
+      summary: "reject new instructor"
+      operationId: "admin reject new instructor"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            type: array
+            items: 
+              type: string
+        "404":
+          description: "You do not have rights to get the information"
+        "405":
+          description: "Wrong id"
+
+# definitions:
+#   Order:
+#     type: "object"
+#     properties:
+#       id:
+#         type: "integer"
+#         format: "int64"
+#       petId:
+#         type: "integer"
+#         format: "int64"
+#       quantity:
+#         type: "integer"
+#         format: "int32"
+#       shipDate:
+#         type: "string"
+#         format: "date-time"
+#       status:
+#         type: "string"
+#         description: "Order Status"
+#         enum:
+#         - "placed"
+#         - "approved"
+#         - "delivered"
+#       complete:
+#         type: "boolean"
+#         default: false
+#     xml:
+#       name: "Order"
+#   Category:
+#     type: "object"
+#     properties:
+#       id:
+#         type: "integer"
+#         format: "int64"
+#       name:
+#         type: "string"
+#     xml:
+#       name: "Category"
+#   User:
+#     type: "object"
+#     properties:
+#       id:
+#         type: "integer"
+#         format: "int64"
+#       username:
+#         type: "string"
+#       firstName:
+#         type: "string"
+#       lastName:
+#         type: "string"
+#       email:
+#         type: "string"
+#       password:
+#         type: "string"
+#       phone:
+#         type: "string"
+#       userStatus:
+#         type: "integer"
+#         format: "int32"
+#         description: "User Status"
+#     xml:
+#       name: "User"
+#   Tag:
+#     type: "object"
+#     properties:
+#       id:
+#         type: "integer"
+#         format: "int64"
+#       name:
+#         type: "string"
+#     xml:
+#       name: "Tag"
+#   Pet:
+#     type: "object"
+#     required:
+#     - "name"
+#     - "photoUrls"
+#     properties:
+#       id:
+#         type: "integer"
+#         format: "int64"
+#       category:
+#         $ref: "#/definitions/Category"
+#       name:
+#         type: "string"
+#         example: "doggie"
+#       photoUrls:
+#         type: "array"
+#         xml:
+#           name: "photoUrl"
+#           wrapped: true
+#         items:
+#           type: "string"
+#       tags:
+#         type: "array"
+#         xml:
+#           name: "tag"
+#           wrapped: true
+#         items:
+#           $ref: "#/definitions/Tag"
+#       status:
+#         type: "string"
+#         description: "pet status in the store"
+#         enum:
+#         - "available"
+#         - "pending"
+#         - "sold"
+#     xml:
+#       name: "Pet"
+#   ApiResponse:
+#     type: "object"
+#     properties:
+#       code:
+#         type: "integer"
+#         format: "int32"
+#       type:
+#         type: "string"
+#       message:
+#         type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

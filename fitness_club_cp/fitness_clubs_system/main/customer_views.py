@@ -6,6 +6,10 @@ from manager.repositories import GroupClassesRepository, \
     GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
     AdminRecordsRepository, CustomUserRepository, FitnessClubsRepository, CustomersRepository
 
+from api.serializers import ServicesSerializer, CustomersSerializer, CustomUserSerializer, AdministratorsSerializer, \
+GroupClassesSerializer, GroupClassesCustomersRecordsSerializer, InstructorsSerializer, GroupClassesSheduleSerializer, \
+AdminRecordsSerializer, InstructorSheduleSerializer, AInstructorSheduleCustomersSerializer, PricesSerializer, \
+SpecialOffersSerializer, InstructorPersonalTrainingsLogsSerializer, AdminGroupClassesLogsSerializer, FitnessClubsSerializer
 from .forms import *
 from api.customer_views import CustomerProfileView, CustomerEditProfileView, CustomerEditProfilePutView, \
     CustomerEditProfileAddMeasureView, CustomerEditProfileDeleteMeasureView, CustomerTrainingRecordsView, \

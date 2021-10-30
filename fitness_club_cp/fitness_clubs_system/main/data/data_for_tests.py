@@ -5,6 +5,39 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
 from main.dataBuilder import CustomerUser
 import datetime
 import time
+from collections import OrderedDict
+from api.serializers import ServicesSerializer, CustomersSerializer, CustomUserSerializer, AdministratorsSerializer, \
+GroupClassesSerializer, GroupClassesCustomersRecordsSerializer, InstructorsSerializer, GroupClassesSheduleSerializer, \
+AdminRecordsSerializer, InstructorSheduleSerializer, AInstructorSheduleCustomersSerializer, PricesSerializer, \
+SpecialOffersSerializer, InstructorPersonalTrainingsLogsSerializer, AdminGroupClassesLogsSerializer, FitnessClubsSerializer
+
+# 'role': {'is_customer': True,
+#     'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+#     'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}
+
+def get_customer_user_index_data(user):
+    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
+    customer_user_index_data = {'title': 'Главная страница', 'role': {'is_customer': True,
+    'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+    'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
+    return customer_user_index_data
+
+def get_customer_user_adress(user):
+    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
+    clubs = FitnessClubsRepository.read_all(user)
+    customer_user_adress = {'clubs': FitnessClubsSerializer(clubs, many=True).data,
+            'role': {'is_customer': True,
+    'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+    'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
+    return customer_user_adress
+
+def get_service_customer_user_data(user):
+    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
+    services = ServicesRepository.read_all(user)
+    services_customer_user_data = {'services': ServicesSerializer(services, many=True).data, 'role': {'is_customer': True,
+    'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+    'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
+    return services_customer_user_data
 
 club_1_schedule = b'{"classes_data": {"09:00": {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": [{"instructor_name": "\\u0412\\u0435\\u0440\\u043e\\u043d\\u0438\\u043a\\u0430", "class_name": "POSTURAL", "shedule_id": 13}]}, "10:00": {"Monday": [], "Tuesday": [{"instructor_name": "\\u0410\\u0440\\u0441\\u0435\\u043d", "class_name": "LEGS&BUTTS", "shedule_id": 4}], "Wednesday": [], "Thursday": [], "Friday": [{"instructor_name": "\\u0414\\u0435\\u043c\\u0438\\u0434", "class_name": "Upper body", "shedule_id": 11}], "Saturday": [], "Sunday": []}, "11:00": {"Monday": [{"instructor_name": "\\u0410\\u0440\\u0441\\u0435\\u043d", "class_name": "CORE", "shedule_id": 1}], "Tuesday": [{"instructor_name": "\\u0410\\u0440\\u0441\\u0435\\u043d", "class_name": "ABS", "shedule_id": 3}], "Wednesday": [], "Thursday": [{"instructor_name": "\\u0410\\u043d\\u0442\\u043e\\u043d", "class_name": "POSTURAL", "shedule_id": 7}], "Friday": [], "Saturday": [], "Sunday": []}, "12:00": {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": [{"instructor_name": "\\u0410\\u043d\\u0442\\u043e\\u043d", "class_name": "MAKE BODY", "shedule_id": 14}]}, "13:00": {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []}, "14:00": {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []}, "15:00": {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [{"instructor_name": "\\u0410\\u0440\\u0441\\u0435\\u043d", "class_name": "ICG Color Cycle", "shedule_id": 10}], "Saturday": [], "Sunday": []}, "16:00": {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []}, "17:00": {"Monday": [], "Tuesday": [], "Wednesday": [{"instructor_name": "\\u0412\\u0435\\u0440\\u043e\\u043d\\u0438\\u043a\\u0430", "class_name": "LEGS&BUTTS", "shedule_id": 6}], "Thursday": [], "Friday": [{"instructor_name": "\\u0415\\u043b\\u0438\\u0437\\u0430\\u0432\\u0435\\u0442\\u0430", "class_name": "LEGS&BUTTS", "shedule_id": 9}], "Saturday": [], "Sunday": []}, "18:00": {"Monday": [], "Tuesday": [], "Wednesday": [{"instructor_name": "\\u0410\\u043d\\u0442\\u043e\\u043d", "class_name": "CORE", "shedule_id": 5}], "Thursday": [{"instructor_name": "\\u0410\\u043d\\u0442\\u043e\\u043d", "class_name": "CORE", "shedule_id": 8}], "Friday": [], "Saturday": [], "Sunday": []}, "19:00": {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []}, "20:00": {"Monday": [{"instructor_name": "\\u0414\\u0435\\u043c\\u0438\\u0434", "class_name": "ABS", "shedule_id": 2}], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [{"instructor_name": "\\u0414\\u0435\\u043c\\u0438\\u0434", "class_name": "LEGS&BUTTS", "shedule_id": 12}], "Sunday": []}}}'
 
@@ -38,8 +71,62 @@ classes_data_club1 = { '09:00': {'Monday': [], 'Tuesday': [], 'Wednesday': [], '
               'Wednesday': [], 'Thursday': [], 'Friday': [],
               'Saturday': [{'instructor_name': 'Демид', 'class_name': 'LEGS&BUTTS', 'shedule_id': 12}], 'Sunday': []}}
 
-def get_instructor_1_detail_data(instructor, customer, user):
-    return {'instructor': instructor, 'exp_str': 'лет', 'role': {'is_customer': True, 'customer': customer, 'is_instructor': False, 'instructor': None, 'is_admin': False, 'admin': None, 'is_guest': False, 'user': user}, 'shedule': {'09:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 33}, 'Saturday': {}, 'Sunday': {}}, '10:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 31}, 'Saturday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 45}, 'Sunday': {}}, '11:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '12:00': {'Monday': {}, 'Tuesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 8}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '13:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 18}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 57}}, '14:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '15:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 46}, 'Sunday': {}}, '16:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 56}}, '17:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'LEGS&BUTTS', 'is_editable': False}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 54}}, '18:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '19:00': {'Monday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 1}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 16}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 32}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 55}}, '20:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 17}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}}, 'address': 'Москва, ул. Вильгельма Пика, вл14, 4 этаж (МФК «Хуамин»)'}
+def get_groupclasses_customer_user_data(user):
+    customer = CustomersRepository.read_filtered(user, {'user' : user.id})[0]
+    gclasses = GroupClassesRepository.read_all(user)
+    data = {'classes_data': classes_data_club1, 'classes': GroupClassesSerializer(gclasses, many=True).data, 'role': {'is_customer': True,
+    'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+    'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
+    return data
+
+def get_instructors_list_data(user):
+    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
+    instructors = InstructorsRepository.read_filtered(user, {'is_active': True})
+    data = {'instructors': InstructorsSerializer(instructors, many=True).data, 'role': {'is_customer': True,
+    'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+    'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
+    return data
+
+def get_instructor_1_detail_data(user):
+    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
+    instructor = InstructorsRepository.read_by_pk(user, 1)
+    return {'instructor': InstructorsSerializer(instructor).data, 'exp_str': 'лет', 'role': {'is_customer': True,
+    'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+    'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data},
+    'shedule': {'09:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 33}, 'Saturday': {}, 'Sunday': {}}, '10:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 31}, 'Saturday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 45}, 'Sunday': {}}, '11:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '12:00': {'Monday': {}, 'Tuesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 8}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '13:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 18}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 57}}, '14:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '15:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 46}, 'Sunday': {}}, '16:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 56}}, '17:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'LEGS&BUTTS', 'is_editable': False}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 54}}, '18:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '19:00': {'Monday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 1}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 16}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 32}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 55}}, '20:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 17}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}}, 'address': 'Москва, ул. Вильгельма Пика, вл14, 4 этаж (МФК «Хуамин»)'}
+
+def get_prices_customer_user_data(user):
+    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
+    special_offers = SpecialOffersRepository.read_all(user)
+    prices = PricesRepository.read_all(user)
+
+    data = {'special_offers': SpecialOffersSerializer(special_offers, many=True).data,
+                'prices': PricesSerializer(prices, many=True).data, 'role': {'is_customer': True,
+    'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
+    'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
+    return data
+
+def get_role_superuser(user):
+    return (False, CustomersSerializer().data, False, InstructorsSerializer().data, True,
+            AdministratorsSerializer(AdministratorsRepository.read_by_pk(user, 1)).data, False,
+    CustomUserSerializer(CustomUserRepository.read_by_pk(user, 1)).data)
+
+def get_role_admin(user):
+    return (False, CustomersSerializer().data, False, InstructorsSerializer().data, True,
+            AdministratorsSerializer(AdministratorsRepository.read_by_pk(user, 2)).data, False,
+                    CustomUserSerializer(CustomUserRepository.read_by_pk(user, 2)).data)
+
+def get_role_instructor(user):
+    return (False, CustomersSerializer().data, True, InstructorsSerializer(InstructorsRepository.read_by_pk(user, 1)).data,
+            False, AdministratorsSerializer().data, False, CustomUserSerializer(CustomUserRepository.read_by_pk(user, 9)).data)
+
+def get_role_customer(user):
+    return (True, CustomersSerializer(CustomersRepository.read_by_pk(user, 1)).data, False,
+            InstructorsSerializer().data, False, AdministratorsSerializer().data, False,
+            CustomUserSerializer(CustomUserRepository.read_by_pk(user, 14)).data)
+
+def get_role_anon():
+    return (False, CustomersSerializer().data, False, InstructorsSerializer().data, False, AdministratorsSerializer().data, True, CustomUserSerializer().data)
 
 instructor_user_11_schedule = {'09:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Friday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Saturday': {}, 'Sunday': {}}, '10:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Upper body', 'is_personal': False, 'count': 0}, 'Saturday': {}, 'Sunday': {}}, '11:00': {'Monday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Sunday': {}}, '12:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Thursday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}}, '13:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Saturday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Sunday': {}}, '14:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}}, '15:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}}, '16:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Saturday': {}, 'Sunday': {}}, '17:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Sunday': {}}, '18:00': {'Monday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '19:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Saturday': {}, 'Sunday': {}}, '20:00': {'Monday': {'name': 'ABS', 'is_personal': False, 'count': 0}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {'name': 'Персональная тренировка', 'is_personal': True, 'customer': None}, 'Friday': {}, 'Saturday': {'name': 'LEGS&BUTTS', 'is_personal': False, 'count': 0}, 'Sunday': {}}}
 

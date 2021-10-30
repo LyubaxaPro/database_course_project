@@ -2,6 +2,9 @@ from manager.repositories import ServicesRepository, FitnessClubsRepository, Gro
     GroupClassesSheduleRepository, InstructorsRepository, SpecialOffersRepository, PricesRepository, \
     GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
     AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, CustomUserRepository
+
+from manager.repositories import FitnessClubsRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository, CustomersRepository, AdministratorsRepository
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .role import *
@@ -140,7 +143,40 @@ class PricesView(APIView):
                 'prices': PricesSerializer(prices, many=True).data, 'role': role}
         return Response(data)
 
+def prices_f(request):
+    special_offers = SpecialOffersRepository.read_all(request.user)
+    prices = PricesRepository.read_all(request.user)
+    return {'special_offers': special_offers, 'prices': prices}
 
+def get_qs_role(request):
+    customer = None
+    is_customer = False
+    instructor = None
+    is_instructor = False
+    is_admin = False
+    admin = None
+    is_guest = True
+    user = None
+
+    if request.user.pk:
+        user = CustomUserRepository.read_filtered(request.user, {'email': CustomUserRepository.read_by_pk(request.user, request.user.pk)})[0]
+        if user.role == 0:
+            customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+            is_customer = True
+            is_guest = False
+        elif user.role == 1:
+            instructor = InstructorsRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+            is_instructor = True
+            is_guest = False
+        elif user.role == 2 or user.role == 3:
+            is_admin = True
+            admin = AdministratorsRepository.read_filtered(request.user, {'user': request.user.pk})[0]
+            is_guest = False
+
+    return is_customer, customer, is_instructor,\
+           instructor, is_admin,\
+           admin, is_guest, \
+           user
 
 
 

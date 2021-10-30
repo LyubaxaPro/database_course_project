@@ -270,7 +270,7 @@ class AdminStatisticsView(APIView):
 class AdminActivateInstructorView(APIView):
     """
     patch:
-        create new instructor
+        activate new instructor
     """
 
     def patch(self, request, *args, **kwargs):

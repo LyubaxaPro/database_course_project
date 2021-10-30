@@ -7,7 +7,6 @@ from manager.models import Instructors, GroupClassesCustomersRecords, Instructor
 from django.test import TestCase
 from users.models import CustomUser, FitnessClubs
 import unittest.mock as mock
-from main.view_funcs.simple_data import *
 from itertools import chain
 
 offers_list = [SpecialOffers(pk=1, offer_name='nklkml', offer_description='jnknjk'), \
