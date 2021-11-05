@@ -1,12 +1,12 @@
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
-    GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository,\
-    AdministratorsRepository, AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, AdminGroupClassesLogsRepository
+from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService,\
+    GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\
+    CustomersService, InstructorSheduleService, GroupClassesCustomersRecordsService, InstructorSheduleCustomersService,\
+    AdministratorsService, AdminRecordsService, InstructorPersonalTrainingsLogsService, AdminGroupClassesLogsService
 
 from .week import *
 
 def form_instructors_shedule_for_tarif(user, instructor_id, tarif, week, customer_id):
-    shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
+    shedule = InstructorSheduleService.read_filtered(user, {'instructor_id': instructor_id})
     dates_raw = get_week_dates(week)
     training_data = {}
 
@@ -45,23 +45,23 @@ def form_instructors_shedule_for_tarif(user, instructor_id, tarif, week, custome
         class_not_done = True
         if current_shed.training_time.hour >= time_classes[0] and current_shed.training_time.hour < time_classes[1] and current_shed.day_of_week in days:
 
-            training_by_customer = InstructorSheduleCustomersRepository.read_filtered(user, {'customer_id': customer_id,
+            training_by_customer = InstructorSheduleCustomersService.read_filtered(user, {'customer_id': customer_id,
                                                                                              'i_shedule_id': current_shed.i_shedule_id,
                                                                                              'training_date': days_dates[current_shed.day_of_week]})
             if len(training_by_customer) != 0:
                 is_training_by_customer = True
             else:
-                training_by_other = InstructorSheduleCustomersRepository.read_filtered(user, {'i_shedule_id': current_shed.i_shedule_id,
+                training_by_other = InstructorSheduleCustomersService.read_filtered(user, {'i_shedule_id': current_shed.i_shedule_id,
                                                                                              'training_date':days_dates[current_shed.day_of_week]})
                 if len(training_by_other) != 0:
                     is_training_by_other = True
 
-            groupclasses = GroupClassesCustomersRecordsRepository.read_filtered(user,
+            groupclasses = GroupClassesCustomersRecordsService.read_filtered(user,
                                                                                 {'customer_id': customer_id,
                                                                                  'class_date': days_dates[current_shed.day_of_week]})
             if len(groupclasses) != 0:
                 for gr_class in groupclasses:
-                    groupclass_time = GroupClassesSheduleRepository.read_filtered(user, {'shedule_id': gr_class.shedule_id})
+                    groupclass_time = GroupClassesSheduleService.read_filtered(user, {'shedule_id': gr_class.shedule_id})
                     if len(groupclass_time) != 0 and groupclass_time[0].class_time == current_shed.training_time:
                         is_in_group_classes_records = True
 
@@ -83,8 +83,8 @@ def form_instructors_shedule_for_tarif(user, instructor_id, tarif, week, custome
     return training_data, dates
 
 def form_instructors_shedule(user, instructor_id):
-    shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
-    group_classes = GroupClassesSheduleRepository.read_join_filtered(user, 'class_field', {'instructor_id': instructor_id})
+    shedule = InstructorSheduleService.read_filtered(user, {'instructor_id': instructor_id})
+    group_classes = GroupClassesSheduleService.read_join_filtered(user, 'class_field', {'instructor_id': instructor_id})
     training_data = {}
     seconds = 32400
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -105,8 +105,8 @@ def form_instructors_shedule(user, instructor_id):
     return training_data
 
 def form_instructors_shedule_for_week(user, instructor_id, week):
-    shedule = InstructorSheduleRepository.read_filtered(user, {'instructor_id': instructor_id})
-    group_classes = GroupClassesSheduleRepository.read_join_filtered(user, 'class_field', {'instructor_id': instructor_id})
+    shedule = InstructorSheduleService.read_filtered(user, {'instructor_id': instructor_id})
+    group_classes = GroupClassesSheduleService.read_join_filtered(user, 'class_field', {'instructor_id': instructor_id})
     training_data = {}
     seconds = 32400
     days_en = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -124,17 +124,17 @@ def form_instructors_shedule_for_week(user, instructor_id, week):
 
     for current_shed in shedule:
         customer = None
-        customer_raw = InstructorSheduleCustomersRepository.read_filtered(user, {'i_shedule_id': current_shed.i_shedule_id,
+        customer_raw = InstructorSheduleCustomersService.read_filtered(user, {'i_shedule_id': current_shed.i_shedule_id,
                                                                              'training_date': days_dates[current_shed.day_of_week]})
 
         if len(customer_raw) != 0:
-            customer = CustomersRepository.read_filtered(user, {'customer_id': customer_raw[0].customer_id})[0]
+            customer = CustomersService.read_filtered(user, {'customer_id': customer_raw[0].customer_id})[0]
         training_data[str(current_shed.training_time)[:-3]][current_shed.day_of_week].update({'name':'Персональная тренировка',
                                                                                               'is_personal': True,
                                                                                               'customer': customer})
     for current_shed in group_classes:
 
-        count = len(GroupClassesCustomersRecordsRepository.read_filtered(user, {'shedule_id': current_shed.shedule_id,
+        count = len(GroupClassesCustomersRecordsService.read_filtered(user, {'shedule_id': current_shed.shedule_id,
                                                                              'class_date': days_dates[current_shed.day_of_week]}))
 
         training_data[str(current_shed.class_time)[:-3]][current_shed.day_of_week].update({'name':current_shed.class_field.class_name,

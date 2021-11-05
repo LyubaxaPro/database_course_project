@@ -13,11 +13,11 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
-    GroupClassesSheduleRepository, InstructorsRepository, SpecialOffersRepository, PricesRepository, \
-    GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
-    AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, CustomUserRepository, \
-    AdminGroupClassesLogsRepository, CustomersRepository, InstructorSheduleRepository
+from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService,\
+    GroupClassesSheduleService, InstructorsService, SpecialOffersService, PricesService, \
+    GroupClassesCustomersRecordsService, InstructorSheduleCustomersService, \
+    AdminRecordsService, InstructorPersonalTrainingsLogsService, CustomUserService, \
+    AdminGroupClassesLogsService, CustomersService, InstructorSheduleService
 
 from manager.models import GroupClassesCustomersRecords, InstructorSheduleCustomers
 class CustomerProfileView(APIView):
@@ -48,7 +48,7 @@ class CustomerProfileView(APIView):
         have_instructor = False
         if role['customer']['instructor']:
             have_instructor = True
-            instructor_action_records = InstructorPersonalTrainingsLogsRepository.read_join_filtered(request.user,
+            instructor_action_records = InstructorPersonalTrainingsLogsService.read_join_filtered(request.user,
                                                                                                       'instructor',
                                                                          {'instructor': role['customer']['instructor']})
 
@@ -57,13 +57,13 @@ class CustomerProfileView(APIView):
                     instructor_action_logs.append(cur)
 
         group_classes_logs = []
-        admin_action_records = AdminGroupClassesLogsRepository.read_join_filtered(request.user, 'group_class',
+        admin_action_records = AdminGroupClassesLogsService.read_join_filtered(request.user, 'group_class',
                                                                              {'club': role['user']['club']})
         for cur in admin_action_records:
             if cur.act_date + datetime.timedelta(days=7) >= timezone.now():
                 group_classes_logs.append(cur)
 
-        tariff = PricesRepository.read_by_pk(request.user, role['customer']['tariff'])
+        tariff = PricesService.read_by_pk(request.user, role['customer']['tariff'])
         data = {'role': get_role_json(request), 'chart': chart,
                                                               'tariff': PricesSerializer(tariff).data,
                                                               'today': today,
@@ -108,7 +108,7 @@ class CustomerEditProfileView(generics.ListCreateAPIView):
             format = "%Y-%m-%d"
             dt_object = datetime.datetime.strptime(dt_string, format)
             cleaned_data['day_of_birth'] = dt_object
-        CustomersRepository.update_by_pk(request.user,
+        CustomersService.update_by_pk(request.user,
                                       role['customer']['customer_id'],
                                       cleaned_data)
 
@@ -134,7 +134,7 @@ class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
         weight = request.data["weight"]
         date = request.data["date"]
 
-        customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+        customer = CustomersService.read_filtered(request.user, {'user_id': request.user.pk})[0]
         old_weights = customer.measured_weights
         old_dates = customer.measure_dates
 
@@ -153,10 +153,10 @@ class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
             new_dates.append(sorted_measure[i][0])
             new_weights.append(sorted_measure[i][1])
 
-        CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': new_weights,
+        CustomersService.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': new_weights,
                                                             'measure_dates': new_dates})
 
-        customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+        customer = CustomersService.read_filtered(request.user, {'user_id': request.user.pk})[0]
 
         is_chart = 1
         if len(customer.measure_dates) == 0:
@@ -173,7 +173,7 @@ class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
 
-        customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+        customer = CustomersService.read_filtered(request.user, {'user_id': request.user.pk})[0]
         weights = customer.measured_weights
         dates = customer.measure_dates
 
@@ -181,9 +181,9 @@ class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
             dates.pop(len(dates) - 1)
             weights.pop(len(dates) - 1)
 
-        CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': weights,
+        CustomersService.update_filtered(request.user, {'user_id': request.user.pk}, {'measured_weights': weights,
                                                             'measure_dates': dates})
-        customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+        customer = CustomersService.read_filtered(request.user, {'user_id': request.user.pk})[0]
         is_chart = 1
         if len(customer.measure_dates) == 0:
             is_chart = 0
@@ -194,7 +194,7 @@ class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
         return Response(data)
 
 def pass_future_group(request, date_today, time_today, customer_id):
-    group_classes_records = GroupClassesCustomersRecordsRepository.read_join_filtered(request.user, "shedule",
+    group_classes_records = GroupClassesCustomersRecordsService.read_join_filtered(request.user, "shedule",
                                                                                       {'customer_id': customer_id})
     pass_classes = []
     future_classes = []
@@ -216,14 +216,14 @@ def pass_future_group(request, date_today, time_today, customer_id):
     return pass_classes, future_classes
 
 def pass_future_personal(request, date_today, time_today, customer_id):
-    personal_records = InstructorSheduleCustomersRepository.read_join_filtered(request.user, "i_shedule",
+    personal_records = InstructorSheduleCustomersService.read_join_filtered(request.user, "i_shedule",
                                                                                {'customer_id': customer_id})
     pass_personal_trainings = []
     future_personal_trainings = []
 
     for train in personal_records:
         instructor = \
-            InstructorsRepository.read_filtered(request.user, {'instructor_id': train.i_shedule.instructor_id})[0]
+            InstructorsService.read_filtered(request.user, {'instructor_id': train.i_shedule.instructor_id})[0]
         name = instructor.surname + " " + instructor.name + " " + instructor.patronymic
         data = {'date': train.training_date, 'day_of_week': days[train.i_shedule.day_of_week],
                 'time': train.i_shedule.training_time, 'instructor_name': name, 'instructor_pk': instructor.pk,
@@ -266,7 +266,7 @@ class CustomerTrainingRecordsView(APIView):
 
 
 
-        tarif = PricesRepository.read_filtered(request.user, {'tariff_id': role['customer']['tariff']})[0]
+        tarif = PricesService.read_filtered(request.user, {'tariff_id': role['customer']['tariff']})[0]
         classes_data, dates = form_classes_data_for_tarif_group_classes(request.user,
                                                                         role['customer']['customer_id'],
                                                                         role['user']['club'], tarif, week)
@@ -280,7 +280,7 @@ class CustomerTrainingRecordsView(APIView):
                                                                        week, role['customer']['customer_id'])
             have_instructor = True
             customers_instructor = \
-            InstructorsRepository.read_filtered(request.user, {'instructor_id': role['customer']['instructor']})[
+            InstructorsService.read_filtered(request.user, {'instructor_id': role['customer']['instructor']})[
                 0]
             instructor_data = {'instructor_name': customers_instructor.name,
                                'instructor_surname': customers_instructor.surname,
@@ -292,11 +292,11 @@ class CustomerTrainingRecordsView(APIView):
             day_of_week_date.update({days[tarif.days_of_week[i]]: dates[i]})
 
         club_id = role['user']['club']
-        users_instructors = CustomUserRepository.read_filtered(request.user, {"club": club_id, 'role': 1})
+        users_instructors = CustomUserService.read_filtered(request.user, {"club": club_id, 'role': 1})
         user_id_list = []
         for user in users_instructors:
             user_id_list.append(user.id)
-        club_instructors = InstructorsRepository.read_filtered(request.user,
+        club_instructors = InstructorsService.read_filtered(request.user,
                                                                {'user__in': user_id_list, 'is_active': True})
         club_instructors_data = []
         for instr in club_instructors:
@@ -346,12 +346,12 @@ class CustomerCreatePersonalTrainingRecordView(generics.ListCreateAPIView):
         if role['customer']['instructor'] == None:
             return JsonResponse({'status': 'Ok', 'message': "User don't have instructor"}, status=405)
 
-        club_schedule = InstructorSheduleRepository.read_filtered(request.user,
+        club_schedule = InstructorSheduleService.read_filtered(request.user,
                                                                     {'i_shedule_id': i_shedule_id,
                                                                      'instructor': role['customer']['instructor']})
 
         if len(club_schedule) > 0:
-            InstructorSheduleCustomersRepository.create(request.user, new_record)
+            InstructorSheduleCustomersService.create(request.user, new_record)
             return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
 
         return JsonResponse({'status': 'false', 'message': 'Wrong i_schedule_id'}, status=405)
@@ -377,7 +377,7 @@ class CustomerDeletePersonalTrainingRecordView(APIView):
 
         for trainig in future_personal_trainings:
             if int(record_id) == trainig['record_id']:
-                InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record_id})
+                InstructorSheduleCustomersService.delete_filtered(request.user, {'record_id': record_id})
                 return JsonResponse({'status': 'Ok', 'message': 'You delete personal training'}, status=200)
 
         return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
@@ -403,13 +403,13 @@ class CustomerAddGroupClassesRecordView(generics.ListCreateAPIView):
         shedule_id = request.data["shedule_id"]
 
         club_id = role['user']['club']
-        club_schedule = GroupClassesSheduleRepository.read_filtered(request.user, {'shedule_id': shedule_id, "club_id": club_id})
+        club_schedule = GroupClassesSheduleService.read_filtered(request.user, {'shedule_id': shedule_id, "club_id": club_id})
 
         if len(club_schedule) > 0:
             new_record.shedule_id = request.data["shedule_id"]
             new_record.customer_id = role['customer']['customer_id']
 
-            GroupClassesCustomersRecordsRepository.create(request.user, new_record)
+            GroupClassesCustomersRecordsService.create(request.user, new_record)
             return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
 
         return JsonResponse({'status': 'false', 'message': 'Wrong schedule_id'}, status=405)
@@ -435,7 +435,7 @@ class CustomerDeleteGroupTrainingRecordView(APIView):
 
         for trainig in future_classes:
             if int(record_id) == trainig['record_id']:
-                GroupClassesCustomersRecordsRepository.delete_filtered(request.user, {'record_id': record_id})
+                GroupClassesCustomersRecordsService.delete_filtered(request.user, {'record_id': record_id})
                 return JsonResponse({'status': 'Ok', 'message': 'You delete personal training'}, status=200)
 
         return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
@@ -457,15 +457,15 @@ class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
         instructor_id = request.data["instructor_id"]
-        instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
+        instructor = InstructorsService.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
-        instructor_club = CustomUserRepository.read_filtered(request.user, {'email' : instructor[0].user})[0].club
+        instructor_club = CustomUserService.read_filtered(request.user, {'email' : instructor[0].user})[0].club
 
         club_id = role['user']['club']
 
         if (club_id == instructor_club):
-            CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk},
+            CustomersService.update_filtered(request.user, {'user_id': request.user.pk},
                                                 {'instructor_id': instructor_id})
             return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
 
@@ -478,16 +478,16 @@ class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
                                 status=404)
 
         instructor_id = request.data["instructor_id"]
-        instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
+        instructor = InstructorsService.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
-        instructor_club = CustomUserRepository.read_filtered(request.user, {'email' : instructor[0].user})[0].club
+        instructor_club = CustomUserService.read_filtered(request.user, {'email' : instructor[0].user})[0].club
 
         club_id = role['user']['club']
 
         if (club_id == instructor_club):
             delete_future_records_for_personal_trainings(request)
-            CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk},
+            CustomersService.update_filtered(request.user, {'user_id': request.user.pk},
                                                 {'instructor_id': instructor_id})
             return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
 
@@ -500,19 +500,19 @@ class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
                                 status=404)
 
         delete_future_records_for_personal_trainings(request)
-        CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': None})
+        CustomersService.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': None})
 
         return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
 
 def delete_future_records_for_personal_trainings(request):
     role = get_role_json(request)
-    instructors_shedule = InstructorSheduleRepository.read_filtered(request.user,
+    instructors_shedule = InstructorSheduleService.read_filtered(request.user,
                                                                     {'instructor_id': role['customer']['instructor']})
     shedule_id_list = []
     for sh in instructors_shedule:
         shedule_id_list.append(sh.i_shedule_id)
 
-    records = InstructorSheduleCustomersRepository.read_filtered(request.user, {'i_shedule_id__in': shedule_id_list,
+    records = InstructorSheduleCustomersService.read_filtered(request.user, {'i_shedule_id__in': shedule_id_list,
                                                                                 'customer_id': role['customer']['customer_id']})
 
     date_today = datetime.date.today()
@@ -520,9 +520,9 @@ def delete_future_records_for_personal_trainings(request):
 
     for record in records:
         if record.training_date > date_today:
-            InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record.record_id})
+            InstructorSheduleCustomersService.delete_filtered(request.user, {'record_id': record.record_id})
         if record.training_date == date_today:
-            shedule_time = InstructorSheduleRepository.read_filtered(request.user,
+            shedule_time = InstructorSheduleService.read_filtered(request.user,
                                                                      {'i_shedule_id': record.i_shedule_id})
             if len(shedule_time) != 0 and shedule_time[0].training_time > time_today:
-                InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record.record_id})
+                InstructorSheduleCustomersService.delete_filtered(request.user, {'record_id': record.record_id})

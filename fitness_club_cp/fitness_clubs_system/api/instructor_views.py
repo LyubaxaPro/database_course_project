@@ -4,15 +4,12 @@ from .role import *
 from .instructor_schedule import *
 from .utils import *
 from .week import *
-from django.utils import timezone
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.http import JsonResponse
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
-    GroupClassesSheduleRepository, InstructorsRepository, SpecialOffersRepository, PricesRepository, \
-    GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
-    AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, CustomUserRepository, \
-    AdminGroupClassesLogsRepository, CustomersRepository, InstructorSheduleRepository
+
+from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
+    GroupClassesSheduleService, InstructorsService, SpecialOffersService, PricesService, \
+    GroupClassesCustomersRecordsService, InstructorSheduleCustomersService, \
+    AdminRecordsService, InstructorPersonalTrainingsLogsService, CustomUserService, \
+    AdminGroupClassesLogsService, CustomersService, InstructorSheduleService
 
 from manager.models import GroupClassesCustomersRecords, InstructorSheduleCustomers, AdminRecords, InstructorShedule
 
@@ -32,7 +29,7 @@ class InstructorView(APIView):
         if not role['is_instructor']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=405)
 
-        fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user']['club']})
+        fitness_club = FitnessClubsService.read_filtered(request.user, {'club_id': role['user']['club']})
         address = fitness_club[0].city + ", " + fitness_club[0].address
         instructor_shedule = form_instructors_shedule(request.user, role['instructor']['instructor_id'])
 
@@ -43,7 +40,7 @@ class InstructorView(APIView):
                                                                                                              14]:
             exp_str = "года"
 
-        record = AdminRecordsRepository.read_filtered(request.user, {'instructor': role['instructor']['instructor_id'],
+        record = AdminRecordsService.read_filtered(request.user, {'instructor': role['instructor']['instructor_id'],
                                                                      'status': AdminRecords.PENDING})
         change_record = None
         is_already_record = False
@@ -69,7 +66,7 @@ class InstructorAttachedCustomersView(APIView):
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         customers_data = []
-        customers = CustomersRepository.read_filtered(request.user, {'instructor_id': role['instructor']['instructor_id']})
+        customers = CustomersService.read_filtered(request.user, {'instructor_id': role['instructor']['instructor_id']})
         is_chart = True
 
         for customer in customers:
@@ -121,7 +118,7 @@ class InstructorEditProfileView(generics.ListCreateAPIView):
             cleaned_data['achievements'] = cleaned_data['achievements'].split(';')
             cleaned_data['specialization'] = cleaned_data['specialization'].split(';')
         print(cleaned_data)
-        InstructorsRepository.update_by_pk(request.user,
+        InstructorsService.update_by_pk(request.user,
                                       role['instructor']['instructor_id'], cleaned_data)
         return JsonResponse({'status': 'Ok'},
                             status=200)
@@ -145,14 +142,14 @@ class InstructorAddPersonalTrainingView(generics.ListCreateAPIView):
         time_raw = request.data["time"]
         time = datetime.datetime.strptime(time_raw, '%H:%M').time()
 
-        flag_rec = InstructorSheduleRepository.read_filtered(request.user, {"day_of_week": day,
+        flag_rec = InstructorSheduleService.read_filtered(request.user, {"day_of_week": day,
                                                             "instructor_id": role['instructor']['instructor_id'],
                                                                             "training_time": time})
         if len(flag_rec) > 0:
             return JsonResponse({'status': 'false', 'message': 'This time is already busy'},
                                 status=405)
 
-        flag_group_classes_rec = GroupClassesSheduleRepository.read_filtered(request.user,
+        flag_group_classes_rec = GroupClassesSheduleService.read_filtered(request.user,
                                                                 {"instructor": role['instructor']['instructor_id'],
                                                                  "class_time": time,
                                                                  "day_of_week": day})
@@ -167,7 +164,7 @@ class InstructorAddPersonalTrainingView(generics.ListCreateAPIView):
         new_record.training_time = time
         new_record.day_of_week = day
 
-        InstructorSheduleRepository.create(request.user, new_record)
+        InstructorSheduleService.create(request.user, new_record)
 
         return JsonResponse({'status': 'Ok', 'message': 'You add new personal training'},
                             status=200)
@@ -184,12 +181,12 @@ class InstructorDeleteProfileChangesView(APIView):
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         pk = kwargs["pk"]
-        flag = AdminRecordsRepository.read_filtered(request.user, {"pk": pk})
+        flag = AdminRecordsService.read_filtered(request.user, {"pk": pk})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "This record doesn't exist"},
                                 status=405)
 
-        AdminRecordsRepository.delete_by_pk(request.user, pk)
+        AdminRecordsService.delete_by_pk(request.user, pk)
 
         return JsonResponse({'status': 'Ok', 'message': 'You delete profile changes'},
                             status=200)
@@ -206,12 +203,12 @@ class InstructorDeletePersonalTrainingView(APIView):
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
         i_shedule_id = kwargs["i_shedule_id"]
-        flag = InstructorSheduleRepository.read_filtered(request.user, {"i_shedule_id": i_shedule_id})
+        flag = InstructorSheduleService.read_filtered(request.user, {"i_shedule_id": i_shedule_id})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "This record doesn't exist"},
                                 status=405)
 
-        InstructorSheduleRepository.delete_filtered(request.user, {'i_shedule_id': i_shedule_id})
+        InstructorSheduleService.delete_filtered(request.user, {'i_shedule_id': i_shedule_id})
 
         return JsonResponse({'status': 'Ok', 'message': 'You delete personal training'},
                             status=200)
@@ -233,7 +230,7 @@ class InstructorTrainingRecordsView(APIView):
         if selected_week:
             week = selected_week
         instructor_shedule, day_of_week_date = form_instructors_shedule_for_week(request.user, role['instructor']['instructor_id'], week)
-        fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user']['club']})
+        fitness_club = FitnessClubsService.read_filtered(request.user, {'club_id': role['user']['club']})
         address = fitness_club[0].city + ", " + fitness_club[0].address
 
         data = {'role': get_role_json(request), 'address': address, 'shedule': instructor_shedule,

@@ -3,14 +3,12 @@ from rest_framework import generics
 from .role import *
 from .form_classes_data import *
 from django.utils import timezone
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.http import JsonResponse
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository, \
-    GroupClassesSheduleRepository, InstructorsRepository, SpecialOffersRepository, PricesRepository, \
-    GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
-    AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, CustomUserRepository, \
-    AdminGroupClassesLogsRepository, CustomersRepository, InstructorSheduleRepository, AdministratorsRepository
+
+from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService, \
+    GroupClassesSheduleService, InstructorsService, SpecialOffersService, PricesService, \
+    GroupClassesCustomersRecordsService, InstructorSheduleCustomersService, \
+    AdminRecordsService, InstructorPersonalTrainingsLogsService, CustomUserService, \
+    AdminGroupClassesLogsService, CustomersService, InstructorSheduleService, AdministratorsService
 
 from manager.models import AdminRecords, GroupClassesShedule, SpecialOffers
 
@@ -32,30 +30,30 @@ class AdminProfileView(APIView):
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
                                 status=404)
 
-        fitness_club = FitnessClubsRepository.read_filtered(request.user, {'club_id': role['user']['club']})
+        fitness_club = FitnessClubsService.read_filtered(request.user, {'club_id': role['user']['club']})
         address = fitness_club[0].city + ", " + fitness_club[0].address
 
-        admin = AdministratorsRepository.read_filtered(request.user, {'user': role['admin']['user']})[0]
+        admin = AdministratorsService.read_filtered(request.user, {'user': role['admin']['user']})[0]
 
-        users_instructors = CustomUserRepository.read_filtered(request.user, {"club": role['user']['club'], 'role': 1})
+        users_instructors = CustomUserService.read_filtered(request.user, {"club": role['user']['club'], 'role': 1})
         user_id_list = []
         for user in users_instructors:
             user_id_list.append(user.id)
 
-        instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list, 'is_active': False})
+        instructors = InstructorsService.read_filtered(request.user, {'user__in': user_id_list, 'is_active': False})
 
         instructors_data = []
         for instructor in instructors:
-            user = CustomUserRepository.read_filtered(request.user, {'id': instructor.user_id})[0]
+            user = CustomUserService.read_filtered(request.user, {'id': instructor.user_id})[0]
             instructors_data.append({'data': instructor, 'user': user})
 
-        changes_instructors = AdminRecordsRepository.read_filtered(request.user, {'admin': role['admin']['user'],
+        changes_instructors = AdminRecordsService.read_filtered(request.user, {'admin': role['admin']['user'],
                                                                                   'status': AdminRecords.PENDING})
 
-        active_instructors = InstructorsRepository.read_filtered(request.user,
+        active_instructors = InstructorsService.read_filtered(request.user,
                                                                  {'user__in': user_id_list, 'is_active': True})
 
-        instructor_action_records = InstructorPersonalTrainingsLogsRepository.read_join_filtered(request.user,
+        instructor_action_records = InstructorPersonalTrainingsLogsService.read_join_filtered(request.user,
                                                                                                  'instructor',
                                                                                                  {
                                                                                                      'instructor__in': active_instructors})
@@ -92,17 +90,17 @@ class AdminGroupClassesView(generics.ListCreateAPIView):
         club_id = role['user']['club']
         classes_data, day_dates = form_admin_classes_data(request.user, club_id, week)
 
-        club_info = FitnessClubsRepository.read_filtered(request.user, {'club_id': club_id})[0]
+        club_info = FitnessClubsService.read_filtered(request.user, {'club_id': club_id})[0]
         address = club_info.city + ", " + club_info.address
 
-        classes = GroupClassesRepository.read_all(request.user)
+        classes = GroupClassesService.read_all(request.user)
 
-        users = CustomUserRepository.read_filtered(request.user, {"club": club_id})
+        users = CustomUserService.read_filtered(request.user, {"club": club_id})
         user_id_list = []
         for user in users:
             user_id_list.append(user.id)
 
-        instructors = InstructorsRepository.read_filtered(request.user, {'user__in': user_id_list, 'is_active': True})
+        instructors = InstructorsService.read_filtered(request.user, {'user__in': user_id_list, 'is_active': True})
 
         data = {'classes_data': classes_data,
                 'classes': GroupClassesSerializer(classes, many=True).data, 'role': role,
@@ -124,20 +122,20 @@ class AdminGroupClassesView(generics.ListCreateAPIView):
         class_id = request.data["class_id"]
         maximum_quantity = request.data["maximum_quantity"]
 
-        flag_class = GroupClassesRepository.read_filtered(request.user, {'class_id': class_id})
+        flag_class = GroupClassesService.read_filtered(request.user, {'class_id': class_id})
         if len(flag_class) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong class_id'}, status=405)
 
         instructor_id = request.data["instructor_id"]
-        instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
+        instructor = InstructorsService.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
 
-        instructor_club = CustomUserRepository.read_filtered(request.user, {'email': instructor[0].user})[0].club
+        instructor_club = CustomUserService.read_filtered(request.user, {'email': instructor[0].user})[0].club
         if instructor_club != club_id:
             return JsonResponse({'status': 'false', 'message': "This instructor don't work in this club"}, status=405)
 
-        busy_instructors = GroupClassesSheduleRepository.read_filtered(request.user, {'class_time': time, 'day_of_week': day})
+        busy_instructors = GroupClassesSheduleService.read_filtered(request.user, {'class_time': time, 'day_of_week': day})
         for i in busy_instructors:
 
             if int(instructor_id) == i.instructor.instructor_id:
@@ -145,14 +143,14 @@ class AdminGroupClassesView(generics.ListCreateAPIView):
                                     status=405)
 
         new_record = GroupClassesShedule()
-        new_record.class_field = GroupClassesRepository.read_filtered(request.user, {'class_id': class_id})[0]
-        new_record.club = FitnessClubsRepository.read_filtered(request.user, {'club_id': club_id})[0]
-        new_record.instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})[0]
+        new_record.class_field = GroupClassesService.read_filtered(request.user, {'class_id': class_id})[0]
+        new_record.club = FitnessClubsService.read_filtered(request.user, {'club_id': club_id})[0]
+        new_record.instructor = InstructorsService.read_filtered(request.user, {'instructor_id': instructor_id})[0]
         new_record.class_time = time
         new_record.day_of_week = day
         new_record.maximum_quantity = int(maximum_quantity)
 
-        GroupClassesSheduleRepository.create(request.user, new_record)
+        GroupClassesSheduleService.create(request.user, new_record)
 
         return JsonResponse({'status': 'Ok', 'message': 'You add new group training'},
                             status=200)
@@ -171,12 +169,12 @@ class AdminDeleteGroupClassesView(APIView):
                                 status=404)
 
         shedule_id = kwargs["shedule_id"]
-        flag = GroupClassesSheduleRepository.read_filtered(request.user, {'shedule_id': shedule_id})
+        flag = GroupClassesSheduleService.read_filtered(request.user, {'shedule_id': shedule_id})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "Don't have this record"},
                                 status=405)
 
-        GroupClassesSheduleRepository.delete_filtered(request.user, {'shedule_id': shedule_id})
+        GroupClassesSheduleService.delete_filtered(request.user, {'shedule_id': shedule_id})
 
         return JsonResponse({'status': 'Ok', 'message': 'You delete group training'},
                             status=200)
@@ -195,11 +193,11 @@ class AdminDeleteSpecialOfferView(APIView):
                                 status=404)
 
         offer_id = kwargs["offer_id"]
-        flag = SpecialOffersRepository.read_filtered(request.user, {'offer_id': offer_id})
+        flag = SpecialOffersService.read_filtered(request.user, {'offer_id': offer_id})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "Don't have this record"},
                                 status=405)
-        SpecialOffersRepository.delete_filtered(request.user, {'offer_id': offer_id})
+        SpecialOffersService.delete_filtered(request.user, {'offer_id': offer_id})
 
         return JsonResponse({'status': 'Ok', 'message': 'You delete special offer'},
                             status=200)
@@ -224,7 +222,7 @@ class AdminAdminSpecialOfferView(generics.ListCreateAPIView):
         new_record.offer_name = offer_name
         new_record.offer_description = offer_description
 
-        SpecialOffersRepository.create(request.user, new_record)
+        SpecialOffersService.create(request.user, new_record)
 
         return JsonResponse({'status': 'Ok', 'message': 'You create special offer'},
                             status=200)
@@ -251,12 +249,12 @@ class AdminStatisticsView(APIView):
         club_id = role['user']['club']
         classes_data, day_of_week_date = form_admin_classes_data(request.user, club_id, week)
 
-        club_info = FitnessClubsRepository.read_filtered(request.user, {'club_id': club_id})[0]
+        club_info = FitnessClubsService.read_filtered(request.user, {'club_id': club_id})[0]
         address = club_info.city + ", " + club_info.address
 
-        classes = GroupClassesRepository.read_all(request.user)
+        classes = GroupClassesService.read_all(request.user)
 
-        users = CustomUserRepository.read_filtered(request.user, {"club": club_id})
+        users = CustomUserService.read_filtered(request.user, {"club": club_id})
         user_id_list = []
         for user in users:
             user_id_list.append(user.id)
@@ -283,7 +281,7 @@ class AdminActivateInstructorView(generics.ListCreateAPIView):
                                 status=404)
 
         instructor_id = request.data["instructor_id"]
-        InstructorsRepository.update_filtered(request.user, {'instructor_id': instructor_id}, {'is_active': True})
+        InstructorsService.update_filtered(request.user, {'instructor_id': instructor_id}, {'is_active': True})
 
         return JsonResponse({'status': 'Ok', 'message': 'You activate new instructor'},
                             status=200)
@@ -301,12 +299,12 @@ class AdminRejectInstructorView(APIView):
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
                                 status=404)
         user_id = kwargs["user_id"]
-        flag = InstructorsRepository.read_filtered(request.user, {"user": user_id, "is_active": False})
+        flag = InstructorsService.read_filtered(request.user, {"user": user_id, "is_active": False})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong id'},
                                 status=405)
 
-        CustomUserRepository.delete_filtered(request.user, {'id': user_id})
+        CustomUserService.delete_filtered(request.user, {'id': user_id})
 
         return JsonResponse({'status': 'Ok', 'message': 'You delete new instructor'},
                             status=200)

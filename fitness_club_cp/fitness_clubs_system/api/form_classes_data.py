@@ -1,13 +1,13 @@
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
-    GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository,\
-    AdministratorsRepository, AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, AdminGroupClassesLogsRepository
+from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService,\
+    GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\
+    CustomersService, InstructorSheduleService, GroupClassesCustomersRecordsService, InstructorSheduleCustomersService,\
+    AdministratorsService, AdminRecordsService, InstructorPersonalTrainingsLogsService, AdminGroupClassesLogsService
 
 from .week import *
 import json
 
 def form_classes_data(user, club_id):
-    classes = GroupClassesSheduleRepository.read_filtered(user, {"club_id" : int(club_id)})
+    classes = GroupClassesSheduleService.read_filtered(user, {"club_id" : int(club_id)})
 
     classes_data = {}
     seconds = 32400
@@ -21,14 +21,14 @@ def form_classes_data(user, club_id):
         seconds += 3600
 
     for current_class in classes:
-        classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name":InstructorsRepository.read_filtered(user,
+        classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name":InstructorsService.read_filtered(user,
                                                                                                         {"instructor_id": current_class.instructor_id})[0].name,
                                                                                           "class_name": current_class.class_field.class_name,
                                                                                           'shedule_id': current_class.shedule_id })
     return classes_data
 
 def form_admin_classes_data(user, club_id, week):
-    classes = GroupClassesSheduleRepository.read_filtered(user, {"club_id" : int(club_id)})
+    classes = GroupClassesSheduleService.read_filtered(user, {"club_id" : int(club_id)})
     dates_raw = get_week_dates(week)
 
     classes_data = {}
@@ -48,7 +48,7 @@ def form_admin_classes_data(user, club_id, week):
 
     for current_class in classes:
         if len(json.loads(classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week]['busy_instructors'])) == 0:
-            busy = GroupClassesSheduleRepository.read_filtered(user, {'class_time': current_class.class_time,
+            busy = GroupClassesSheduleService.read_filtered(user, {'class_time': current_class.class_time,
                                                                       'day_of_week': current_class.day_of_week,
                                                                       "club_id": int(club_id)})
             instructors = []
@@ -57,10 +57,10 @@ def form_admin_classes_data(user, club_id, week):
 
             classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].update({'busy_instructors': json.dumps(instructors)})
 
-        count = len(GroupClassesCustomersRecordsRepository.read_filtered(user, {'shedule_id': current_class.shedule_id,
+        count = len(GroupClassesCustomersRecordsService.read_filtered(user, {'shedule_id': current_class.shedule_id,
                                                                                 'class_date': days_dates[current_class.day_of_week]}))
 
-        classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week]['data'].append({"instructor_name": InstructorsRepository.read_filtered(user,
+        classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week]['data'].append({"instructor_name": InstructorsService.read_filtered(user,
                                                                                                         {"instructor_id": current_class.instructor_id})[0].name,
                                                                                           "class_name": current_class.class_field.class_name,
                                                                                           'shedule_id': current_class.shedule_id,
@@ -102,7 +102,7 @@ def form_data_for_tarif(tarif, week):
     return classes_data, seconds, days_dates, days, dates, time_classes
 
 def form_classes_data_for_tarif_group_classes(user, customer_id, club_id, tarif, week):
-    classes = GroupClassesSheduleRepository.read_filtered(user, {"club_id": int(club_id)})
+    classes = GroupClassesSheduleService.read_filtered(user, {"club_id": int(club_id)})
     classes_data, seconds, days_dates, days, dates, time_classes = form_data_for_tarif(tarif, week)
     date_today = datetime.date.today()
     time_today = datetime.datetime.now().time()
@@ -113,17 +113,17 @@ def form_classes_data_for_tarif_group_classes(user, customer_id, club_id, tarif,
         class_not_done = True
         more_than_maximum_quantity = False
         if current_class.class_time.hour >= time_classes[0] and current_class.class_time.hour < time_classes[1] and current_class.day_of_week in days:
-            groupclasses = GroupClassesCustomersRecordsRepository.read_filtered(user, {'shedule_id': current_class.shedule_id,
+            groupclasses = GroupClassesCustomersRecordsService.read_filtered(user, {'shedule_id': current_class.shedule_id,
                                                                                        'customer_id': customer_id,
                                                                                        'class_date': days_dates[current_class.day_of_week]})
             if len(groupclasses) != 0:
                 is_in_group_classes_records = True
 
-            personal_trainings = InstructorSheduleCustomersRepository.read_filtered(user, {'customer_id': customer_id,
+            personal_trainings = InstructorSheduleCustomersService.read_filtered(user, {'customer_id': customer_id,
                                                                                        'training_date': days_dates[current_class.day_of_week]})
             if len(personal_trainings) != 0:
                 for train in personal_trainings:
-                    personal_training_time = InstructorSheduleRepository.read_filtered(user, {'i_shedule_id': train.i_shedule_id})
+                    personal_training_time = InstructorSheduleService.read_filtered(user, {'i_shedule_id': train.i_shedule_id})
                     if len(personal_training_time) != 0 and personal_training_time[0].training_time == current_class.class_time:
                         is_in_personal_trainings_records = True
 
@@ -133,17 +133,17 @@ def form_classes_data_for_tarif_group_classes(user, customer_id, club_id, tarif,
             if  days_dates[current_class.day_of_week] == date_today and current_class.class_time < time_today:
                 class_not_done = False
 
-            this_groupclasses = GroupClassesCustomersRecordsRepository.read_filtered(user,
+            this_groupclasses = GroupClassesCustomersRecordsService.read_filtered(user,
                                                                                 {'shedule_id': current_class.shedule_id,
                                                                                  'class_date': days_dates[current_class.day_of_week]})
             if len(this_groupclasses) > 0:
-                this_class_quantity = GroupClassesSheduleRepository.read_filtered(user, {"shedule_id": current_class.shedule_id})[0].maximum_quantity
+                this_class_quantity = GroupClassesSheduleService.read_filtered(user, {"shedule_id": current_class.shedule_id})[0].maximum_quantity
                 if len(this_groupclasses) >= this_class_quantity:
                     more_than_maximum_quantity = True
 
 
 
-            classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name": InstructorsRepository.read_filtered(user,
+            classes_data[str(current_class.class_time)[:-3]][current_class.day_of_week].append({"instructor_name": InstructorsService.read_filtered(user,
                                                                                                         {"instructor_id": current_class.instructor_id})[0].name,
                                                                                           "class_name": current_class.class_field.class_name,
                                                                                           'shedule_id': current_class.shedule_id,
