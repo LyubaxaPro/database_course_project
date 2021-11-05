@@ -1,3 +1,5 @@
+from rest_framework import generics
+
 from .role import *
 from .form_classes_data import *
 from django.utils import timezone
@@ -70,12 +72,16 @@ class AdminProfileView(APIView):
 
         return Response(data)
 
-class AdminGroupClassesView(APIView):
+class AdminGroupClassesView(generics.ListCreateAPIView):
     """
     get:
         get group classes schedule
-    """
 
+    post:
+        create group class
+    """
+    allowed_methods = ["GET", "POST"]
+    serializer_class = AdminGroupClassesViewSerializer
     def get(self, request):
         role = get_role_json(request)
         if not role['is_admin']:
@@ -105,30 +111,24 @@ class AdminGroupClassesView(APIView):
 
         return Response(data)
 
-class AdminAddGroupClassesView(APIView):
-    """
-    post:
-        create group class
-    """
-
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
                                 status=404)
 
-        day = kwargs["day"]
-        time_raw = kwargs["time"]
+        day = request.data["day"]
+        time_raw = request.data["time"]
         time = datetime.datetime.strptime(time_raw, '%H:%M').time()
         club_id = role['user']['club']
-        class_id = kwargs["class_id"]
-        maximum_quantity = kwargs["maximum_quantity"]
+        class_id = request.data["class_id"]
+        maximum_quantity = request.data["maximum_quantity"]
 
         flag_class = GroupClassesRepository.read_filtered(request.user, {'class_id': class_id})
         if len(flag_class) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong class_id'}, status=405)
 
-        instructor_id = kwargs["instructor_id"]
+        instructor_id = request.data["instructor_id"]
         instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
@@ -156,6 +156,7 @@ class AdminAddGroupClassesView(APIView):
 
         return JsonResponse({'status': 'Ok', 'message': 'You add new group training'},
                             status=200)
+
 
 class AdminDeleteGroupClassesView(APIView):
     """
@@ -203,20 +204,21 @@ class AdminDeleteSpecialOfferView(APIView):
         return JsonResponse({'status': 'Ok', 'message': 'You delete special offer'},
                             status=200)
 
-class AdminAdminSpecialOfferView(APIView):
+class AdminAdminSpecialOfferView(generics.ListCreateAPIView):
     """
     post:
         create special offer
     """
-
-    def post(self, request, *args, **kwargs):
+    allowed_methods = ["POST"]
+    serializer_class = AdminSpecialOfferSerializer
+    def post(self, request):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
                                 status=404)
 
-        offer_name = kwargs["offer_name"]
-        offer_description = kwargs["offer_description"]
+        offer_name = request.data["offer_name"]
+        offer_description = request.data["offer_description"]
 
         new_record = SpecialOffers()
         new_record.offer_name = offer_name
@@ -267,19 +269,20 @@ class AdminStatisticsView(APIView):
                 'current_week': week}
         return Response(data)
 
-class AdminActivateInstructorView(APIView):
+class AdminActivateInstructorView(generics.ListCreateAPIView):
     """
     patch:
         activate new instructor
     """
-
-    def patch(self, request, *args, **kwargs):
+    allowed_methods = ["PATCH"]
+    serializer_class = AdminActivateInstructorsSerializer
+    def patch(self, request):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
                                 status=404)
 
-        instructor_id = kwargs["instructor_id"]
+        instructor_id = request.data["instructor_id"]
         InstructorsRepository.update_filtered(request.user, {'instructor_id': instructor_id}, {'is_active': True})
 
         return JsonResponse({'status': 'Ok', 'message': 'You activate new instructor'},
@@ -307,62 +310,3 @@ class AdminRejectInstructorView(APIView):
 
         return JsonResponse({'status': 'Ok', 'message': 'You delete new instructor'},
                             status=200)
-
-# class AdminChangeInstructorView(APIView):
-#     """
-#     put:
-#         confirm change info for instructor
-#     """
-#
-#     def put(self, request, *args, **kwargs):
-#         role = get_role_json(request)
-#         if not role['is_admin']:
-#             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-#                                 status=404)
-#
-#         pk = kwargs["pk"]
-#
-#         AdminRecordsRepository.update_by_pk(request.user, pk, {'status': AdminRecords.ACCEPTED})
-#         change_dict = {}
-#         admin_record = AdminRecordsRepository.read_by_pk(request.user, pk)
-#
-#         if admin_record.change['new_name'] != '':
-#             change_dict.update({'name': admin_record.change['new_name']})
-#
-#         if admin_record.change['new_surname']:
-#             change_dict.update({'surname': admin_record.change['new_surname']})
-#
-#         if admin_record.change['new_patronymic']:
-#             change_dict.update({'patronymic': admin_record.change['new_patronymic']})
-#
-#         if admin_record.change['new_education']:
-#             change_dict.update({'education': admin_record.change['new_education']})
-#
-#         if admin_record.change['new_experience']:
-#             change_dict.update({'experience': admin_record.change['new_experience']})
-#
-#         if admin_record.change['new_achievements']:
-#             change_dict.update({'achievements': admin_record.change['new_achievements']})
-#
-#         if admin_record.change['new_specialization']:
-#             change_dict.update({'specialization': admin_record.change['new_specialization']})
-#         InstructorsRepository.update_by_pk(request.user, pk, change_dict)
-#         return JsonResponse({'status': 'Ok', 'message': 'You change instructor info'},
-#                             status=200)
-#
-# class AdminRejectChangeInstructorView(APIView):
-#     """
-#     put:
-#         reject change info for instructor
-#     """
-#
-#     def put(self, request, *args, **kwargs):
-#         role = get_role_json(request)
-#         if not role['is_admin']:
-#             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-#                                 status=404)
-#         pk = kwargs["pk"]
-#         AdminRecordsRepository.update_by_pk(request.user, pk, {'status': AdminRecords.DECLINED})
-#
-#         return JsonResponse({'status': 'Ok', 'message': 'You not change instructor info'},
-#                             status=200)

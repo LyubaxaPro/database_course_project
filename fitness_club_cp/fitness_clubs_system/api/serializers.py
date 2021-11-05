@@ -84,3 +84,47 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
+
+class EditCustomerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customers
+        fields = ["name", "surname", "patronymic", "day_of_birth", "height"]
+
+class CustomerMeasureSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    weight = serializers.IntegerField()
+
+class CustomerPersonalTrainingSerializer(serializers.Serializer):
+    i_shedule_id = serializers.IntegerField()
+    date_raw = serializers.CharField()
+
+class CustomerGroupTrainingSerializer(serializers.Serializer):
+    shedule_id = serializers.IntegerField()
+    date_raw = serializers.CharField()
+
+class CustomerAppointSerializer(serializers.Serializer):
+    instructor_id = serializers.IntegerField()
+
+class EditInstructorProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Instructors
+        fields = ["name", "surname", "patronymic", "education", "experience", "achievements", "specialization"]
+
+class InstructorAddPersonalTrainingSerializer(serializers.Serializer):
+    day = serializers.CharField()
+    time = serializers.CharField()
+
+class AdminGroupClassesViewSerializer(serializers.Serializer):
+    day = serializers.CharField()
+    time = serializers.CharField()
+    class_id = serializers.IntegerField()
+    maximum_quantity = serializers.IntegerField()
+    instructor_id = serializers.IntegerField()
+
+class AdminSpecialOfferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecialOffers
+        fields = ["offer_name", "offer_description"]
+
+class AdminActivateInstructorsSerializer(serializers.Serializer):
+    instructor_id = serializers.IntegerField()

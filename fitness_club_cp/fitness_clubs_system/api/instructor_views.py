@@ -1,3 +1,5 @@
+from rest_framework import generics
+
 from .role import *
 from .instructor_schedule import *
 from .utils import *
@@ -87,12 +89,17 @@ class InstructorAttachedCustomersView(APIView):
         data = {'role': role, 'customers_data': customers_data}
         return Response(data)
 
-class InstructorEditProfileView(APIView):
+class InstructorEditProfileView(generics.ListCreateAPIView):
     """
     get:
         get information to render page with edit form
-    """
 
+    put:
+        edit instructor info
+        education, achievements, specialization with ;
+
+    """
+    allowed_methods = ["PUT", "GET"]
     def get(self, request):
         role = get_role_json(request)
         if not role['is_instructor']:
@@ -101,21 +108,14 @@ class InstructorEditProfileView(APIView):
         data = {'role': role}
 
         return Response(data)
-    
 
-class InstructorEditProfilePostView(APIView):
-    """
-    put:
-        edit instructor info
-        education, achievements, specialization with ;
-    """
-
-    def put(self, request, *args, **kwargs):
+    serializer_class = EditInstructorProfileSerializer
+    def put(self, request):
         role = get_role_json(request)
         if not role['is_instructor']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
-        cleaned_data = kwargs
+        cleaned_data = request.data
         if type(cleaned_data['education']) == str:
             cleaned_data['education'] = cleaned_data['education'].split(';')
             cleaned_data['achievements'] = cleaned_data['achievements'].split(';')
@@ -125,22 +125,24 @@ class InstructorEditProfilePostView(APIView):
                                       role['instructor']['instructor_id'], cleaned_data)
         return JsonResponse({'status': 'Ok'},
                             status=200)
+    
 
-class InstructorAddPersonalTrainingView(APIView):
+class InstructorAddPersonalTrainingView(generics.ListCreateAPIView):
     """
     post:
         add personal training to instructor's schedule
         day - day of week
         time from 9:00 to 20:00
     """
-
-    def post(self, request, *args, **kwargs):
+    allowed_methods = ["POST"]
+    serializer_class = InstructorAddPersonalTrainingSerializer
+    def post(self, request):
         role = get_role_json(request)
         if not role['is_instructor']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'}, status=404)
 
-        day = kwargs["day"]
-        time_raw = kwargs["time"]
+        day = request.data["day"]
+        time_raw = request.data["time"]
         time = datetime.datetime.strptime(time_raw, '%H:%M').time()
 
         flag_rec = InstructorSheduleRepository.read_filtered(request.user, {"day_of_week": day,

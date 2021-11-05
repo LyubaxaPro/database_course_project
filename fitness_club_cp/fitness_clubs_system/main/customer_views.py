@@ -11,11 +11,10 @@ GroupClassesSerializer, GroupClassesCustomersRecordsSerializer, InstructorsSeria
 AdminRecordsSerializer, InstructorSheduleSerializer, AInstructorSheduleCustomersSerializer, PricesSerializer, \
 SpecialOffersSerializer, InstructorPersonalTrainingsLogsSerializer, AdminGroupClassesLogsSerializer, FitnessClubsSerializer
 from .forms import *
-from api.customer_views import CustomerProfileView, CustomerEditProfileView, CustomerEditProfilePutView, \
-    CustomerEditProfileAddMeasureView, CustomerEditProfileDeleteMeasureView, CustomerTrainingRecordsView, \
-    CustomerDeletePersonalTrainingRecordView, CustomerDeleteGroupTrainingRecordView, \
-    CustomerAddGroupClassesRecordView, CustomerAddPersonalTrainingRecordView, CustomerAppointmentToInstructorView,\
-    CustomerDeleteAppointmentToInstructorView, CustomerChangeAppointmentToInstructorView
+from api.customer_views import CustomerProfileView, CustomerEditProfileView, \
+    CustomerEditProfileMeasureView, CustomerTrainingRecordsView, \
+    CustomerCreatePersonalTrainingRecordView, CustomerDeletePersonalTrainingRecordView, CustomerDeleteGroupTrainingRecordView, \
+    CustomerAddGroupClassesRecordView, CustomerAppointmentToInstructorView
 
 def customer_profile(request):
     view = CustomerProfileView()
@@ -30,9 +29,10 @@ def edit_customer_profile(request):
         customer_form = CustomerEditProfileForm(request.POST, instance=customer)
         customer_form.actual_user = request.user
         if customer_form.is_valid():
-            view = CustomerEditProfilePutView()
+            view = CustomerEditProfileView()
             cleaned_data = customer_form.cleaned_data
-            view.put(request=request, **cleaned_data)
+            request.data = cleaned_data
+            view.put(request=request)
 
             return redirect('customer_profile')
     else:
@@ -46,12 +46,13 @@ def add_measure(request):
     weight = request.GET.get("weight")
     date = request.GET.get("date")
 
-    view = CustomerEditProfileAddMeasureView()
-    data = view.put(request, **{'weight': weight, 'date': date}).data
+    view = CustomerEditProfileMeasureView()
+    request.data = {'weight': weight, 'date': date}
+    data = view.put(request).data
     return JsonResponse(data, safe=False)
 
 def delete_measure(request):
-    view = CustomerEditProfileDeleteMeasureView()
+    view = CustomerEditProfileMeasureView()
     data = view.delete(request).data
     return JsonResponse(data, safe=False)
 
@@ -77,39 +78,40 @@ def add_group_class_record(request):
     shedule_id = request.GET.get("shedule_id")
 
     view = CustomerAddGroupClassesRecordView()
-    view.post(request, **{'date_raw': date_raw, 'shedule_id': shedule_id})
+    request.data = {'date_raw': date_raw, 'shedule_id': shedule_id}
+    view.post(request)
 
     return JsonResponse({'q': []}, safe=False)
-
 
 def add_personal_training_record(request):
     i_shedule_id = request.GET.get("i_shedule_id")
     date_raw = request.GET.get("date")
 
-    view = CustomerAddPersonalTrainingRecordView()
-    view.post(request, **{'date_raw': date_raw, 'i_shedule_id': i_shedule_id})
+    view = CustomerCreatePersonalTrainingRecordView()
+    request.data = {'date_raw': date_raw, 'i_shedule_id': i_shedule_id}
+    view.post(request)
 
     return JsonResponse({'q': []}, safe=False)
 
 def appointment_to_instructor(request):
     instructor_id = request.GET.get("instructor_id")
-
+    request.data = {'instructor_id': instructor_id}
     view = CustomerAppointmentToInstructorView()
-    view.put(request, **{'instructor_id': instructor_id})
+    view.post(request)
 
     return JsonResponse({'q': []}, safe=False)
 
 def delete_appointment_to_instructor(request):
-    view = CustomerDeleteAppointmentToInstructorView()
+    view = CustomerAppointmentToInstructorView()
     view.delete(request)
 
     return JsonResponse({'q': []}, safe=False)
 
 def replace_appointment_to_instructor(request):
     instructor_id = request.GET.get("instructor_id")
-
-    view = CustomerChangeAppointmentToInstructorView()
-    view.put(request, **{'instructor_id': instructor_id})
+    request.data = {'instructor_id': instructor_id}
+    view = CustomerAppointmentToInstructorView()
+    view.put(request)
 
     return JsonResponse({'q': []}, safe=False)
 

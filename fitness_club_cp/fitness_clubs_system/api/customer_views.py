@@ -1,3 +1,9 @@
+from gunicorn.http import body
+from rest_framework import generics
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
+from rest_framework.schemas import AutoSchema, coreapi
+
 from .role import *
 from .form_classes_data import *
 from .instructor_schedule import *
@@ -68,12 +74,16 @@ class CustomerProfileView(APIView):
 
         return Response(data)
 
-class CustomerEditProfileView(APIView):
+class CustomerEditProfileView(generics.ListCreateAPIView):
     """
     get:
         get information to render page with edit form
-    """
 
+    put:
+        put new information to render page with edit form
+        day_of_birth format is 1999-12-9
+    """
+    allowed_methods = ["PUT", "GET"]
     def get(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
@@ -85,18 +95,14 @@ class CustomerEditProfileView(APIView):
 
         return Response(data)
 
-class CustomerEditProfilePutView(APIView):
-    """
-    put:
-        put new information to render page with edit form
-        day_of_birth format is 1999-12-9
-    """
-    def put(self, request, *args, **kwargs):
+    serializer_class = EditInstructorProfileSerializer
+    def put(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
-        cleaned_data = kwargs
+
+        cleaned_data = request.data
         if type(cleaned_data['day_of_birth']) == str:
             dt_string = cleaned_data['day_of_birth']
             format = "%Y-%m-%d"
@@ -109,20 +115,24 @@ class CustomerEditProfilePutView(APIView):
         return JsonResponse({'status': 'Ok', 'message': 'You change customer profile data'},
                             status=200)
 
-class CustomerEditProfileAddMeasureView(APIView):
+class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
     """
     put:
         add new measure to customers measures
         date format is 1999-12-9
+    delete:
+        delete last measure from customers measures
     """
-    def put(self, request, *args, **kwargs):
+    allowed_methods = ["PUT", "DELETE"]
+    serializer_class = CustomerMeasureSerializer
+    def put(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
 
-        weight = kwargs["weight"]
-        date = kwargs["date"]
+        weight = request.data["weight"]
+        date = request.data["date"]
 
         customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
         old_weights = customer.measured_weights
@@ -157,11 +167,6 @@ class CustomerEditProfileAddMeasureView(APIView):
 
         return Response(data)
 
-class CustomerEditProfileDeleteMeasureView(APIView):
-    """
-    delete:
-        delete last measure from customers measures
-    """
     def delete(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
@@ -315,6 +320,42 @@ class CustomerTrainingRecordsView(APIView):
 
         return Response(data)
 
+class CustomerCreatePersonalTrainingRecordView(generics.ListCreateAPIView):
+    """
+    post:
+        create new record for personal training
+    """
+    allowed_methods = ["POST"]
+    serializer_class = CustomerPersonalTrainingSerializer
+    def post(self, request):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        i_shedule_id = request.data["i_shedule_id"]
+        date_raw = request.data["date_raw"]
+
+        date = datetime.datetime.strptime(date_raw, "%Y-%m-%d").date()
+        new_record = InstructorSheduleCustomers()
+        role = get_role_json(request)
+        new_record.customer_id = role['customer']['customer_id']
+        new_record.training_date = date
+        new_record.i_shedule_id = i_shedule_id
+
+        if role['customer']['instructor'] == None:
+            return JsonResponse({'status': 'Ok', 'message': "User don't have instructor"}, status=405)
+
+        club_schedule = InstructorSheduleRepository.read_filtered(request.user,
+                                                                    {'i_shedule_id': i_shedule_id,
+                                                                     'instructor': role['customer']['instructor']})
+
+        if len(club_schedule) > 0:
+            InstructorSheduleCustomersRepository.create(request.user, new_record)
+            return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
+
+        return JsonResponse({'status': 'false', 'message': 'Wrong i_schedule_id'}, status=405)
+
 class CustomerDeletePersonalTrainingRecordView(APIView):
     """
     delete:
@@ -341,63 +382,31 @@ class CustomerDeletePersonalTrainingRecordView(APIView):
 
         return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
 
-class CustomerAddPersonalTrainingRecordView(APIView):
-    """
-    post:
-        create new record for personal training
-    """
-    def post(self, request, *args, **kwargs):
-        role = get_role_json(request)
-        if not role['is_customer']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
 
-        i_shedule_id = kwargs["i_shedule_id"]
-        date_raw = kwargs["date_raw"]
-
-        date = datetime.datetime.strptime(date_raw, "%Y-%m-%d").date()
-        new_record = InstructorSheduleCustomers()
-        role = get_role_json(request)
-        new_record.customer_id = role['customer']['customer_id']
-        new_record.training_date = date
-        new_record.i_shedule_id = i_shedule_id
-
-        if role['customer']['instructor'] == None:
-            return JsonResponse({'status': 'Ok', 'message': "User don't have instructor"}, status=405)
-
-        club_schedule = InstructorSheduleRepository.read_filtered(request.user,
-                                                                    {'i_shedule_id': i_shedule_id,
-                                                                     'instructor': role['customer']['instructor']})
-
-        if len(club_schedule) > 0:
-            InstructorSheduleCustomersRepository.create(request.user, new_record)
-            return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
-
-        return JsonResponse({'status': 'false', 'message': 'Wrong i_schedule_id'}, status=405)
-
-
-class CustomerAddGroupClassesRecordView(APIView):
+class CustomerAddGroupClassesRecordView(generics.ListCreateAPIView):
     """
     post:
         create new record for group classes
     """
-    def post(self, request, *args, **kwargs):
+    allowed_methods = ["POST"]
+    serializer_class = CustomerGroupTrainingSerializer
+    def post(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
 
         new_record = GroupClassesCustomersRecords()
-        date_raw = kwargs["date_raw"]
+        date_raw = request.data["date_raw"]
         date = datetime.datetime.strptime(date_raw, "%Y-%m-%d").date()
         new_record.class_date = date
-        shedule_id = kwargs["shedule_id"]
+        shedule_id = request.data["shedule_id"]
 
         club_id = role['user']['club']
         club_schedule = GroupClassesSheduleRepository.read_filtered(request.user, {'shedule_id': shedule_id, "club_id": club_id})
 
         if len(club_schedule) > 0:
-            new_record.shedule_id = kwargs["shedule_id"]
+            new_record.shedule_id = request.data["shedule_id"]
             new_record.customer_id = role['customer']['customer_id']
 
             GroupClassesCustomersRecordsRepository.create(request.user, new_record)
@@ -431,17 +440,23 @@ class CustomerDeleteGroupTrainingRecordView(APIView):
 
         return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
 
-class CustomerAppointmentToInstructorView(APIView):
+class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
     """
-    put:
+    post:
         appoint customer to instructor
+    put:
+        change appoint customer to instructor
+    delete:
+        delete appoint customer to instructor
     """
-    def put(self, request, *args, **kwargs):
+    allowed_methods = ["PUT", "POST", "DELETE"]
+    serializer_class = CustomerAppointSerializer
+    def post(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
-        instructor_id = kwargs["instructor_id"]
+        instructor_id = request.data["instructor_id"]
         instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
@@ -456,18 +471,13 @@ class CustomerAppointmentToInstructorView(APIView):
 
         return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=405)
 
-class CustomerChangeAppointmentToInstructorView(APIView):
-    """
-    put:
-        change appoint customer to instructor
-    """
-    def put(self, request, *args, **kwargs):
+    def put(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
                                 status=404)
 
-        instructor_id = kwargs["instructor_id"]
+        instructor_id = request.data["instructor_id"]
         instructor = InstructorsRepository.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
@@ -482,6 +492,17 @@ class CustomerChangeAppointmentToInstructorView(APIView):
             return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
 
         return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=405)
+
+    def delete(self, request):
+        role = get_role_json(request)
+        if not role['is_customer']:
+            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
+                                status=404)
+
+        delete_future_records_for_personal_trainings(request)
+        CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': None})
+
+        return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
 
 def delete_future_records_for_personal_trainings(request):
     role = get_role_json(request)
@@ -505,19 +526,3 @@ def delete_future_records_for_personal_trainings(request):
                                                                      {'i_shedule_id': record.i_shedule_id})
             if len(shedule_time) != 0 and shedule_time[0].training_time > time_today:
                 InstructorSheduleCustomersRepository.delete_filtered(request.user, {'record_id': record.record_id})
-
-class CustomerDeleteAppointmentToInstructorView(APIView):
-    """
-    delete:
-        delete appoint customer to instructor
-    """
-    def delete(self, request):
-        role = get_role_json(request)
-        if not role['is_customer']:
-            return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
-
-        delete_future_records_for_personal_trainings(request)
-        CustomersRepository.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': None})
-
-        return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)

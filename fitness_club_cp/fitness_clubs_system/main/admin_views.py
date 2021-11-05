@@ -7,7 +7,7 @@ from manager.repositories import GroupClassesRepository, \
     AdminRecordsRepository, CustomUserRepository, FitnessClubsRepository, CustomersRepository
 
 from .forms import *
-from api.admin_views import AdminProfileView, AdminGroupClassesView, AdminAddGroupClassesView,\
+from api.admin_views import AdminProfileView, AdminGroupClassesView,\
     AdminDeleteGroupClassesView, AdminDeleteSpecialOfferView, AdminAdminSpecialOfferView, AdminStatisticsView, \
     AdminActivateInstructorView, AdminRejectInstructorView
 
@@ -27,10 +27,10 @@ def add_group_class_in_shedule(request):
     instructor_id = request.GET.get("instructor_id")
     class_id = request.GET.get("class_id")
     maximum_quantity = request.GET.get("maximum_quantity")
-
-    view = AdminAddGroupClassesView()
-    view.post(request, **{'day':day, 'time': time_raw, 'instructor_id': instructor_id, 'class_id': class_id,
-                                  'maximum_quantity': maximum_quantity})
+    request.data = {'day':day, 'time': time_raw, 'instructor_id': instructor_id, 'class_id': class_id,
+                                  'maximum_quantity': maximum_quantity}
+    view = AdminGroupClassesView()
+    view.post(request)
     return JsonResponse({'q': []}, safe=False)
 
 def delete_group_class_in_shedule(request):
@@ -52,7 +52,8 @@ def add_special_offer_by_admin(request):
     offer_description = request.GET.get("offer_description")
 
     view = AdminAdminSpecialOfferView()
-    view.post(request, **{'offer_name':offer_name, 'offer_description': offer_description})
+    request.data = {'offer_name':offer_name, 'offer_description': offer_description}
+    view.post(request)
 
     return JsonResponse({'q': []}, safe=False)
 
@@ -66,7 +67,8 @@ def add_new_instructor(request):
     instructor_id = request.GET.get("instructor_id")
 
     view = AdminActivateInstructorView()
-    view.patch(request, **{'instructor_id': instructor_id})
+    request.data = {'instructor_id': instructor_id}
+    view.patch(request)
     return JsonResponse({'q': []}, safe=False)
 
 def delete_new_instructor(request):

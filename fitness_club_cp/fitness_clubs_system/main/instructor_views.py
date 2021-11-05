@@ -8,7 +8,7 @@ from manager.repositories import GroupClassesRepository, \
 
 from .forms import *
 from api.instructor_views import InstructorView, InstructorAttachedCustomersView, InstructorEditProfileView,\
-    InstructorEditProfilePostView, InstructorAddPersonalTrainingView, InstructorDeleteProfileChangesView, \
+ InstructorAddPersonalTrainingView, InstructorDeleteProfileChangesView, \
     InstructorDeletePersonalTrainingView, InstructorTrainingRecordsView
 
 def instructor_profile(request):
@@ -31,9 +31,9 @@ def edit_instructor(request):
         instructor_form.actual_user = request.user
 
         if instructor_form.is_valid():
-            view = InstructorEditProfilePostView()
-            cleaned_data = instructor_form.cleaned_data
-            view.put(request=request, **cleaned_data)
+            view = InstructorEditProfileView()
+            request.data = instructor_form.cleaned_data
+            view.put(request=request)
 
             return redirect('instructor_profile')
     else:
@@ -46,9 +46,9 @@ def edit_instructor(request):
 def instructor_add_personal_training(request):
     day = request.GET.get("day")
     time_raw = request.GET.get("time")
-
+    request.data = {"day": day, "time": time_raw}
     view = InstructorAddPersonalTrainingView()
-    view.post(request, **{"day": day, "time": time_raw})
+    view.post(request)
 
     return JsonResponse({'q': []}, safe=False)
 
