@@ -1,4 +1,4 @@
-from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService,\
+from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
     GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\
     CustomersService, InstructorSheduleService, GroupClassesCustomersRecordsService, InstructorSheduleCustomersService,\
     AdministratorsService, AdminRecordsService, InstructorPersonalTrainingsLogsService, AdminGroupClassesLogsService

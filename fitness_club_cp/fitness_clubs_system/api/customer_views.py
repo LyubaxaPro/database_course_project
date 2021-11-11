@@ -13,7 +13,7 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
-from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService,\
+from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
     GroupClassesSheduleService, InstructorsService, SpecialOffersService, PricesService, \
     GroupClassesCustomersRecordsService, InstructorSheduleCustomersService, \
     AdminRecordsService, InstructorPersonalTrainingsLogsService, CustomUserService, \

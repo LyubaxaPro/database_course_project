@@ -4,6 +4,7 @@ from .customer_views import *
 from .instructor_views import *
 from .admin_views import *
 urlpatterns = [
+    path('auth/', AuthAPIView.as_view()),
     # common urls
     path('info/index/', IndexView.as_view()),
     path('info/address/', AddressView.as_view()),

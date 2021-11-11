@@ -4,7 +4,7 @@ from .role import *
 from .form_classes_data import *
 from django.utils import timezone
 
-from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService, \
+from manager.services import ServicesService, FitnessClubsService, GroupClassesService, \
     GroupClassesSheduleService, InstructorsService, SpecialOffersService, PricesService, \
     GroupClassesCustomersRecordsService, InstructorSheduleCustomersService, \
     AdminRecordsService, InstructorPersonalTrainingsLogsService, CustomUserService, \

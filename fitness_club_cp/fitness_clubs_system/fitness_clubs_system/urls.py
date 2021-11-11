@@ -30,7 +30,8 @@ from rest_framework import permissions
 schema_view = get_schema_view(  # new
     openapi.Info(
         title="Swagger Fitness club system",
-        default_version='v1',
+        default_version='3.0.0',
+_version='2.0',
         description="A personal project aimed at working with a network of fitness clubs in three roles: user, instructors, administrator.",
         terms_of_service="https://smartbear.com/terms-of-use/",
         contact=openapi.Contact(email="lyubaxova@mail.ru"),
@@ -42,7 +43,7 @@ schema_view = get_schema_view(  # new
 )
 
 urlpatterns = [
-    path('swagger-ui/', TemplateView.as_view(template_name='swaggerui/swaggerui.html',
+    path('api/v1/', TemplateView.as_view(template_name='swaggerui/swaggerui.html',
                                               extra_context={'schema_url': 'openapi-schema'}),name='swagger-ui'),
     url(r'^swagger(?P<format>\.json|\.yaml)$',schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('admin/', admin.site.urls),

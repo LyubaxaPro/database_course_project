@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-e(bg1o72-_*5$8pdm986a+ucdj)!_l)t2amqlabwb4t)n)g5_a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'HOST IP', 'DOMAIN NAIM', 'localhost', '127.0.0.1', 'golden_owl;']
+INTERNAL_IPS = ['127.0.0.1']
+ALLOWED_HOSTS = ['progoldenowl.com', '127.0.0.1', 'backend']
 
 
 # Application definition

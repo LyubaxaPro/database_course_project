@@ -1,0 +1,749 @@
+swagger: '2.0'
+info:
+  title: Swagger Fitness club system
+  description: 'A personal project aimed at working with a network of fitness clubs
+    in three roles: user, instructors, administrator.'
+  termsOfService: https://smartbear.com/terms-of-use/
+  contact:
+    email: lyubaxova@mail.ru
+  license:
+    name: BSD License
+  version: v1
+host: 127.0.0.1:8000
+schemes:
+  - http
+basePath: /api
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  Basic:
+    type: basic
+security:
+  - Basic: []
+paths:
+  /administrator/group_classes/:
+    get:
+      operationId: administrator_group_classes_list
+      description: get group classes schedule
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AdminGroupClassesView'
+      tags:
+        - administrator
+    post:
+      operationId: administrator_group_classes_create
+      description: create group class
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AdminGroupClassesView'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/AdminGroupClassesView'
+      tags:
+        - administrator
+    parameters: []
+  /administrator/group_classes/{shedule_id}/:
+    delete:
+      operationId: administrator_group_classes_delete
+      description: delete group class
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - administrator
+    parameters:
+      - name: shedule_id
+        in: path
+        required: true
+        type: string
+  /administrator/instructors/:
+    patch:
+      operationId: administrator_instructors_partial_update
+      description: activate new instructor
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AdminActivateInstructors'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/AdminActivateInstructors'
+      tags:
+        - administrator
+    parameters: []
+  /administrator/instructors/{user_id}/:
+    delete:
+      operationId: administrator_instructors_delete
+      description: reject new instructor
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - administrator
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
+  /administrator/profile/:
+    get:
+      operationId: administrator_profile_list
+      description: get information for admin profile
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - administrator
+    parameters: []
+  /administrator/special_offers/:
+    post:
+      operationId: administrator_special_offers_create
+      description: create special offer
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AdminSpecialOffer'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/AdminSpecialOffer'
+      tags:
+        - administrator
+    parameters: []
+  /administrator/special_offers/{offer_name}/:
+    delete:
+      operationId: administrator_special_offers_delete
+      description: delete special offer
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - administrator
+    parameters:
+      - name: offer_name
+        in: path
+        required: true
+        type: string
+  /administrator/statistics/{week_num}/:
+    get:
+      operationId: administrator_statistics_read
+      description: |-
+        get trainings statistics
+            week_num format 2021-W30
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - administrator
+    parameters:
+      - name: week_num
+        in: path
+        required: true
+        type: string
+  /customer/profile/:
+    get:
+      operationId: customer_profile_list
+      description: get information for customer profile
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - customer
+    parameters: []
+  /customer/profile/change/:
+    get:
+      operationId: customer_profile_change_list
+      description: get information to render page with edit form
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/EditInstructorProfile'
+      tags:
+        - customer
+    put:
+      operationId: customer_profile_change_update
+      description: |-
+        put new information to render page with edit form
+            day_of_birth format is 1999-12-9
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EditInstructorProfile'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/EditInstructorProfile'
+      tags:
+        - customer
+    parameters: []
+  /customer/profile/change/measure/:
+    put:
+      operationId: customer_profile_change_measure_update
+      description: |-
+        add new measure to customers measures
+            date format is 1999-12-9
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerMeasure'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CustomerMeasure'
+      tags:
+        - customer
+    delete:
+      operationId: customer_profile_change_measure_delete
+      description: delete last measure from customers measures
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - customer
+    parameters: []
+  /customer/training_records/:
+    get:
+      operationId: customer_training_records_list
+      description: get customer training records
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - customer
+    parameters: []
+  /customer/training_records/attachment/:
+    post:
+      operationId: customer_training_records_attachment_create
+      description: appoint customer to instructor
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerAppoint'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/CustomerAppoint'
+      tags:
+        - customer
+    put:
+      operationId: customer_training_records_attachment_update
+      description: change appoint customer to instructor
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerAppoint'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CustomerAppoint'
+      tags:
+        - customer
+    delete:
+      operationId: customer_training_records_attachment_delete
+      description: delete appoint customer to instructor
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - customer
+    parameters: []
+  /customer/training_records/group_classes/:
+    post:
+      operationId: customer_training_records_group_classes_create
+      description: create new record for group classes
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerGroupTraining'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/CustomerGroupTraining'
+      tags:
+        - customer
+    parameters: []
+  /customer/training_records/group_classes/{record_id}/:
+    delete:
+      operationId: customer_training_records_group_classes_delete
+      description: delete record for group training by record_id
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - customer
+    parameters:
+      - name: record_id
+        in: path
+        required: true
+        type: string
+  /customer/training_records/personal_training/:
+    post:
+      operationId: customer_training_records_personal_training_create
+      description: create new record for personal training
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerPersonalTraining'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/CustomerPersonalTraining'
+      tags:
+        - customer
+    parameters: []
+  /customer/training_records/personal_training/{record_id}/:
+    delete:
+      operationId: customer_training_records_personal_training_delete
+      description: delete record for personal training by record_id
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - customer
+    parameters:
+      - name: record_id
+        in: path
+        required: true
+        type: string
+  /info/address/:
+    get:
+      operationId: info_address_list
+      description: Return address of clubs
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters: []
+  /info/groupclasses_schedule/:
+    get:
+      operationId: info_groupclasses_schedule_list
+      description: get classes data for club with club_id = 1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters: []
+  /info/groupclasses_schedule/{club_id}/:
+    get:
+      operationId: info_groupclasses_schedule_read
+      description: get classes data for club with club_id
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters:
+      - name: club_id
+        in: path
+        required: true
+        type: string
+  /info/index/:
+    get:
+      operationId: info_index_list
+      description: Return home page info
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters: []
+  /info/instructors/:
+    get:
+      operationId: info_instructors_list
+      description: get list of club instrutors
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters: []
+  /info/instructors/{club_id}/:
+    get:
+      operationId: info_instructors_read
+      description: get list of instrutors for club with club_id
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters:
+      - name: club_id
+        in: path
+        required: true
+        type: string
+  /info/instructors/{id}/:
+    get:
+      operationId: info_instructors_read
+      description: "\u0418\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u043E\
+        \u0431 \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440\u0435"
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /info/prices/:
+    get:
+      operationId: info_prices_list
+      description: get prices and special offers
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters: []
+  /info/services/:
+    get:
+      operationId: info_services_list
+      description: Return list of services of clubs
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - info
+    parameters: []
+  /instructor/attached_customers:
+    get:
+      operationId: instructor_attached_customers_list
+      description: get information for attached customers
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - instructor
+    parameters: []
+  /instructor/personal_training/:
+    post:
+      operationId: instructor_personal_training_create
+      description: |-
+        add personal training to instructor's schedule
+            day - day of week
+            time from 9:00 to 20:00
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/InstructorAddPersonalTraining'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/InstructorAddPersonalTraining'
+      tags:
+        - instructor
+    parameters: []
+  /instructor/personal_training/{i_shedule_id}:
+    delete:
+      operationId: instructor_personal_training_delete
+      description: delete personal training from schedule
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - instructor
+    parameters:
+      - name: i_shedule_id
+        in: path
+        required: true
+        type: string
+  /instructor/profile/:
+    get:
+      operationId: instructor_profile_list
+      description: get information for instructor profile
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - instructor
+    parameters: []
+  /instructor/profile/change/:
+    get:
+      operationId: instructor_profile_change_list
+      description: get information to render page with edit form
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/EditInstructorProfile'
+      tags:
+        - instructor
+    put:
+      operationId: instructor_profile_change_update
+      description: |-
+        edit instructor info
+            education, achievements, specialization with ;
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EditInstructorProfile'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/EditInstructorProfile'
+      tags:
+        - instructor
+    parameters: []
+  /instructor/profile/change/{id}:
+    delete:
+      operationId: instructor_profile_change_delete
+      description: delete changes in instructor's profile
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - instructor
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /instructor/records/{week_num}:
+    get:
+      operationId: instructor_records_read
+      description: |-
+        get records from customers for week
+            format of week 2021-W41 ({year}-W{week num})
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - instructor
+    parameters:
+      - name: week_num
+        in: path
+        required: true
+        type: string
+definitions:
+  AdminGroupClassesView:
+    required:
+      - day
+      - time
+      - class_id
+      - maximum_quantity
+      - instructor_id
+    type: object
+    properties:
+      day:
+        title: Day
+        type: string
+        minLength: 1
+      time:
+        title: Time
+        type: string
+        minLength: 1
+      class_id:
+        title: Class id
+        type: integer
+      maximum_quantity:
+        title: Maximum quantity
+        type: integer
+      instructor_id:
+        title: Instructor id
+        type: integer
+  AdminActivateInstructors:
+    required:
+      - instructor_id
+    type: object
+    properties:
+      instructor_id:
+        title: Instructor id
+        type: integer
+  AdminSpecialOffer:
+    type: object
+    properties:
+      offer_name:
+        title: Offer name
+        type: string
+        x-nullable: true
+      offer_description:
+        title: Offer description
+        type: string
+        x-nullable: true
+  EditInstructorProfile:
+    required:
+      - name
+      - surname
+      - patronymic
+      - education
+      - experience
+      - achievements
+      - specialization
+    type: object
+    properties:
+      name:
+        title: "\u0418\u043C\u044F"
+        type: string
+        maxLength: 50
+        minLength: 1
+      surname:
+        title: "\u0424\u0430\u043C\u0438\u043B\u0438\u044F"
+        type: string
+        maxLength: 50
+        minLength: 1
+      patronymic:
+        title: "\u041E\u0442\u0447\u0435\u0441\u0442\u0432\u043E"
+        type: string
+        maxLength: 50
+        minLength: 1
+      education:
+        type: array
+        items:
+          title: Education
+          type: string
+          x-nullable: true
+      experience:
+        title: "\u0421\u0442\u0430\u0436"
+        type: integer
+        maximum: 2147483647
+        minimum: -2147483648
+      achievements:
+        type: array
+        items:
+          title: Achievements
+          type: string
+          x-nullable: true
+      specialization:
+        type: array
+        items:
+          title: Specialization
+          type: string
+          x-nullable: true
+  CustomerMeasure:
+    required:
+      - date
+      - weight
+    type: object
+    properties:
+      date:
+        title: Date
+        type: string
+        format: date
+      weight:
+        title: Weight
+        type: integer
+  CustomerAppoint:
+    required:
+      - instructor_id
+    type: object
+    properties:
+      instructor_id:
+        title: Instructor id
+        type: integer
+  CustomerGroupTraining:
+    required:
+      - shedule_id
+      - date_raw
+    type: object
+    properties:
+      shedule_id:
+        title: Shedule id
+        type: integer
+      date_raw:
+        title: Date raw
+        type: string
+        minLength: 1
+  CustomerPersonalTraining:
+    required:
+      - i_shedule_id
+      - date_raw
+    type: object
+    properties:
+      i_shedule_id:
+        title: I shedule id
+        type: integer
+      date_raw:
+        title: Date raw
+        type: string
+        minLength: 1
+  InstructorAddPersonalTraining:
+    required:
+      - day
+      - time
+    type: object
+    properties:
+      day:
+        title: Day
+        type: string
+        minLength: 1
+      time:
+        title: Time
+        type: string
+        minLength: 1

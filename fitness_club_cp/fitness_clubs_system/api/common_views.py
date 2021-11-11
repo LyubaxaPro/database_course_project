@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from manager.services import CustomUserService, CustomersService, InstructorsService, AdministratorsService,\
 AdminRecordsService, GroupClassesService, GroupClassesCustomersRecordsService, GroupClassesSheduleService\
     ,InstructorSheduleService, InstructorSheduleCustomersService, PricesService, ServicesService, FitnessClubsService,\
@@ -8,12 +9,45 @@ from rest_framework.views import APIView
 from .role import *
 from .form_classes_data import *
 from .instructor_schedule import *
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
+from django.contrib.auth import authenticate, login
+
+class AuthAPIView(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = AuthSerializer
+
+    def post(self, request):
+        user = request.data.get('user', {})
+        #
+        # email = request.POST['email']
+        # password = request.POST['password']
+        #
+        # # authenticate user then login
+        # user = authenticate(email=email, password=password)
+        # login(request, user)
+
+        # # Паттерн создания сериализатора, валидации и сохранения - довольно
+        # # стандартный, и его можно часто увидеть в реальных проектах.
+        print("AAAAAAAAAAAA")
+        serializer = self.serializer_class(data=user)
+        print(serializer)
+        serializer.is_valid(raise_exception=True)
+        print("AAA")
+        serializer.save()
+        print(serializer.data['email'])
+        #
+        # return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse({'status': 'Ok', 'message': 'Ok'},
+                            status=200)
 
 class IndexView(APIView):
     """
     get:
         Return home page info
     """
+
+    # permission_classes = (IsAuthenticated)
     def get(self, request):
         data = {
             'title': 'Главная страница',

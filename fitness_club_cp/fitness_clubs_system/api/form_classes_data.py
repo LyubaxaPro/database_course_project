@@ -1,8 +1,8 @@
-from manager.repositories import ServicesService, FitnessClubsService, GroupClassesService,\
+from manager.services import FitnessClubsService, GroupClassesService,\
     GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\
     CustomersService, InstructorSheduleService, GroupClassesCustomersRecordsService, InstructorSheduleCustomersService,\
     AdministratorsService, AdminRecordsService, InstructorPersonalTrainingsLogsService, AdminGroupClassesLogsService
-
+import time
 from .week import *
 import json
 
@@ -153,4 +153,3 @@ def form_classes_data_for_tarif_group_classes(user, customer_id, club_id, tarif,
                                                                                                 'class_not_done': class_not_done,
                                                                                                 'more_than_maximum_quantity': more_than_maximum_quantity})
     return classes_data, dates
-##############################################
