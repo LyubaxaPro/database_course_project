@@ -129,12 +129,9 @@ class AdminSpecialOfferSerializer(serializers.ModelSerializer):
 class AdminActivateInstructorsSerializer(serializers.Serializer):
     instructor_id = serializers.IntegerField()
 
-class AuthSerializer(serializers.ModelSerializer):
-
-    # Клиентская сторона не должна иметь возможность отправлять токен вместе с
-    # запросом на регистрацию. Сделаем его доступным только на чтение.
-    token = serializers.CharField(max_length=255, read_only=True)
+class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'token']
+        fields = ['email', 'role', 'club', 'login', 'password']
+        extra_kwargs = {'password': {'write_only': True}}

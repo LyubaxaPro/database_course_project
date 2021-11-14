@@ -1,14 +1,16 @@
+from django.conf.urls import url
 from django.urls import path
 from .common_views import *
 from .customer_views import *
 from .instructor_views import *
 from .admin_views import *
 urlpatterns = [
-    path('auth/', AuthAPIView.as_view()),
+    url(r'^create/$', CreateUserApiView.as_view()),
+    url(r'^auth/$', AuthUserView.as_view()),
     # common urls
     path('info/index/', IndexView.as_view()),
-    path('info/address/', AddressView.as_view()),
-    path('info/services/', ServicesView.as_view()),
+    path('info/address/', AddressInfoView.as_view()),
+    path('info/services/', ServicesInfoView.as_view()),
     path('info/groupclasses_schedule/', ClubGroupClassesView.as_view()),
     path('info/groupclasses_schedule/<int:club_id>/', ClubGroupClassesScheduleForClubView.as_view()),
     path('info/instructors/', ClubInstructorsView.as_view()),

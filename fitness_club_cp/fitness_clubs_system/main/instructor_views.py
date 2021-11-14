@@ -1,11 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-
-from manager.repositories import GroupClassesRepository, \
-    InstructorsRepository, SpecialOffersRepository, \
-    GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
-    AdminRecordsRepository, CustomUserRepository, FitnessClubsRepository, CustomersRepository
-
+from manager.services import InstructorsService
 from .forms import *
 from api.instructor_views import InstructorView, InstructorAttachedCustomersView, InstructorEditProfileView,\
  InstructorAddPersonalTrainingView, InstructorDeleteProfileChangesView, \
@@ -23,7 +18,7 @@ def instructor_attached_customers(request):
 
 
 def edit_instructor(request):
-    instructor = InstructorsRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+    instructor = InstructorsService.read_filtered(request.user, {'user_id': request.user.pk})[0]
 
     if request.method == 'POST':
 

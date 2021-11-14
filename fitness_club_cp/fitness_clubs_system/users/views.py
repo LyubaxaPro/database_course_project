@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from .forms import CustomUserSignUpForm
 from .models import CustomUser
 from main.forms import InstructorProfileForm, CustomerProfileForm
-from manager.repositories import InstructorsRepository,CustomersRepository
+from manager.services import InstructorsService,CustomersService
 
 
 def auth_manually(request):
@@ -74,7 +74,7 @@ class InstructorSignUpView(View):
             instructor = profile_form.save(commit=False)
             instructor.user = user
             instructor.admin_id = user.club
-            InstructorsRepository.create(user, instructor)
+            InstructorsService.create(user, instructor)
             auth_manually(self.request)
             return redirect('home')
 
@@ -109,7 +109,7 @@ class CustomerSignUpView(View):
             customer = profile_form.save(commit=False)
             customer.user = user
             customer.customer_id = user.id
-            CustomersRepository.create(user, customer)
+            CustomersService.create(user, customer)
             auth_manually(self.request)
             return redirect('home')
 

@@ -28,7 +28,7 @@ class AdminProfileView(APIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         fitness_club = FitnessClubsService.read_filtered(request.user, {'club_id': role['user']['club']})
         address = fitness_club[0].city + ", " + fitness_club[0].address
@@ -84,7 +84,7 @@ class AdminGroupClassesView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         week = get_week()
         club_id = role['user']['club']
@@ -113,7 +113,7 @@ class AdminGroupClassesView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         day = request.data["day"]
         time_raw = request.data["time"]
@@ -124,23 +124,23 @@ class AdminGroupClassesView(generics.ListCreateAPIView):
 
         flag_class = GroupClassesService.read_filtered(request.user, {'class_id': class_id})
         if len(flag_class) == 0:
-            return JsonResponse({'status': 'false', 'message': 'Wrong class_id'}, status=405)
+            return JsonResponse({'status': 'false', 'message': 'Wrong class_id'}, status=400)
 
         instructor_id = request.data["instructor_id"]
         instructor = InstructorsService.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
-            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
+            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=400)
 
         instructor_club = CustomUserService.read_filtered(request.user, {'email': instructor[0].user})[0].club
         if instructor_club != club_id:
-            return JsonResponse({'status': 'false', 'message': "This instructor don't work in this club"}, status=405)
+            return JsonResponse({'status': 'false', 'message': "This instructor don't work in this club"}, status=400)
 
         busy_instructors = GroupClassesSheduleService.read_filtered(request.user, {'class_time': time, 'day_of_week': day})
         for i in busy_instructors:
 
             if int(instructor_id) == i.instructor.instructor_id:
                 return JsonResponse({'status': 'false', 'message': "This instructor already busy"},
-                                    status=405)
+                                    status=400)
 
         new_record = GroupClassesShedule()
         new_record.class_field = GroupClassesService.read_filtered(request.user, {'class_id': class_id})[0]
@@ -166,13 +166,13 @@ class AdminDeleteGroupClassesView(APIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         shedule_id = kwargs["shedule_id"]
         flag = GroupClassesSheduleService.read_filtered(request.user, {'shedule_id': shedule_id})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "Don't have this record"},
-                                status=405)
+                                status=400)
 
         GroupClassesSheduleService.delete_filtered(request.user, {'shedule_id': shedule_id})
 
@@ -190,13 +190,13 @@ class AdminDeleteSpecialOfferView(APIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         offer_id = kwargs["offer_id"]
         flag = SpecialOffersService.read_filtered(request.user, {'offer_id': offer_id})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': "Don't have this record"},
-                                status=405)
+                                status=400)
         SpecialOffersService.delete_filtered(request.user, {'offer_id': offer_id})
 
         return JsonResponse({'status': 'Ok', 'message': 'You delete special offer'},
@@ -213,7 +213,7 @@ class AdminAdminSpecialOfferView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         offer_name = request.data["offer_name"]
         offer_description = request.data["offer_description"]
@@ -238,7 +238,7 @@ class AdminStatisticsView(APIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         week = get_week()
         selected_week = kwargs['week_num']
@@ -278,7 +278,7 @@ class AdminActivateInstructorView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         instructor_id = request.data["instructor_id"]
         InstructorsService.update_filtered(request.user, {'instructor_id': instructor_id}, {'is_active': True})
@@ -297,12 +297,12 @@ class AdminRejectInstructorView(APIView):
         role = get_role_json(request)
         if not role['is_admin']:
             return JsonResponse({'status': 'false', 'message': 'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
         user_id = kwargs["user_id"]
         flag = InstructorsService.read_filtered(request.user, {"user": user_id, "is_active": False})
         if len(flag) == 0:
             return JsonResponse({'status': 'false', 'message': 'Wrong id'},
-                                status=405)
+                                status=400)
 
         CustomUserService.delete_filtered(request.user, {'id': user_id})
 

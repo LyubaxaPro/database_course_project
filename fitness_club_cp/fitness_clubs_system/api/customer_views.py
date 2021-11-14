@@ -30,7 +30,7 @@ class CustomerProfileView(APIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         role = get_role_json(request)
         is_chart = True
@@ -88,7 +88,7 @@ class CustomerEditProfileView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         role = get_role_json(request)
         data = {'role': role}
@@ -100,7 +100,7 @@ class CustomerEditProfileView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         cleaned_data = request.data
         if type(cleaned_data['day_of_birth']) == str:
@@ -129,7 +129,7 @@ class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         weight = request.data["weight"]
         date = request.data["date"]
@@ -171,7 +171,7 @@ class CustomerEditProfileMeasureView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         customer = CustomersService.read_filtered(request.user, {'user_id': request.user.pk})[0]
         weights = customer.measured_weights
@@ -248,7 +248,7 @@ class CustomerTrainingRecordsView(APIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         week = get_week()
         selected_week = request.GET.get('week_num')
@@ -331,7 +331,7 @@ class CustomerCreatePersonalTrainingRecordView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         i_shedule_id = request.data["i_shedule_id"]
         date_raw = request.data["date_raw"]
@@ -344,7 +344,7 @@ class CustomerCreatePersonalTrainingRecordView(generics.ListCreateAPIView):
         new_record.i_shedule_id = i_shedule_id
 
         if role['customer']['instructor'] == None:
-            return JsonResponse({'status': 'Ok', 'message': "User don't have instructor"}, status=405)
+            return JsonResponse({'status': 'Ok', 'message': "User don't have instructor"}, status=400)
 
         club_schedule = InstructorSheduleService.read_filtered(request.user,
                                                                     {'i_shedule_id': i_shedule_id,
@@ -354,7 +354,7 @@ class CustomerCreatePersonalTrainingRecordView(generics.ListCreateAPIView):
             InstructorSheduleCustomersService.create(request.user, new_record)
             return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
 
-        return JsonResponse({'status': 'false', 'message': 'Wrong i_schedule_id'}, status=405)
+        return JsonResponse({'status': 'false', 'message': 'Wrong i_schedule_id'}, status=400)
 
 class CustomerDeletePersonalTrainingRecordView(APIView):
     """
@@ -365,7 +365,7 @@ class CustomerDeletePersonalTrainingRecordView(APIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         record_id = kwargs["record_id"]
 
@@ -380,7 +380,7 @@ class CustomerDeletePersonalTrainingRecordView(APIView):
                 InstructorSheduleCustomersService.delete_filtered(request.user, {'record_id': record_id})
                 return JsonResponse({'status': 'Ok', 'message': 'You delete personal training'}, status=200)
 
-        return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
+        return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=400)
 
 
 class CustomerAddGroupClassesRecordView(generics.ListCreateAPIView):
@@ -394,7 +394,7 @@ class CustomerAddGroupClassesRecordView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         new_record = GroupClassesCustomersRecords()
         date_raw = request.data["date_raw"]
@@ -412,7 +412,7 @@ class CustomerAddGroupClassesRecordView(generics.ListCreateAPIView):
             GroupClassesCustomersRecordsService.create(request.user, new_record)
             return JsonResponse({'status': 'Ok', 'message': 'New record created'}, status=200)
 
-        return JsonResponse({'status': 'false', 'message': 'Wrong schedule_id'}, status=405)
+        return JsonResponse({'status': 'false', 'message': 'Wrong schedule_id'}, status=400)
 
 class CustomerDeleteGroupTrainingRecordView(APIView):
     """
@@ -423,7 +423,7 @@ class CustomerDeleteGroupTrainingRecordView(APIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         record_id = kwargs["record_id"]
 
@@ -438,7 +438,7 @@ class CustomerDeleteGroupTrainingRecordView(APIView):
                 GroupClassesCustomersRecordsService.delete_filtered(request.user, {'record_id': record_id})
                 return JsonResponse({'status': 'Ok', 'message': 'You delete personal training'}, status=200)
 
-        return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=405)
+        return JsonResponse({'status': 'false', 'message': 'Wrong record_id!'}, status=400)
 
 class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
     """
@@ -455,11 +455,11 @@ class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
         instructor_id = request.data["instructor_id"]
         instructor = InstructorsService.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
-            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
+            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=400)
         instructor_club = CustomUserService.read_filtered(request.user, {'email' : instructor[0].user})[0].club
 
         club_id = role['user']['club']
@@ -469,18 +469,18 @@ class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
                                                 {'instructor_id': instructor_id})
             return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
 
-        return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=405)
+        return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=400)
 
     def put(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         instructor_id = request.data["instructor_id"]
         instructor = InstructorsService.read_filtered(request.user, {'instructor_id': instructor_id})
         if len(instructor) == 0:
-            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=405)
+            return JsonResponse({'status': 'false', 'message': 'Wrong instructor_id'}, status=400)
         instructor_club = CustomUserService.read_filtered(request.user, {'email' : instructor[0].user})[0].club
 
         club_id = role['user']['club']
@@ -491,13 +491,13 @@ class CustomerAppointmentToInstructorView(generics.ListCreateAPIView):
                                                 {'instructor_id': instructor_id})
             return JsonResponse({'status': 'Ok', 'message': 'Success'}, status=200)
 
-        return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=405)
+        return JsonResponse({'status': 'false', 'message': 'Instructor work in other club!'}, status=400)
 
     def delete(self, request):
         role = get_role_json(request)
         if not role['is_customer']:
             return JsonResponse({'status':'false','message':'You do not have rights to get the information'},
-                                status=404)
+                                status=403)
 
         delete_future_records_for_personal_trainings(request)
         CustomersService.update_filtered(request.user, {'user_id': request.user.pk}, {'instructor_id': None})

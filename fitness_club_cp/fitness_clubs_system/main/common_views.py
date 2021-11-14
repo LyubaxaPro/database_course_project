@@ -1,11 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from manager.repositories import GroupClassesRepository, \
-    InstructorsRepository, SpecialOffersRepository, \
-    GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
-    AdminRecordsRepository, CustomUserRepository, FitnessClubsRepository
-
 from .forms import *
 from api.common_views import IndexView, AddressView, ServicesView, ClubGroupClassesView, ClubInstructorsView, \
     ClubInstructorsDetailView, ClubGroupClassesScheduleForClubView, ClubInstructorsForClubView, PricesView

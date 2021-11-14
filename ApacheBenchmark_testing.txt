@@ -165,3 +165,117 @@ Percentage of the requests served within a certain time (ms)
   98%   1188
   99%   1191
  100%   1202 (longest request)
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+lyubaxapro@lyubaxapro-laptop:/etc/nginx/sites-available$ ab -c 300 -n 10000 http://127.0.0.1./api/v1/info/address/
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1. (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        nginx/1.18.0
+Server Hostname:        127.0.0.1.
+Server Port:            80
+
+Document Path:          /api/v1/info/address/
+Document Length:        1803 bytes
+
+Concurrency Level:      300
+Time taken for tests:   94.232 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      21060000 bytes
+HTML transferred:       18030000 bytes
+Requests per second:    106.12 [#/sec] (mean)
+Time per request:       2826.961 [ms] (mean)
+Time per request:       9.423 [ms] (mean, across all concurrent requests)
+Transfer rate:          218.25 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   1.0      0      10
+Processing:    10 2733 2285.1   3511    7135
+Waiting:       10 2733 2285.1   3510    7135
+Total:         10 2733 2285.3   3511    7140
+
+Percentage of the requests served within a certain time (ms)
+  50%   3511
+  66%   5012
+  75%   5014
+  80%   5016
+  90%   5022
+  95%   5030
+  98%   5531
+  99%   6084
+ 100%   7140 (longest request)
+
+ --------------------------------------------------------------------------------------------------------
+lyubaxapro@lyubaxapro-laptop:/etc/nginx/sites-available$ ab -c 300 -n 10000 http://127.0.0.1./api/v1/info/address/
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1. (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        nginx/1.18.0
+Server Hostname:        127.0.0.1.
+Server Port:            80
+
+Document Path:          /api/v1/info/address/
+Document Length:        1803 bytes
+
+Concurrency Level:      300
+Time taken for tests:   126.006 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      21060000 bytes
+HTML transferred:       18030000 bytes
+Requests per second:    79.36 [#/sec] (mean)
+Time per request:       3780.189 [ms] (mean)
+Time per request:       12.601 [ms] (mean, across all concurrent requests)
+Transfer rate:          163.22 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   1.1      0       9
+Processing:    10 3694 2145.2   5027    8621
+Waiting:       10 3694 2145.2   5026    8621
+Total:         10 3694 2145.4   5027    8626
+
+Percentage of the requests served within a certain time (ms)
+  50%   5027
+  66%   5038
+  75%   5045
+  80%   5049
+  90%   5065
+  95%   5114
+  98%   6263
+  99%   7416
+ 100%   8626 (longest request)

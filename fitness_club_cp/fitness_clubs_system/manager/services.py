@@ -1,4 +1,7 @@
-from .repositories import *
+from .common_repositories import *
+from .logs_repositories import *
+from .schedule_repositories import *
+from .users_repositories import *
 
 class CustomService():
 

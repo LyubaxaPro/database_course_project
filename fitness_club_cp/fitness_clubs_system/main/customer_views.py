@@ -1,10 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-
-from manager.repositories import GroupClassesRepository, \
-    InstructorsRepository, SpecialOffersRepository, \
-    GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
-    AdminRecordsRepository, CustomUserRepository, FitnessClubsRepository, CustomersRepository
+from manager.services import CustomersService
 
 from api.serializers import ServicesSerializer, CustomersSerializer, CustomUserSerializer, AdministratorsSerializer, \
 GroupClassesSerializer, GroupClassesCustomersRecordsSerializer, InstructorsSerializer, GroupClassesSheduleSerializer, \
@@ -23,7 +19,7 @@ def customer_profile(request):
     return render(request, "main/customer_profile.html", data)
 
 def edit_customer_profile(request):
-    customer = CustomersRepository.read_filtered(request.user, {'user_id': request.user.pk})[0]
+    customer = CustomersService.read_filtered(request.user, {'user_id': request.user.pk})[0]
 
     if request.method == 'POST':
         customer_form = CustomerEditProfileForm(request.POST, instance=customer)

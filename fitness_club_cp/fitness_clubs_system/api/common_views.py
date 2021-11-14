@@ -1,45 +1,61 @@
+import jwt
+from django.conf import settings
 from django.http import JsonResponse
 from manager.services import CustomUserService, CustomersService, InstructorsService, AdministratorsService,\
 AdminRecordsService, GroupClassesService, GroupClassesCustomersRecordsService, GroupClassesSheduleService\
     ,InstructorSheduleService, InstructorSheduleCustomersService, PricesService, ServicesService, FitnessClubsService,\
     SpecialOffersService, InstructorPersonalTrainingsLogsService, AdminGroupClassesLogsService
-
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_jwt.serializers import jwt_payload_handler
+
 from .role import *
 from .form_classes_data import *
 from .instructor_schedule import *
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, user_logged_in
 
-class AuthAPIView(APIView):
+
+class CreateUserApiView(APIView):
     permission_classes = (AllowAny,)
-    serializer_class = AuthSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
-        #
-        # email = request.POST['email']
-        # password = request.POST['password']
-        #
-        # # authenticate user then login
-        # user = authenticate(email=email, password=password)
-        # login(request, user)
-
-        # # Паттерн создания сериализатора, валидации и сохранения - довольно
-        # # стандартный, и его можно часто увидеть в реальных проектах.
-        print("AAAAAAAAAAAA")
-        serializer = self.serializer_class(data=user)
-        print(serializer)
+        user = request.data
+        serializer = CreateUserSerializer(data=user)
         serializer.is_valid(raise_exception=True)
-        print("AAA")
         serializer.save()
-        print(serializer.data['email'])
-        #
-        # return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse({'status': 'Ok', 'message': 'Ok'},
-                            status=200)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class AuthUserView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        try:
+            email = request.data['email']
+            password = request.data['password']
+            print(request.user)
+            user_qs = CustomUserService.read_filtered(request.user, {'email': email, 'password': password})
+            print(user_qs)
+            if user_qs:
+                try:
+                    user = user_qs[0]
+                    payload = jwt_payload_handler(user)
+                    token = jwt.encode(payload, settings.SECRET_KEY)
+                    user_details = {}
+                    user_details['email'] = "%s" % (user.email)
+                    user_details['token'] = token
+                    user_logged_in.send(sender=user.__class__, request=request, user=user)
+                    return Response(user_details, status=status.HTTP_200_OK)
+                except Exception as e:
+                    raise e
+            else:
+                res = {'error': 'can not authenticate with given credentials'}
+                return Response(res, status=status.HTTP_403_FORBIDDEN)
+        except KeyError:
+            res = {'error': 'please provide a email and password'}
+            return Response(res)
 
 class IndexView(APIView):
     """
@@ -47,7 +63,6 @@ class IndexView(APIView):
         Return home page info
     """
 
-    # permission_classes = (IsAuthenticated)
     def get(self, request):
         data = {
             'title': 'Главная страница',
@@ -55,27 +70,29 @@ class IndexView(APIView):
         }
         return Response(data)
 
-class AddressView(APIView):
+class AddressInfoView(APIView):
     """
     get:
         Return address of clubs
     """
+    permission_classes = [IsAuthenticated]
+    serializer_class = CreateUserSerializer
     def get(self, request):
         data = {
             'clubs': FitnessClubsSerializer(FitnessClubsService.read_all(request.user), many=True).data,
-            'role': get_role_json(request)
         }
         return Response(data)
 
-class ServicesView(APIView):
+class ServicesInfoView(APIView):
     """
     get:
         Return list of services of clubs
     """
+    permission_classes = [IsAuthenticated]
+    serializer_class = CreateUserSerializer
     def get(self, request):
         data = {
             'services':  ServicesSerializer(ServicesService.read_all(request.user), many=True).data,
-            'role': get_role_json(request)
         }
         return Response(data)
 
@@ -211,4 +228,27 @@ def get_qs_role(request):
 
 
 
+class AddressView(APIView):
+    """
+    get:
+        Return address of clubs
+    """
+    def get(self, request):
+        data = {
+            'clubs': FitnessClubsSerializer(FitnessClubsService.read_all(request.user), many=True).data,
+            'role': get_role_json(request)
+        }
+        return Response(data)
+
+class ServicesView(APIView):
+    """
+    get:
+        Return list of services of clubs
+    """
+    def get(self, request):
+        data = {
+            'services':  ServicesSerializer(ServicesService.read_all(request.user), many=True).data,
+            'role': get_role_json(request)
+        }
+        return Response(data)
 

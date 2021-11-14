@@ -1,3 +1,5 @@
+from datetime import time
+
 from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
     GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\
     CustomersService, InstructorSheduleService, GroupClassesCustomersRecordsService, InstructorSheduleCustomersService,\

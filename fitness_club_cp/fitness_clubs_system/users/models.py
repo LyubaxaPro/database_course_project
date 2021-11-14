@@ -10,7 +10,6 @@ from django.conf import settings
 class CustomUserManager(BaseUserManager):
 
     def create_user(self, email, password, role=None, **extra_fields):
-
         if not email:
             raise ValueError('The Email must be set')
 
@@ -35,7 +34,6 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email=email, password=password, role=role, **extra_fields)
-
 
 class FitnessClubs(models.Model):
     CLUB_CHOICES = (
@@ -104,25 +102,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-    @property
-    def token(self):
-        """
-        Позволяет получить токен пользователя путем вызова user.token, вместо
-        user._generate_jwt_token(). Декоратор @property выше делает это
-        возможным. token называется "динамическим свойством".
-        """
-        return self._generate_jwt_token()
+    def save(self, *args, **kwargs):
+        super(CustomUser, self).save(*args, **kwargs)
+        return self
 
-    def _generate_jwt_token(self):
-        """
-        Генерирует веб-токен JSON, в котором хранится идентификатор этого
-        пользователя, срок действия токена составляет 1 день от создания
-        """
-        dt = datetime.now() + timedelta(days=1)
 
-        token = jwt.encode({
-            'id': self.pk,
-            'exp': int(dt.strftime('%s'))
-        }, settings.SECRET_KEY, algorithm='HS256')
 
-        return token.decode('utf-8')
