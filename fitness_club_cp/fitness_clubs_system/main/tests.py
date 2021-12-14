@@ -1,6 +1,3 @@
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository, \
-    InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository, AdministratorsRepository
 from django.test import TestCase, RequestFactory, Client
 from http import HTTPStatus
 from django.contrib.auth.models import AnonymousUser

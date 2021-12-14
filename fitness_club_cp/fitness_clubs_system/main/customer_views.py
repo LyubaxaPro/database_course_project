@@ -2,10 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from manager.services import CustomersService
 
-from api.serializers import ServicesSerializer, CustomersSerializer, CustomUserSerializer, AdministratorsSerializer, \
-GroupClassesSerializer, GroupClassesCustomersRecordsSerializer, InstructorsSerializer, GroupClassesSheduleSerializer, \
-AdminRecordsSerializer, InstructorSheduleSerializer, AInstructorSheduleCustomersSerializer, PricesSerializer, \
-SpecialOffersSerializer, InstructorPersonalTrainingsLogsSerializer, AdminGroupClassesLogsSerializer, FitnessClubsSerializer
 from .forms import *
 from api.customer_views import CustomerProfileView, CustomerEditProfileView, \
     CustomerEditProfileMeasureView, CustomerTrainingRecordsView, \
@@ -13,6 +9,7 @@ from api.customer_views import CustomerProfileView, CustomerEditProfileView, \
     CustomerAddGroupClassesRecordView, CustomerAppointmentToInstructorView
 
 def customer_profile(request):
+
     view = CustomerProfileView()
     data = view.get(request).data
     data['form'] = AddMeasureForm()

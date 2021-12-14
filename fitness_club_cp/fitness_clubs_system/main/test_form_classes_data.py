@@ -1,8 +1,8 @@
 from django.test import TestCase, RequestFactory, Client
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
-    GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository,\
-    AdministratorsRepository, AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, AdminGroupClassesLogsRepository
+from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
+    GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\
+    CustomersService, InstructorSheduleService, GroupClassesCustomersRecordsService, InstructorSheduleCustomersService,\
+    AdministratorsService, AdminRecordsService, InstructorPersonalTrainingsLogsService, AdminGroupClassesLogsService
 from .dataBuilder import *
 from api.form_classes_data import form_classes_data, form_admin_classes_data, form_data_for_tarif
 from api.instructor_schedule import form_instructors_shedule, form_instructors_shedule_for_week
@@ -35,7 +35,7 @@ class CheckFormData(TestCase):
 
     def test_form_data_for_tarif(self):
         user = UserByPk(14).user
-        tarifs = PricesRepository.read_all(user)
+        tarifs = PricesService.read_all(user)
 
         result_data1 = form_data_for_tarif(tarifs[0], self.week)
         result_data2 = form_data_for_tarif(tarifs[1], self.week)

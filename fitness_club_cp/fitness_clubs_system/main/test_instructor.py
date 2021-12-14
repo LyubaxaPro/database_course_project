@@ -1,11 +1,11 @@
-from manager.repositories import InstructorsRepository, InstructorSheduleRepository
+from manager.services import InstructorsService, InstructorSheduleService
 from django.test import TestCase, RequestFactory, Client
 from http import HTTPStatus
 from .dataBuilder import *
 from .data.data_for_tests import *
 from .instructor_views import *
 from api.instructor_views import InstructorView, InstructorAttachedCustomersView, InstructorEditProfileView,\
-    InstructorEditProfilePostView, InstructorAddPersonalTrainingView, InstructorDeleteProfileChangesView, \
+ InstructorAddPersonalTrainingView, InstructorDeleteProfileChangesView, \
     InstructorDeletePersonalTrainingView, InstructorTrainingRecordsView
 from api.serializers import ServicesSerializer, CustomersSerializer, CustomUserSerializer, AdministratorsSerializer, \
 GroupClassesSerializer, GroupClassesCustomersRecordsSerializer, InstructorsSerializer, GroupClassesSheduleSerializer, \
@@ -34,7 +34,7 @@ class TestInstructor(TestCase):
         user = InstructorUser().user
         request = self.factory.get('/instructor_profile/')
         request.user = user
-        instructor = InstructorsRepository.read_filtered(user, {'user' : user.id})
+        instructor = InstructorsService.read_filtered(user, {'user' : user.id})
         view = InstructorView()
 
         result_data = view.get(request).data
@@ -49,7 +49,7 @@ class TestInstructor(TestCase):
         user = UserByPk(11).user
         request = self.factory.get('/instructor_profile/')
         request.user = user
-        instructor = InstructorsRepository.read_filtered(user, {'user': user.id})
+        instructor = InstructorsService.read_filtered(user, {'user': user.id})
         view = InstructorAttachedCustomersView()
 
         result_data = view.get(request).data
@@ -70,24 +70,24 @@ class TestInstructor(TestCase):
 
         instructor_add_personal_training(request)
 
-        self.assertNotEqual(InstructorSheduleRepository.read_filtered(user, {'day_of_week': 'Monday',
+        self.assertNotEqual(InstructorSheduleService.read_filtered(user, {'day_of_week': 'Monday',
                                                                              'training_time': '21:00:00'}), None)
 
     def test_instructor_delete_personal_training(self):
         user = UserByPk(11).user
-        prev_qs = InstructorSheduleRepository.read_all(user)
+        prev_qs = InstructorSheduleService.read_all(user)
         request = self.factory.get('/instructor_delete_personal_training/?i_shedule_id=1')
         request.user = user
 
         instructor_delete_personal_training(request)
 
-        self.assertNotEqual(prev_qs, InstructorSheduleRepository.read_all(user))
+        self.assertNotEqual(prev_qs, InstructorSheduleService.read_all(user))
 
     def test_instructor_training_records_func(self):
         user = UserByPk(11).user
         request = self.factory.get('instructor_training_records/')
         request.user = user
-        instructor = InstructorsRepository.read_filtered(user, {'user': user.id})
+        instructor = InstructorsService.read_filtered(user, {'user': user.id})
         view = InstructorTrainingRecordsView()
 
         result_data = view.get(request, **{"week_num": "2021-W35"}).data

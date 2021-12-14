@@ -1,4 +1,4 @@
-from datetime import time
+import time
 
 from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
     GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\

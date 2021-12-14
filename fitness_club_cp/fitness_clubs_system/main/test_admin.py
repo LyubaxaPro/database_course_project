@@ -1,18 +1,14 @@
-from manager.repositories import GroupClassesSheduleRepository, SpecialOffersRepository, AdministratorsRepository
+from manager.services import GroupClassesSheduleService, SpecialOffersService, AdministratorsService
 from django.test import TestCase, RequestFactory, Client
 from http import HTTPStatus
 from .dataBuilder import *
-from manager.repositories import GroupClassesRepository, \
-    InstructorsRepository, SpecialOffersRepository, \
-    GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository, \
-    AdminRecordsRepository, CustomUserRepository, FitnessClubsRepository, CustomersRepository
 from api.serializers import ServicesSerializer, CustomersSerializer, CustomUserSerializer, AdministratorsSerializer, \
 GroupClassesSerializer, GroupClassesCustomersRecordsSerializer, InstructorsSerializer, GroupClassesSheduleSerializer, \
 AdminRecordsSerializer, InstructorSheduleSerializer, AInstructorSheduleCustomersSerializer, PricesSerializer, \
 SpecialOffersSerializer, InstructorPersonalTrainingsLogsSerializer, AdminGroupClassesLogsSerializer, FitnessClubsSerializer
 
 from .forms import *
-from api.admin_views import AdminProfileView, AdminGroupClassesView, AdminAddGroupClassesView,\
+from api.admin_views import AdminProfileView, AdminGroupClassesView,\
     AdminDeleteGroupClassesView, AdminDeleteSpecialOfferView, AdminAdminSpecialOfferView, AdminStatisticsView, \
     AdminActivateInstructorView, AdminRejectInstructorView
 from .admin_views import *
@@ -38,7 +34,7 @@ class TestAdmin(TestCase):
         user = SuperUser().user
         request = self.factory.get('/admin_profile/')
         request.user = user
-        admin = AdministratorsRepository.read_filtered(user, {'user': user.id})
+        admin = AdministratorsService.read_filtered(user, {'user': user.id})
         view = AdminProfileView()
 
         result_data = view.get(request).data
@@ -51,23 +47,23 @@ class TestAdmin(TestCase):
 
     def test_delete_group_class_in_shedule(self):
         user = SuperUser().user
-        prev_qs = GroupClassesSheduleRepository.read_all(user)
+        prev_qs = GroupClassesSheduleService.read_all(user)
         request = self.factory.get('/delete_group_class_in_shedule/?shedule_id=1')
         request.user = user
 
         delete_group_class_in_shedule(request)
 
-        self.assertNotEqual(prev_qs, GroupClassesSheduleRepository.read_all(user))
+        self.assertNotEqual(prev_qs, GroupClassesSheduleService.read_all(user))
 
     def test_delete_special_offer_by_admin(self):
         user = SuperUser().user
-        prev_qs = SpecialOffersRepository.read_all(user)
+        prev_qs = SpecialOffersService.read_all(user)
         request = self.factory.get('/delete_special_offer_by_admin/?offer_id=1')
         request.user = user
 
         delete_special_offer_by_admin(request)
 
-        self.assertNotEqual(prev_qs, SpecialOffersRepository.read_all(user))
+        self.assertNotEqual(prev_qs, SpecialOffersService.read_all(user))
 
     def test_add_special_offer_by_admin(self):
         user = SuperUser().user
@@ -76,5 +72,5 @@ class TestAdmin(TestCase):
 
         add_special_offer_by_admin(request)
 
-        self.assertNotEqual(None, SpecialOffersRepository.read_filtered(user, {'offer_name': 'Super offer!',
+        self.assertNotEqual(None, SpecialOffersService.read_filtered(user, {'offer_name': 'Super offer!',
                                                                                'offer_description': 'fffff'}))

@@ -1,7 +1,7 @@
-from manager.repositories import ServicesRepository, FitnessClubsRepository, GroupClassesRepository,\
-    GroupClassesSheduleRepository, InstructorsRepository, CustomUserRepository, SpecialOffersRepository, PricesRepository,\
-    CustomersRepository, InstructorSheduleRepository, GroupClassesCustomersRecordsRepository, InstructorSheduleCustomersRepository,\
-    AdministratorsRepository, AdminRecordsRepository, InstructorPersonalTrainingsLogsRepository, AdminGroupClassesLogsRepository
+from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
+    GroupClassesSheduleService, InstructorsService, CustomUserService, SpecialOffersService, PricesService,\
+    CustomersService, InstructorSheduleService, GroupClassesCustomersRecordsService, InstructorSheduleCustomersService,\
+    AdministratorsService, AdminRecordsService, InstructorPersonalTrainingsLogsService, AdminGroupClassesLogsService
 from main.dataBuilder import CustomerUser
 import datetime
 import time
@@ -16,15 +16,15 @@ SpecialOffersSerializer, InstructorPersonalTrainingsLogsSerializer, AdminGroupCl
 #     'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}
 
 def get_customer_user_index_data(user):
-    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
+    customer = CustomersService.read_filtered(user, {'user': user.id})[0]
     customer_user_index_data = {'title': 'Главная страница', 'role': {'is_customer': True,
     'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
     'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
     return customer_user_index_data
 
 def get_customer_user_adress(user):
-    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
-    clubs = FitnessClubsRepository.read_all(user)
+    customer = CustomersService.read_filtered(user, {'user': user.id})[0]
+    clubs = FitnessClubsService.read_all(user)
     customer_user_adress = {'clubs': FitnessClubsSerializer(clubs, many=True).data,
             'role': {'is_customer': True,
     'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
@@ -32,8 +32,8 @@ def get_customer_user_adress(user):
     return customer_user_adress
 
 def get_service_customer_user_data(user):
-    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
-    services = ServicesRepository.read_all(user)
+    customer = CustomersService.read_filtered(user, {'user': user.id})[0]
+    services = ServicesService.read_all(user)
     services_customer_user_data = {'services': ServicesSerializer(services, many=True).data, 'role': {'is_customer': True,
     'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
     'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
@@ -72,33 +72,33 @@ classes_data_club1 = { '09:00': {'Monday': [], 'Tuesday': [], 'Wednesday': [], '
               'Saturday': [{'instructor_name': 'Демид', 'class_name': 'LEGS&BUTTS', 'shedule_id': 12}], 'Sunday': []}}
 
 def get_groupclasses_customer_user_data(user):
-    customer = CustomersRepository.read_filtered(user, {'user' : user.id})[0]
-    gclasses = GroupClassesRepository.read_all(user)
+    customer = CustomersService.read_filtered(user, {'user' : user.id})[0]
+    gclasses = GroupClassesService.read_all(user)
     data = {'classes_data': classes_data_club1, 'classes': GroupClassesSerializer(gclasses, many=True).data, 'role': {'is_customer': True,
     'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
     'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
     return data
 
 def get_instructors_list_data(user):
-    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
-    instructors = InstructorsRepository.read_filtered(user, {'is_active': True})
+    customer = CustomersService.read_filtered(user, {'user': user.id})[0]
+    instructors = InstructorsService.read_filtered(user, {'is_active': True})
     data = {'instructors': InstructorsSerializer(instructors, many=True).data, 'role': {'is_customer': True,
     'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
     'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data}}
     return data
 
 def get_instructor_1_detail_data(user):
-    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
-    instructor = InstructorsRepository.read_by_pk(user, 1)
+    customer = CustomersService.read_filtered(user, {'user': user.id})[0]
+    instructor = InstructorsService.read_by_pk(user, 1)
     return {'instructor': InstructorsSerializer(instructor).data, 'exp_str': 'лет', 'role': {'is_customer': True,
     'customer': CustomersSerializer(customer).data,'is_instructor': False, 'instructor': InstructorsSerializer().data,
     'is_admin': False, 'admin': AdministratorsSerializer().data, 'is_guest': False, 'user': CustomUserSerializer(user).data},
     'shedule': {'09:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 33}, 'Saturday': {}, 'Sunday': {}}, '10:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 31}, 'Saturday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 45}, 'Sunday': {}}, '11:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '12:00': {'Monday': {}, 'Tuesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 8}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '13:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 18}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 57}}, '14:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '15:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 46}, 'Sunday': {}}, '16:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 56}}, '17:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {'name': 'LEGS&BUTTS', 'is_editable': False}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 54}}, '18:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}, '19:00': {'Monday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 1}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 16}, 'Thursday': {}, 'Friday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 32}, 'Saturday': {}, 'Sunday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 55}}, '20:00': {'Monday': {}, 'Tuesday': {}, 'Wednesday': {'name': 'Персональная тренировка', 'is_editable': True, 'i_shedule_id': 17}, 'Thursday': {}, 'Friday': {}, 'Saturday': {}, 'Sunday': {}}}, 'address': 'Москва, ул. Вильгельма Пика, вл14, 4 этаж (МФК «Хуамин»)'}
 
 def get_prices_customer_user_data(user):
-    customer = CustomersRepository.read_filtered(user, {'user': user.id})[0]
-    special_offers = SpecialOffersRepository.read_all(user)
-    prices = PricesRepository.read_all(user)
+    customer = CustomersService.read_filtered(user, {'user': user.id})[0]
+    special_offers = SpecialOffersService.read_all(user)
+    prices = PricesService.read_all(user)
 
     data = {'special_offers': SpecialOffersSerializer(special_offers, many=True).data,
                 'prices': PricesSerializer(prices, many=True).data, 'role': {'is_customer': True,
@@ -108,22 +108,22 @@ def get_prices_customer_user_data(user):
 
 def get_role_superuser(user):
     return (False, CustomersSerializer().data, False, InstructorsSerializer().data, True,
-            AdministratorsSerializer(AdministratorsRepository.read_by_pk(user, 1)).data, False,
-    CustomUserSerializer(CustomUserRepository.read_by_pk(user, 1)).data)
+            AdministratorsSerializer(AdministratorsService.read_by_pk(user, 1)).data, False,
+    CustomUserSerializer(CustomUserService.read_by_pk(user, 1)).data)
 
 def get_role_admin(user):
     return (False, CustomersSerializer().data, False, InstructorsSerializer().data, True,
-            AdministratorsSerializer(AdministratorsRepository.read_by_pk(user, 2)).data, False,
-                    CustomUserSerializer(CustomUserRepository.read_by_pk(user, 2)).data)
+            AdministratorsSerializer(AdministratorsService.read_by_pk(user, 2)).data, False,
+                    CustomUserSerializer(CustomUserService.read_by_pk(user, 2)).data)
 
 def get_role_instructor(user):
-    return (False, CustomersSerializer().data, True, InstructorsSerializer(InstructorsRepository.read_by_pk(user, 1)).data,
-            False, AdministratorsSerializer().data, False, CustomUserSerializer(CustomUserRepository.read_by_pk(user, 9)).data)
+    return (False, CustomersSerializer().data, True, InstructorsSerializer(InstructorsService.read_by_pk(user, 1)).data,
+            False, AdministratorsSerializer().data, False, CustomUserSerializer(CustomUserService.read_by_pk(user, 9)).data)
 
 def get_role_customer(user):
-    return (True, CustomersSerializer(CustomersRepository.read_by_pk(user, 1)).data, False,
+    return (True, CustomersSerializer(CustomersService.read_by_pk(user, 1)).data, False,
             InstructorsSerializer().data, False, AdministratorsSerializer().data, False,
-            CustomUserSerializer(CustomUserRepository.read_by_pk(user, 14)).data)
+            CustomUserSerializer(CustomUserService.read_by_pk(user, 14)).data)
 
 def get_role_anon():
     return (False, CustomersSerializer().data, False, InstructorsSerializer().data, False, AdministratorsSerializer().data, True, CustomUserSerializer().data)

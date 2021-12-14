@@ -4,7 +4,11 @@ from django.http import JsonResponse
 from .forms import *
 from api.common_views import IndexView, AddressView, ServicesView, ClubGroupClassesView, ClubInstructorsView, \
     ClubInstructorsDetailView, ClubGroupClassesScheduleForClubView, ClubInstructorsForClubView, PricesView
-
+from manager.services import ServicesService, FitnessClubsService, GroupClassesService,\
+    GroupClassesSheduleService, InstructorsService, SpecialOffersService, PricesService, \
+    GroupClassesCustomersRecordsService, InstructorSheduleCustomersService, \
+    AdminRecordsService, InstructorPersonalTrainingsLogsService, CustomUserService, \
+    AdminGroupClassesLogsService, CustomersService, InstructorSheduleService
 def index(request):
     indexView = IndexView()
     data = indexView.get(request)
@@ -41,7 +45,7 @@ def get_club_instructors(request):
 def instructors_list(request):
     view = ClubInstructorsView()
     data = view.get(request).data
-    return render(request, 'main/instructors.html', {'instructors': InstructorsRepository.read_filtered(request.user, {'is_active': True}), 'form' : ClubForm(),
+    return render(request, 'main/instructors.html', {'instructors': InstructorsService.read_filtered(request.user, {'is_active': True}), 'form' : ClubForm(),
                                                      'role': data['role']})
 
 def instructor_detail(request, pk):
