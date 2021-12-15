@@ -83,66 +83,72 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'fitness_clubs_system.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fitness_clubs',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'TEST': {
-            'NAME': 'default'
+if sys.argv[1] == 'test':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
-    },
-
-    'guest_role_connect': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fitness_clubs',
-        'USER': 'guest',
-        'PASSWORD': 'quest_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    },
-
-    'superuser_role_connect': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fitness_clubs',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    },
-
-    'instructor_role_connect': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fitness_clubs',
-        'USER': 'instructor',
-        'PASSWORD': 'instructor_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    },
-
-    'customer_role_connect': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fitness_clubs',
-        'USER': 'customer',
-        'PASSWORD': 'customer_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    },
-
-    'admin_role_connect': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fitness_clubs',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'fitness_clubs',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432',
+            'TEST': {
+                'NAME': 'default'
+            }
+        },
+
+        'guest_role_connect': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'fitness_clubs',
+            'USER': 'guest',
+            'PASSWORD': 'quest_password',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        },
+
+        'superuser_role_connect': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'fitness_clubs',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        },
+
+        'instructor_role_connect': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'fitness_clubs',
+            'USER': 'instructor',
+            'PASSWORD': 'instructor_password',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        },
+
+        'customer_role_connect': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'fitness_clubs',
+            'USER': 'customer',
+            'PASSWORD': 'customer_password',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        },
+
+        'admin_role_connect': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'fitness_clubs',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 # Password validation
