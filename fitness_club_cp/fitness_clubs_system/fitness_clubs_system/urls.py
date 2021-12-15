@@ -16,10 +16,8 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
-from django.contrib.auth import logout
 from django.urls import path, include
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 
 from django.views.generic import TemplateView
@@ -43,12 +41,12 @@ _version='2.0',
 )
 
 urlpatterns = [
-    path('api/v1/', TemplateView.as_view(template_name='swaggerui/swaggerui.html',
-                                              extra_context={'schema_url': 'openapi-schema'}),name='swagger-ui'),
-    url(r'^swagger(?P<format>\.json|\.yaml)$',schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    # path('api/v1/', TemplateView.as_view(template_name='swaggerui/swaggerui.html',
+    #                                           extra_context={'schema_url': 'openapi-schema'}),name='swagger-ui'),
+    # path('swagger/',schema_view.without_ui(cache_timeout=0)),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('users/', include('users.urls')),
     path('', include('main.urls')),
-    url(r'^logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
