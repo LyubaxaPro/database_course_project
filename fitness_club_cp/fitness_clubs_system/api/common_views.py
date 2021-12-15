@@ -1,6 +1,3 @@
-import jwt
-from django.conf import settings
-from django.http import JsonResponse
 from manager.services import CustomUserService, CustomersService, InstructorsService, AdministratorsService,\
 AdminRecordsService, GroupClassesService, GroupClassesCustomersRecordsService, GroupClassesSheduleService\
     ,InstructorSheduleService, InstructorSheduleCustomersService, PricesService, ServicesService, FitnessClubsService,\
@@ -8,7 +5,7 @@ AdminRecordsService, GroupClassesService, GroupClassesCustomersRecordsService, G
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_jwt.serializers import jwt_payload_handler
+# from rest_framework_jwt.serializers import jwt_payload_handler
 
 from .role import *
 from .form_classes_data import *
@@ -18,44 +15,44 @@ from rest_framework import status
 from django.contrib.auth import authenticate, login, user_logged_in
 
 
-class CreateUserApiView(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request):
-        user = request.data
-        serializer = CreateUserSerializer(data=user)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-class AuthUserView(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request):
-        try:
-            email = request.data['email']
-            password = request.data['password']
-            print(request.user)
-            user_qs = CustomUserService.read_filtered(request.user, {'email': email, 'password': password})
-            print(user_qs)
-            if user_qs:
-                try:
-                    user = user_qs[0]
-                    payload = jwt_payload_handler(user)
-                    token = jwt.encode(payload, settings.SECRET_KEY)
-                    user_details = {}
-                    user_details['email'] = "%s" % (user.email)
-                    user_details['token'] = token
-                    user_logged_in.send(sender=user.__class__, request=request, user=user)
-                    return Response(user_details, status=status.HTTP_200_OK)
-                except Exception as e:
-                    raise e
-            else:
-                res = {'error': 'can not authenticate with given credentials'}
-                return Response(res, status=status.HTTP_403_FORBIDDEN)
-        except KeyError:
-            res = {'error': 'please provide a email and password'}
-            return Response(res)
+# class CreateUserApiView(APIView):
+#     permission_classes = (AllowAny,)
+#
+#     def post(self, request):
+#         user = request.data
+#         serializer = CreateUserSerializer(data=user)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#
+# class AuthUserView(APIView):
+#     permission_classes = (AllowAny,)
+#
+#     def post(self, request):
+#         try:
+#             email = request.data['email']
+#             password = request.data['password']
+#             print(request.user)
+#             user_qs = CustomUserService.read_filtered(request.user, {'email': email, 'password': password})
+#             print(user_qs)
+#             if user_qs:
+#                 try:
+#                     user = user_qs[0]
+#                     payload = jwt_payload_handler(user)
+#                     token = jwt.encode(payload, settings.SECRET_KEY)
+#                     user_details = {}
+#                     user_details['email'] = "%s" % (user.email)
+#                     user_details['token'] = token
+#                     user_logged_in.send(sender=user.__class__, request=request, user=user)
+#                     return Response(user_details, status=status.HTTP_200_OK)
+#                 except Exception as e:
+#                     raise e
+#             else:
+#                 res = {'error': 'can not authenticate with given credentials'}
+#                 return Response(res, status=status.HTTP_403_FORBIDDEN)
+#         except KeyError:
+#             res = {'error': 'please provide a email and password'}
+#             return Response(res)
 
 class IndexView(APIView):
     """
