@@ -18,4 +18,4 @@ jobs:
         pip install -r requirements.txt
     - name: unit-tests
       run: |
-        python manage.py test main.tests
+        python LyubaxaPro/database_course_project/fitness_club_cp/fitness_clubs_system/manage.py test main.tests
