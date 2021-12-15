@@ -6,6 +6,9 @@ coverage==4.5.2
 pytest
 pytest-django
 pytest-cov
+django-crispy-forms
+djangorestframework
+django-rest-swagger
 # lint
 pylint==2.3.0
 pylint-django==2.0.6
