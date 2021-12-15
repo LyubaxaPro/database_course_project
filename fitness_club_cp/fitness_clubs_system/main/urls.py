@@ -1,4 +1,3 @@
-from django.conf.urls import url
 from django.urls import path
 from .common_views import *
 from .customer_views import *
