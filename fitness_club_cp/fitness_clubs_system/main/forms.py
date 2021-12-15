@@ -1,10 +1,5 @@
-import self as self
-from django import forms
 from manager.models import Customers, Instructors
-from users.models import CustomUser
 from django import forms
-#
-from .widgets import BootstrapDateTimePickerInput
 
 CLUB_CHOICES = (
     (1, "Москва, ул. Вильгельма Пика, вл14, 4 этаж (МФК «Хуамин»)"),
