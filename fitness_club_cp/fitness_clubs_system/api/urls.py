@@ -1,12 +1,12 @@
-from django.conf.urls import url
+# from django.conf.urls import url
 from django.urls import path
 from .common_views import *
 from .customer_views import *
 from .instructor_views import *
 from .admin_views import *
 urlpatterns = [
-    url(r'^create/$', CreateUserApiView.as_view()),
-    url(r'^auth/$', AuthUserView.as_view()),
+    # url(r'^create/$', CreateUserApiView.as_view()),
+    # url(r'^auth/$', AuthUserView.as_view()),
     # common urls
     path('info/index/', IndexView.as_view()),
     path('info/address/', AddressInfoView.as_view()),
