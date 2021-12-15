@@ -11,6 +11,7 @@ djangorestframework
 django-rest-swagger
 djangorestframework-jwt
 gunicorn
+matplotlib
 # lint
 pylint==2.3.0
 pylint-django==2.0.6
