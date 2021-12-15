@@ -19,25 +19,24 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
-from django.views.generic import TemplateView
-from drf_yasg.views import get_schema_view  # new
-from drf_yasg import openapi  # new
-from rest_framework import permissions
+# from drf_yasg.views import get_schema_view  # new
+# from drf_yasg import openapi  # new
+# from rest_framework import permissions
 
-schema_view = get_schema_view(  # new
-    openapi.Info(
-        title="Swagger Fitness club system",
-        default_version='3.0.0',
-_version='2.0',
-        description="A personal project aimed at working with a network of fitness clubs in three roles: user, instructors, administrator.",
-        terms_of_service="https://smartbear.com/terms-of-use/",
-        contact=openapi.Contact(email="lyubaxova@mail.ru"),
-        license=openapi.License(name="BSD License"),
-    ),
-    patterns=[path('api/', include('api.urls')), ],
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+# schema_view = get_schema_view(  # new
+#     openapi.Info(
+#         title="Swagger Fitness club system",
+#         default_version='3.0.0',
+# _version='2.0',
+#         description="A personal project aimed at working with a network of fitness clubs in three roles: user, instructors, administrator.",
+#         terms_of_service="https://smartbear.com/terms-of-use/",
+#         contact=openapi.Contact(email="lyubaxova@mail.ru"),
+#         license=openapi.License(name="BSD License"),
+#     ),
+#     patterns=[path('api/', include('api.urls')), ],
+#     public=True,
+#     permission_classes=(permissions.AllowAny,),
+# )
 
 urlpatterns = [
     # path('api/v1/', TemplateView.as_view(template_name='swaggerui/swaggerui.html',
