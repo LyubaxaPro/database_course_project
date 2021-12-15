@@ -7,8 +7,23 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  container-job:
     runs-on: ubuntu-latest
+    container: node:10.18-jessie
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
     - name: Prepare repo
       uses: actions/checkout@master
@@ -18,4 +33,10 @@ jobs:
         pip install -r requirements.txt
     - name: unit-tests
       run: |
-        python fitness_club_cp/fitness_clubs_system/manage.py test main.tests
+        python fitness_club_cp/fitness_clubs_system/manage.py test main.test
+      env:
+        POSTGRES_HOST: localhost
+        # The default PostgreSQL port
+        POSTGRES_PORT: 5432
+        
+      
