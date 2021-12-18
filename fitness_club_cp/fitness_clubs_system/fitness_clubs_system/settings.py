@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'manager.apps.ManagerConfig',
     'crispy_forms',
     'rest_framework',
+    'corsheaders',
     'rest_framework_swagger',
     'api.apps.ApiConfig',
 ]
