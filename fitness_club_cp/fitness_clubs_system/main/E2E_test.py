@@ -1,4 +1,4 @@
-from manager.services import CustomersService, CustomUserService, PricesService, InstructorsService, AdministratorsService
+from manager.services import CustomersService, CustomUserService, PricesService, InstructorsService, AdministratorsService, GroupClassesCustomersRecordsService
 from django.test import TestCase, RequestFactory, Client
 from .dataBuilder import *
 from .data.data_for_tests import *
@@ -49,7 +49,7 @@ class E2ETestCustomer(TestCase):
         view = CustomerEditProfileMeasureView()
         request = self.factory.get('/delete_measure/')
         request.user = user
-        view.delete(request).data
+        view.delete(request)
         customer = CustomersService.read_filtered(user, {'user': user.id})
 
         # assert
@@ -59,11 +59,37 @@ class E2ETestCustomer(TestCase):
         request = self.factory.get('/add_measure/')
         request.user = user
         request.data = {'weight': 80, 'date': "2021-10-12"}
-        view.put(request).data
+        view.put(request)
         customer = CustomersService.read_filtered(user, {'user': user.id})
 
         # assert
         self.assertEqual(len(customer[0].measured_weights), 1)
+        self.assertEqual(customer[0].measured_weights[0], 80)
+        self.assertEqual(customer[0].measure_dates[0], datetime.date(2021, 10, 12))
+
+
+        # act запись на групповое занятие
+        request = self.factory.get('/add_group_class_record/')
+        request.user = user
+        view = CustomerAddGroupClassesRecordView()
+        request.data = {'date_raw': "2022-01-03", 'shedule_id': 1}
+        view.post(request)
+        group_classs = GroupClassesCustomersRecordsService.read_filtered(user, {'shedule_id': 1, "customer": customer[0].pk, "class_date":datetime.date(2022, 1, 3)})
+
+        # assert
+        self.assertEqual(len(group_classs), 1)
+
+        # act отмена записи на групповое занятие
+        request = self.factory.get('/delete_group_class_record/')
+        request.user = user
+        view = CustomerDeleteGroupTrainingRecordView()
+        view.delete(request, **{'record_id': group_classs[0].pk})
+
+        # assert
+        self.assertEqual(len(GroupClassesCustomersRecordsService.read_filtered(user, {'shedule_id': 1, "customer": customer[0].pk, "class_date":datetime.date(2022, 1, 3)})), 0)
+
+
+
 
 
 
